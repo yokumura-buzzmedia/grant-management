@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-01T00:00:00.000Z" agent="Codex" version="24.7.17" type="device" compressed="false">
+  <diagram id="function-list" name="機能一覧">
+    <mxGraphModel dx="2400" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b style=&quot;font-size:24px&quot;&gt;助成金管理システム 機能一覧&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:12px;color:#666666&quot;&gt;出典：01_要件定義.md ／ 2026-09-01時点&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1F4E78;strokeColor=#163A5C;fontColor=#FFFFFF;align=left;verticalAlign=middle;spacingLeft=24;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="2320" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend" value="&lt;b&gt;アクター&lt;/b&gt;　［顧客］クライアント　［事務］事務員　［管理］システム管理者　［講師］講師　［社労士］社会保険労務士　［全員］全アクター" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2F8;strokeColor=#7EA6C4;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=18;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="125" width="2320" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="account" value="&lt;b style=&quot;font-size:17px&quot;&gt;1. 認証・アカウント管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;［全員］ログイン&lt;br&gt;［管理／事務］顧客・講師・社労士アカウント作成&lt;br&gt;［管理］事務員アカウント作成&lt;br&gt;［作成者］メールアドレス以外のログインID設定&lt;br&gt;仮パスワード自動発行・初回変更強制&lt;br&gt;［管理／事務］仮パスワード再生成&lt;br&gt;通常パスワード8文字以上" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="company" value="&lt;b style=&quot;font-size:17px&quot;&gt;2. 会社・顧客管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;［顧客］自社情報の登録・閲覧・編集&lt;br&gt;会社基本情報13項目を必須入力&lt;br&gt;1社に複数の顧客アカウントを登録&lt;br&gt;会社主担当者情報をアカウントと別管理&lt;br&gt;会社と複数の申請案件を紐づけて管理&lt;br&gt;会社情報変更時は事務員へ通知しない" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="830" y="200" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="application" value="&lt;b style=&quot;font-size:17px&quot;&gt;3. ダッシュボード・申請案件管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;［事務／管理／社労士］ダッシュボード表示&lt;br&gt;ステータス別案件数から絞り込み一覧へ移動&lt;br&gt;［顧客］自社案件一覧、［講師］担当講義予定を初期表示&lt;br&gt;案件一覧を会社名検索・ステータス絞り込み&lt;br&gt;［事務／管理］案件作成・案件番号自動発行&lt;br&gt;全ステータスの案件を確認後に完全削除（復元不可）&lt;br&gt;案件専用の書類・予約・チーム・投稿も一括削除&lt;br&gt;削除者・削除日時・案件番号の履歴を保存&lt;br&gt;［事務］ステータス手動更新、［管理］誤操作修正" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1620" y="200" width="740" height="300" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="documents" value="&lt;b style=&quot;font-size:17px&quot;&gt;4. 必要書類の提出・審査&lt;/b&gt;&lt;br&gt;&lt;br&gt;全案件共通の必要書類を設定&lt;br&gt;［顧客］書類提出・不備時の再提出&lt;br&gt;1種類につき1ファイル（PDF／JPEG／PNG、50MB）&lt;br&gt;［事務］提出書類の確認・承認・不備コメント&lt;br&gt;全書類承認済みを「書類収集完了」の条件とする&lt;br&gt;差し替え時に承認取消・再承認&lt;br&gt;提出時に事務員へシステム内通知&lt;br&gt;差し替え前ファイル・提出履歴は保存しない" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="740" height="320" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="schedule" value="&lt;b style=&quot;font-size:17px&quot;&gt;5. 講義予約・スケジュール管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;［顧客］案件ごとに2～5日間の予約枠を申請&lt;br&gt;講義日・開始時刻選択、終了時刻自動計算&lt;br&gt;土日祝・個別休業日を予約不可に設定&lt;br&gt;申請時点で枠を確保（上限＝有効講師数－1）&lt;br&gt;［事務］予約承認・担当講師指定・確定&lt;br&gt;講師の重複割当を禁止&lt;br&gt;承認前は顧客、確定後は管理／事務が変更・取消&lt;br&gt;取消・却下時に枠を即時解放&lt;br&gt;確定・確定後変更時に顧客と講師へ通知" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="830" y="510" width="740" height="320" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="team" value="&lt;b style=&quot;font-size:17px&quot;&gt;6. チーム・受講者管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;［管理／事務］予約後にチーム作成&lt;br&gt;予約枠とチームを1対1で紐づけ&lt;br&gt;取消・却下後もチームを保存し再利用&lt;br&gt;チーム名・受講者を登録&lt;br&gt;［顧客］受講者を初回登録&lt;br&gt;［顧客／事務／管理］受講者の編集・削除&lt;br&gt;同一会社の別案件で受講者を再利用&lt;br&gt;同一案件内の複数チームへの重複登録を禁止&lt;br&gt;受講者削除時はチーム・過去記録からも削除" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1620" y="510" width="740" height="320" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="curriculum" value="&lt;b style=&quot;font-size:17px&quot;&gt;7. カリキュラム管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;［管理／事務］カリキュラム登録・編集&lt;br&gt;予約後にチームへカリキュラムを登録&lt;br&gt;1チームにつき1カリキュラム&lt;br&gt;1カリキュラムに複数の講義日を設定&lt;br&gt;すべてのカリキュラムは合計10時間&lt;br&gt;［顧客］カリキュラムの登録・選択は不可" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="860" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="contract" value="&lt;b style=&quot;font-size:17px&quot;&gt;8. 契約書・FREE SIGN連携&lt;/b&gt;&lt;br&gt;&lt;br&gt;［事務］本システムから契約書送付操作&lt;br&gt;FREE SIGNへ契約書作成・送付を自動連携&lt;br&gt;FREE SIGN上で契約締結&lt;br&gt;締結済みPDFを自動取得・保存&lt;br&gt;1案件につき契約書1つ&lt;br&gt;［事務］締結確認後にステータスを手動更新" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="830" y="860" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="billing" value="&lt;b style=&quot;font-size:17px&quot;&gt;9. 見積・発注・請求・入金管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;見積もり兼発注書を登録データから自動生成&lt;br&gt;1案件につき見積もり兼発注書1つ&lt;br&gt;請求書を登録データから自動生成&lt;br&gt;生成時は自動送付しない&lt;br&gt;［事務］明示的な操作時のみメール送付&lt;br&gt;送付先は会社の担当者メールアドレス&lt;br&gt;［事務］入金確認後にステータスを手動更新" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1620" y="860" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="board" value="&lt;b style=&quot;font-size:17px&quot;&gt;10. 案件掲示板・共通通知&lt;/b&gt;&lt;br&gt;&lt;br&gt;案件ごとに掲示板を設置し全アクターが利用&lt;br&gt;自分以外の投稿を未読とし、タブ表示時に既読化&lt;br&gt;［投稿者］自分の投稿を編集・削除、ファイル添付&lt;br&gt;掲示板投稿は共通通知の対象外&lt;br&gt;共通通知をベルから一覧表示・未読件数表示&lt;br&gt;通知選択時に既読化して対象画面へ移動&lt;br&gt;「すべて既読にする」操作&lt;br&gt;過去の通知を自動削除せず全件保存&lt;br&gt;［社労士］コメントによる事務員フォロー" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1170" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="admin" value="&lt;b style=&quot;font-size:17px&quot;&gt;11. システム管理・マスタ管理&lt;/b&gt;&lt;br&gt;&lt;br&gt;［管理］設定変更・誤操作時のデータ修正&lt;br&gt;［管理／事務］個別休業日の登録・変更&lt;br&gt;講師マスタの有効／無効管理&lt;br&gt;有効講師数を予約枠上限へ反映&lt;br&gt;講師減少時も既存予約を維持&lt;br&gt;アクターごとの閲覧・編集権限を制御&lt;br&gt;［講師］自分の担当スケジュールのみ確認" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="830" y="1170" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="todo" value="&lt;b style=&quot;font-size:17px&quot;&gt;12. 要検討・TODO&lt;/b&gt;&lt;br&gt;&lt;br&gt;必要書類の具体的な名称&lt;br&gt;受講者の登録項目・出欠管理の要否&lt;br&gt;カリキュラムの登録項目&lt;br&gt;契約書の送付方法、FREE SIGNのAPI仕様&lt;br&gt;署名・押印済み見積もり兼発注書の回収方法&lt;br&gt;案件削除時に残す共通データ・履歴閲覧権限&lt;br&gt;セキュリティ設計の再確認&lt;br&gt;（仮パスワード期限、MFA、ロック等）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1620" y="1170" width="740" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="footer" value="確定済み要件を機能単位に整理。黄色の破線枠は未確定事項であり、今後の要件確認により更新する。" style="whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;fontColor=#666666;align=right;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1470" width="2320" height="35" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
