@@ -55,7 +55,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="management-environment" name="管理・利用環境・TODO">
-    <mxGraphModel dx="2400" dy="1550" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1470" math="0" shadow="0">
+    <mxGraphModel dx="2400" dy="1550" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1570" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
@@ -84,11 +84,11 @@
         <mxCell id="p2_announcement" value="&lt;b style=&quot;font-size:17px&quot;&gt;13-6. お知らせ&lt;/b&gt;&lt;br&gt;&lt;br&gt;管理画面に全利用者へ表示するお知らせの編集機能を設ける&lt;br&gt;内容と表示ON／OFFを編集できるのはシステム管理者のみ&lt;br&gt;リンク・太字・斜体・下線・文字色・文字サイズに対応&lt;br&gt;本文は最大1,000文字、画像・動画・ファイルは添付不可&lt;br&gt;ONにする前に実際の表示内容をプレビューできる&lt;br&gt;OFF中も内容と文字装飾を保持、ONにする場合は本文が必須&lt;br&gt;ON中に内容を保存した場合は全画面へ即時反映&lt;br&gt;ログイン画面を含む全画面へ共通バナーとして1件のみ表示&lt;br&gt;利用者は表示中のバナーを閉じられる&lt;br&gt;閉じた状態は保存せず、再読み込み・再起動で再表示&lt;br&gt;内容変更時もOFF→ONに戻した場合も全利用者へ再表示&lt;br&gt;リンクは新しいタブを開かず現在のタブで開く&lt;br&gt;表示開始・終了日時による予約表示は設けず手動で切り替える&lt;br&gt;重大な障害を検知してもシステム管理者へメール通知は送らない" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="1230" y="890" width="1130" height="310" as="geometry"/>
         </mxCell>
-        <mxCell id="p2_todo" value="&lt;b style=&quot;font-size:17px&quot;&gt;14. 要検討・TODO&lt;/b&gt;&lt;br&gt;&lt;br&gt;雇用契約書以外の必要書類の具体的な名称と種類（5.2）&lt;br&gt;欠席後のフォロー（振替受講）を本システムで扱うか（5.11）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1240" width="1130" height="110" as="geometry"/>
+        <mxCell id="p2_todo" value="&lt;b style=&quot;font-size:17px&quot;&gt;14. 要検討・TODO&lt;/b&gt;&lt;br&gt;&lt;br&gt;雇用契約書以外の必要書類の具体的な名称と種類（5.2）&lt;br&gt;欠席後のフォロー（振替受講）を本システムで扱うか（5.11）&lt;br&gt;申請案件のステータス全般（5、5.1）&lt;br&gt;　・「契約書送付」の手前に案件作成直後の状態を設けるか&lt;br&gt;　・各ステータスへ進むための条件&lt;br&gt;　・変更できるアクターと、例外的に戻せる場合の扱い&lt;br&gt;　※12段階の構成は暫定。確定まで設計は仮置き&lt;br&gt;　※整理と要検討事項は 11_ステータスの遷移.drawio に集約" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1240" width="1130" height="210" as="geometry"/>
         </mxCell>
         <mxCell id="management-environment_footer" value="確定済み要件を項目別に分割。黄色の破線枠は未確定事項。" style="whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;fontColor=#666666;align=right;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1390" width="2320" height="35" as="geometry"/>
+          <mxGeometry x="40" y="1490" width="2320" height="35" as="geometry"/>
         </mxCell>
       </root>
     </mxGraphModel>
