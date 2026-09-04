@@ -15,30 +15,105 @@ export function ErrorList({ errors }: { errors: string[] }) {
   )
 }
 
+const inputClass =
+  "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+
+function Label({
+  label,
+  required,
+  hint,
+  errors,
+  children,
+}: {
+  label: string
+  required?: boolean
+  hint?: string
+  errors?: string[]
+  children: React.ReactNode
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-sm font-medium text-slate-700">
+        {label}
+        {required ? <span className="ml-1 text-red-600">*</span> : null}
+      </span>
+      {children}
+      {hint ? <span className="mt-1 block text-xs text-slate-500">{hint}</span> : null}
+      {errors?.map((error) => (
+        <span key={error} className="mt-1 block text-xs text-red-700">
+          {error}
+        </span>
+      ))}
+    </label>
+  )
+}
+
 export function Field({
   label,
   name,
   type = "text",
   autoComplete,
   hint,
+  defaultValue,
+  required,
+  errors,
+  inputMode,
+  placeholder,
 }: {
   label: string
   name: string
   type?: string
   autoComplete?: string
   hint?: string
+  defaultValue?: string | number | null
+  required?: boolean
+  errors?: string[]
+  inputMode?: "text" | "numeric" | "tel" | "email"
+  placeholder?: string
 }) {
   return (
-    <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
+    <Label label={label} required={required} hint={hint} errors={errors}>
       <input
         name={name}
         type={type}
         autoComplete={autoComplete}
-        className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+        inputMode={inputMode}
+        placeholder={placeholder}
+        defaultValue={defaultValue ?? ""}
+        className={inputClass}
       />
-      {hint ? <span className="mt-1 block text-xs text-slate-500">{hint}</span> : null}
-    </label>
+    </Label>
+  )
+}
+
+export function SelectField({
+  label,
+  name,
+  options,
+  defaultValue,
+  required,
+  errors,
+  placeholder = "選択してください",
+}: {
+  label: string
+  name: string
+  options: readonly { value: string; label: string }[]
+  defaultValue?: string | null
+  required?: boolean
+  errors?: string[]
+  placeholder?: string
+}) {
+  return (
+    <Label label={label} required={required} errors={errors}>
+      <select name={name} defaultValue={defaultValue ?? ""} className={inputClass}>
+        <option value="">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </Label>
   )
 }
 

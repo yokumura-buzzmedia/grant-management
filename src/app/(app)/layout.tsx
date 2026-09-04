@@ -6,6 +6,7 @@ import { ROLE_LABELS, requireActiveUser } from "@/lib/auth/guards"
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   // 権限は毎リクエスト user_roles を参照する（5.19）
   const user = await requireActiveUser()
+  const canManage = user.roles.includes("staff") || user.roles.includes("admin")
 
   return (
     <div className="min-h-dvh">
@@ -16,6 +17,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Link href="/" className="font-bold">
             助成金管理システム
           </Link>
+          {canManage ? (
+            <nav className="flex gap-3 text-sm">
+              <Link href="/companies" className="text-slate-600 underline">
+                会社
+              </Link>
+            </nav>
+          ) : null}
           <div className="ml-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             <span>
               {user.displayName}

@@ -29,6 +29,16 @@ export const requireActiveUser = async (): Promise<CurrentUser> => {
 }
 
 /**
+ * 指定した権限のいずれかを持つことを求める。
+ * 権限が足りない場合は、そのアカウントの初期表示画面へ戻す。
+ */
+export const requireRoles = async (allowed: readonly UserRole[]): Promise<CurrentUser> => {
+  const user = await requireActiveUser()
+  if (!allowed.some((role) => user.roles.includes(role))) redirect(initialPath(user.roles))
+  return user
+}
+
+/**
  * ログイン後の最初の画面（5.14 / 06_画面設計.md 3）。
  * 複数の権限を持つ場合は事務員・システム管理者を優先する。
  */
