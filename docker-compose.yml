@@ -1,0 +1,32 @@
+# ローカル開発用の MySQL。
+# 照合順序は本番と同じ utf8mb4_ja_0900_as_cs を使う（docs/設計/03_技術選定.md 4.2）。
+# MySQL 8 既定の utf8mb4_0900_ai_ci は濁点・半濁点を区別せず、
+# 氏名・会社名の検索と重複判定が壊れるため使わない。
+services:
+  mysql:
+    # 本番は RDS の MySQL 8.4。イメージを取得できない環境では MYSQL_TAG=8.0 などで差し替える
+    image: mysql:${MYSQL_TAG:-8.4}
+    container_name: grant-management-mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_ja_0900_as_cs
+      # 日時はすべて UTC で保存する（04_DB論理設計.md）
+      - --default-time-zone=+00:00
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: grant_management
+      MYSQL_USER: grant
+      MYSQL_PASSWORD: grant
+      TZ: UTC
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  mysql-data:

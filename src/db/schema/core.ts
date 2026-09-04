@@ -147,12 +147,12 @@ export const sessions = mysqlTable(
     userId: fk("user_id")
       .notNull()
       .references((): AnyMySqlColumn => users.id, { onDelete: "cascade" }),
-    tokenHash: varbinary("token_hash", { length: 32 }).notNull(),
+    tokenHash: varbinary("token_hash", { length: 32 }).notNull().$type<Buffer>(),
     /** 発行時点から30日 */
     expiresAt: datetime("expires_at").notNull(),
     lastUsedAt: datetime("last_used_at").notNull(),
     userAgent: varchar("user_agent", { length: 255 }),
-    ipAddress: varbinary("ip_address", { length: 16 }),
+    ipAddress: varbinary("ip_address", { length: 16 }).$type<Buffer>(),
     createdAt: datetime("created_at").notNull(),
   },
   (t) => [

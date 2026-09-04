@@ -4,21 +4,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクトの現状
 
-助成金管理システムの**設計フェーズ**のリポジトリです。アプリケーション実装はまだ存在せず、
-現在あるのは設計ドキュメントと DB スキーマ定義（Drizzle）のみです。
+助成金管理システムのリポジトリです。設計ドキュメントと DB スキーマ（Drizzle 34テーブル）に加え、
+**認証（A-01〜A-04）までを実装済み**です。業務機能は未着手で、
+ダッシュボード・申請案件一覧・講義スケジュールはプレースホルダのみです。
 
 ドキュメント・コメント・コミットメッセージはすべて日本語で記述します。
 
 Remove all mannered prose.
 
+### Node のバージョン
+
+`.nvmrc` で **Node 22** を指定しています。fnm の `--use-on-cd` により、
+このディレクトリに入ると自動で切り替わります。fnm の既定は `system`（Homebrew の Node）のままなので、
+他プロジェクトの Node バージョンには影響しません。
+
 ## コマンド
 
 ```bash
+npm run setup        # db:up → db:migrate → db:seed（初回はこれだけでよい）
+npm run dev          # 開発サーバー http://localhost:3000
+npm run build        # 本番ビルド
 npm run typecheck    # tsc --noEmit
+
+npm run db:up        # ローカル MySQL 8.4 を起動（docker compose、ホスト側 3307）
+npm run db:down      # 停止
+npm run db:reset     # ボリュームごと作り直す
 npm run db:generate  # スキーマから drizzle/ 配下へマイグレーションSQLを生成
-npm run db:migrate   # マイグレーションを適用（DATABASE_URL が必要）
+npm run db:migrate   # マイグレーションを適用
+npm run db:seed      # 初期システム管理者を作成し、仮パスワードを表示する
 npm run db:studio    # Drizzle Studio
 ```
+
+環境変数は `.env.example` を `.env.local` へコピーして使います。
+`next dev` は `.env.local` を自動で読みますが、drizzle-kit と seed は読まないため
+`node --env-file=.env.local` を経由させています。
 
 テストランナーはまだ導入していません。
 
@@ -62,6 +81,36 @@ npm run db:studio    # Drizzle Studio
 - **50MB のファイルは S3 への署名付きURLで直接アップロード**します。Server Action のボディ上限を超えるためです。
 - **freeeサインは Webhook を使わず、ポーリングのみで締結を検知します。** サンドボックス環境がなく
   Webhook の送信先を環境ごとに分けられないためです。詳細は `05_外部連携仕様.md`。
+
+## 認証の実装（`src/lib/auth/`, `src/app/`）
+
+画面は `docs/設計/06_画面設計.md` の A-01〜A-04。ルートグループでガードを分けています。
+
+| グループ | ガード | 画面 |
+| --- | --- | --- |
+| `(public)` | なし | `/login` |
+| `(setup)` | ログイン済み **かつ仮パスワード** | `/password/setup` |
+| `(app)` | ログイン済み **かつ仮パスワードでない** | それ以外すべて |
+
+仮パスワードの利用者を通常機能から締め出す（5.4）ため、この3分割にしています。
+レイアウトでガードするので、画面ごとの書き忘れが起きません。
+
+- **`actions.ts` は `"use server"` のため async 関数しか export できません。**
+  `FormState` と `EMPTY_STATE` は `form-state.ts` に分けています。
+- **パスワードとログインIDの条件は `policy.ts`** に置きます。クライアントコンポーネントでも
+  条件を表示するため、`@node-rs/argon2` に依存する `password.ts` とは分けています。
+- **`getCurrentUser()` は React の `cache` で包んでいます。** 1リクエスト内では1回だけ問い合わせ、
+  リクエストをまたいでキャッシュしないので、権限変更とアカウント無効化が次のリクエストで反映されます（5.19）。
+- **全端末ログアウトの発火点**は、パスワード設定・パスワード変更・ログインID変更・
+  `is_active` が false のアカウントの検出、の4か所です。
+- 存在しないログインIDでもダミーハッシュと照合し、応答時間からアカウントの有無を推測させません。
+
+### 実装時に決めたこと
+
+- **初回パスワード設定（A-02）でも全端末ログアウトします。** 5.19 の「通常パスワードを変更した場合は
+  変更操作を行った端末を含むすべての端末からログアウト」に文字どおり従っています。
+  仮パスワードはメールやLINEで送るため、設定直後に再ログインさせる方が安全です。
+- 仮パスワードは 0 O 1 l I を除いた12文字です。手入力で伝えるための措置で、要件の指定ではありません。
 
 ## DB スキーマの規約（`src/db/schema/`）
 

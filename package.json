@@ -4,18 +4,42 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "typecheck": "tsc --noEmit",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d --wait",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:migrate": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs migrate",
+    "db:studio": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs studio",
+    "db:seed": "node --env-file=.env.local --import tsx ./src/db/seed.ts",
+    "setup": "npm run db:up && npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@node-rs/argon2": "^2.2.0",
     "drizzle-orm": "^0.44.0",
-    "mysql2": "^3.11.0"
+    "mysql2": "^3.11.0",
+    "next": "^15.5.25",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-hook-form": "^7.87.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.0.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
     "drizzle-kit": "^0.31.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13",
     "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }
