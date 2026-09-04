@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-04T00:00:00.000Z" agent="Claude" version="24.7.17" type="device" compressed="false">
+  <diagram id="screen-transition" name="画面遷移">
+    <mxGraphModel dx="2000" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2120" pageHeight="1640" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b style=&quot;font-size:24px&quot;&gt;助成金管理システム 画面遷移図&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:12px;color:#666666&quot;&gt;出典：06_画面設計.md ／ 2026-09-04時点&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1F4E78;strokeColor=#163A5C;fontColor=#FFFFFF;align=left;verticalAlign=middle;spacingLeft=24;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="2040" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="legendbar" value="&lt;b&gt;読み方&lt;/b&gt;　上段＝ログインから初期表示までの流れ　下段＝機能グループごとの画面。色はグループを表す　／　事務員とシステム管理者は、ヘッダのナビゲーションから各グループへ直接遷移できる（図では矢印を省略）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2F8;strokeColor=#7EA6C4;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=18;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="125" width="2040" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="a01" value="&lt;b&gt;A-01&lt;/b&gt;　ログイン" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="780" y="210" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="a02" value="&lt;b&gt;A-02&lt;/b&gt;　初回パスワード設定" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="210" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_a01_a02" value="仮パスワード" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="a01" target="a02">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="b01" value="&lt;b&gt;B-01&lt;/b&gt;　ダッシュボード&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;事務員・管理者・社労士&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="200" y="350" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="c01" value="&lt;b&gt;C-01&lt;/b&gt;　申請案件一覧&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;クライアント・代理店&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="780" y="350" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e03" value="&lt;b&gt;E-03&lt;/b&gt;　講義スケジュール&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;講師&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="350" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_a01_b01" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a01" target="b01">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_a01_c01" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a01" target="c01">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_a01_e03" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a01" target="e03">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_a02_home" value="設定完了" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a02" target="e03">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_b01_c01" value="件数を選択して絞り込み" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="b01" target="c01">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="g_proj" value="申請案件" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9AA5B1;dashed=1;fontColor=#3D4852;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="500" width="640" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="c01g" value="&lt;b&gt;C-01&lt;/b&gt;　申請案件一覧" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="555" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="c09" value="&lt;b&gt;C-09&lt;/b&gt;　申請案件の作成" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="635" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="c02" value="&lt;b&gt;C-02〜C-08&lt;/b&gt;　案件詳細（7タブ）&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;基本情報／必要書類／契約書／見積・請求／予約・チーム／出欠／掲示板&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="715" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_proj_0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c01g" target="c09">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_proj_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c09" target="c02">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="g_comp" value="会社・受講者" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9AA5B1;dashed=1;fontColor=#3D4852;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="500" width="640" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="d01" value="&lt;b&gt;D-01&lt;/b&gt;　会社一覧" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="555" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="d02" value="&lt;b&gt;D-02&lt;/b&gt;　会社情報の登録・編集" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="635" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="d03" value="&lt;b&gt;D-03&lt;/b&gt;　受講者の登録・編集" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="715" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="d04" value="&lt;b&gt;D-04&lt;/b&gt;　雇用契約書の提出・承認" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="795" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_comp_0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="d01" target="d02">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_comp_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="d02" target="d03">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_comp_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="d03" target="d04">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="g_resv" value="予約・スケジュール" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9AA5B1;dashed=1;fontColor=#3D4852;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="500" width="640" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="e01" value="&lt;b&gt;E-01&lt;/b&gt;　講義予約の申請&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;クライアント&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="555" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e02" value="&lt;b&gt;E-02&lt;/b&gt;　予約の承認・講師割当&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;事務員・管理者&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="635" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e03g" value="&lt;b&gt;E-03&lt;/b&gt;　講義スケジュール&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;講師&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="715" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_resv_0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="e01" target="e02">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_resv_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="e02" target="e03g">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="g_mstr" value="マスタ管理" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9AA5B1;dashed=1;fontColor=#3D4852;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="960" width="640" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="f01" value="&lt;b&gt;F-01&lt;/b&gt;　カリキュラムマスタ管理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1015" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="f02" value="&lt;b&gt;F-02&lt;/b&gt;　CSVインポート" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1095" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="f03" value="&lt;b&gt;F-03&lt;/b&gt;　代理店マスタ管理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1175" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="f04" value="&lt;b&gt;F-04&lt;/b&gt;　休業日管理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1255" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_mstr_0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="f01" target="f02">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_mstr_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="f02" target="f03">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_mstr_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="f03" target="f04">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="g_admin" value="システム管理" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9AA5B1;dashed=1;fontColor=#3D4852;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="960" width="640" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="g01" value="&lt;b&gt;G-01&lt;/b&gt;　アカウント一覧" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="1015" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="g02" value="&lt;b&gt;G-02&lt;/b&gt;　アカウントの作成・編集" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="1095" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="g03" value="&lt;b&gt;G-03&lt;/b&gt;　お知らせ編集&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;管理者のみ&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="1175" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="g04" value="&lt;b&gt;G-04&lt;/b&gt;　削除履歴" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="1255" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_admin_0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="g01" target="g02">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_admin_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="g02" target="g03">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_g_admin_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="g03" target="g04">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="g_common" value="全画面から利用" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9AA5B1;dashed=1;fontColor=#3D4852;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="960" width="640" height="320" as="geometry"/>
+        </mxCell>
+        <mxCell id="b02" value="&lt;b&gt;B-02&lt;/b&gt;　通知一覧&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;ベルアイコン。代理店を除く&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="1015" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="a03" value="&lt;b&gt;A-03&lt;/b&gt;　パスワード変更" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="1095" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="a04" value="&lt;b&gt;A-04&lt;/b&gt;　ログインID変更" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="1175" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="note" value="&lt;b&gt;図に含めていない遷移&lt;/b&gt;&lt;br&gt;&lt;br&gt;・事務員とシステム管理者は、ヘッダのナビゲーションから各グループへ直接遷移できる&lt;br&gt;・お知らせバナーはログイン画面を含むすべての画面に表示される（5.23）&lt;br&gt;・通知（B-02）を選択すると、対応する申請案件または予約画面へ移動する（5.13）&lt;br&gt;・削除の確認ダイアログは画面として数えていない（2.4）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=top;spacing=14;spacingTop=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1400" width="1400" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="footer" value="権限マトリクスと各画面の要素は 06_画面設計.md を参照。確認事項6件は同8章に記載。" style="whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;fontColor=#666666;align=right;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1560" width="2040" height="35" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

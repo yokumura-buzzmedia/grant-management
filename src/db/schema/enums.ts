@@ -64,24 +64,23 @@ export const PROJECT_STATUSES = [
   "company_info_entry", // 6. 必要事項記入中
   "employment_contract_pending", // 7. 雇用契約書提出中
   "employment_contract_completed", // 8. 雇用契約書提出済
-  "new", // 9. 新規
-  "schedule_confirmed", // 10. 日程調整済
-  "curriculum_selected", // 11. カリキュラム選定済
-  "quotation_sent", // 12. 見積もり兼発注書送付済
-  "quotation_received", // 13. 見積もり兼発注書受領済
-  "invoice_sent", // 14. 請求書送付済
-  "gbiz_guided", // 15. GBiz案内済
-  "gbiz_registered", // 16. GBiz記入済
-  "plan_submitted", // 17. 計画届済
-  "payment_confirmed", // 18. 入金確認済
-  "training_in_progress", // 19. 研修中
-  "training_completed", // 20. 研修完了
-  "subsidy_application_notified", // 21. 支給申請連絡済
-  "documents_collecting", // 22. 必要書類収集中
-  "documents_collected", // 23. 必要書類収集完了
-  "subsidy_application_completed", // 24. 助成金の支給申請完了
-  "completed", // 25. 完了（申請案件の終端）
-  "inquiry", // 26. 問い合わせ。対応が終われば 25 へ戻す
+  "schedule_confirmed", // 9. 日程調整済
+  "curriculum_selected", // 10. カリキュラム選定済
+  "quotation_sent", // 11. 見積もり兼発注書送付済
+  "quotation_received", // 12. 見積もり兼発注書受領済
+  "invoice_sent", // 13. 請求書送付済
+  "gbiz_guided", // 14. GBiz案内済
+  "gbiz_registered", // 15. GBiz記入済
+  "plan_submitted", // 16. 計画届済
+  "payment_confirmed", // 17. 入金確認済
+  "training_in_progress", // 18. 研修中
+  "training_completed", // 19. 研修完了
+  "subsidy_application_notified", // 20. 支給申請連絡済
+  "documents_collecting", // 21. 必要書類収集中
+  "documents_collected", // 22. 必要書類収集完了
+  "subsidy_application_completed", // 23. 助成金の支給申請完了
+  "completed", // 24. 完了
+  "inquiry", // 25. 問い合わせ。対応が終われば completed へ戻す
 ] as const
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number]
 

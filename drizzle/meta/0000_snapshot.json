@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "8ad7fe89-77b8-456e-a5c0-c843f37497ac",
+  "id": "0932d1ca-9388-4622-8f02-e10b38c8f2e1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "agencies": {
@@ -1755,7 +1755,7 @@
       "checkConstraint": {
         "chk_projects_status": {
           "name": "chk_projects_status",
-          "value": "`status` in ('prospecting', 'verbal_agreement', 'subsidy_explained', 'contract_sent', 'contract_concluded', 'company_info_entry', 'employment_contract_pending', 'employment_contract_completed', 'new', 'schedule_confirmed', 'curriculum_selected', 'quotation_sent', 'quotation_received', 'invoice_sent', 'gbiz_guided', 'gbiz_registered', 'plan_submitted', 'payment_confirmed', 'training_in_progress', 'training_completed', 'subsidy_application_notified', 'documents_collecting', 'documents_collected', 'subsidy_application_completed', 'completed', 'inquiry')"
+          "value": "`status` in ('prospecting', 'verbal_agreement', 'subsidy_explained', 'contract_sent', 'contract_concluded', 'company_info_entry', 'employment_contract_pending', 'employment_contract_completed', 'schedule_confirmed', 'curriculum_selected', 'quotation_sent', 'quotation_received', 'invoice_sent', 'gbiz_guided', 'gbiz_registered', 'plan_submitted', 'payment_confirmed', 'training_in_progress', 'training_completed', 'subsidy_application_notified', 'documents_collecting', 'documents_collected', 'subsidy_application_completed', 'completed', 'inquiry')"
         }
       }
     },

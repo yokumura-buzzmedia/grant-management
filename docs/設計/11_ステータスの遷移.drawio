@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-09-03T00:00:00.000Z" agent="Claude" version="24.7.17" type="device" compressed="false">
+<mxfile host="app.diagrams.net" modified="2026-09-04T00:00:00.000Z" agent="Claude" version="24.7.17" type="device" compressed="false">
   <diagram id="status-transition" name="ステータス遷移">
-    <mxGraphModel dx="2000" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2030" pageHeight="3585" math="0" shadow="0">
+    <mxGraphModel dx="2000" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2030" pageHeight="3455" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
 
-        <mxCell id="title" value="&lt;b style=&quot;font-size:24px&quot;&gt;助成金管理システム 申請案件のステータス遷移&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:12px;color:#666666&quot;&gt;出典：ヒアリング（2026-09-03） ／ 顧客ステータスと案件ステータスを1本にマージした構成&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1F4E78;strokeColor=#163A5C;fontColor=#FFFFFF;align=left;verticalAlign=middle;spacingLeft=24;" vertex="1" parent="1">
+        <mxCell id="title" value="&lt;b style=&quot;font-size:24px&quot;&gt;助成金管理システム 申請案件のステータス遷移&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:12px;color:#666666&quot;&gt;出典：ヒアリング（2026-09-04） ／ 全24段階＋問い合わせ&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1F4E78;strokeColor=#163A5C;fontColor=#FFFFFF;align=left;verticalAlign=middle;spacingLeft=24;" vertex="1" parent="1">
           <mxGeometry x="40" y="30" width="1930" height="80" as="geometry"/>
         </mxCell>
         <mxCell id="legendbar" value="&lt;b&gt;読み方&lt;/b&gt;　左＝業務フェーズ　中央左＝ステータス（上から順に進む）　中央右＝次のステータスへ進むための条件　右＝ルールと要確認事項" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2F8;strokeColor=#7EA6C4;fontColor=#1F2937;align=left;verticalAlign=middle;spacingLeft=18;fontSize=13;" vertex="1" parent="1">
@@ -22,25 +22,25 @@
           <mxGeometry x="40" y="854" width="26" height="322" as="geometry"/>
         </mxCell>
         <mxCell id="ph8" value="案件準備" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1244" width="26" height="322" as="geometry"/>
+          <mxGeometry x="40" y="1244" width="26" height="192" as="geometry"/>
         </mxCell>
-        <mxCell id="ph11" value="見積・請求" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1634" width="26" height="322" as="geometry"/>
+        <mxCell id="ph10" value="見積・請求" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1504" width="26" height="322" as="geometry"/>
         </mxCell>
-        <mxCell id="ph14" value="助成金申請手続き" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="2024" width="26" height="322" as="geometry"/>
+        <mxCell id="ph13" value="助成金申請手続き" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1894" width="26" height="322" as="geometry"/>
         </mxCell>
-        <mxCell id="ph17" value="入金" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="2414" width="26" height="62" as="geometry"/>
+        <mxCell id="ph16" value="入金" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2284" width="26" height="62" as="geometry"/>
         </mxCell>
-        <mxCell id="ph18" value="研修" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="2544" width="26" height="192" as="geometry"/>
+        <mxCell id="ph17" value="研修" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2414" width="26" height="192" as="geometry"/>
         </mxCell>
-        <mxCell id="ph20" value="支給申請" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="2804" width="26" height="452" as="geometry"/>
+        <mxCell id="ph19" value="支給申請" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2674" width="26" height="452" as="geometry"/>
         </mxCell>
-        <mxCell id="ph24" value="完了" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="3324" width="26" height="62" as="geometry"/>
+        <mxCell id="ph23" value="完了" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3194" width="26" height="62" as="geometry"/>
         </mxCell>
         <mxCell id="s0" value="&lt;b&gt;1&lt;/b&gt;　営業中" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="210" width="330" height="50" as="geometry"/>
@@ -66,56 +66,53 @@
         <mxCell id="s7" value="&lt;b&gt;8&lt;/b&gt;　雇用契約書提出済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1120" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s8" value="&lt;b&gt;9&lt;/b&gt;　新規" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s8" value="&lt;b&gt;9&lt;/b&gt;　日程調整済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1250" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s9" value="&lt;b&gt;10&lt;/b&gt;　日程調整済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s9" value="&lt;b&gt;10&lt;/b&gt;　カリキュラム選定済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1380" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s10" value="&lt;b&gt;11&lt;/b&gt;　カリキュラム選定済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s10" value="&lt;b&gt;11&lt;/b&gt;　見積もり兼発注書送付済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1510" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s11" value="&lt;b&gt;12&lt;/b&gt;　見積もり兼発注書送付済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s11" value="&lt;b&gt;12&lt;/b&gt;　見積もり兼発注書受領済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1640" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s12" value="&lt;b&gt;13&lt;/b&gt;　見積もり兼発注書受領済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s12" value="&lt;b&gt;13&lt;/b&gt;　請求書送付済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1770" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s13" value="&lt;b&gt;14&lt;/b&gt;　請求書送付済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s13" value="&lt;b&gt;14&lt;/b&gt;　GBiz案内済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1900" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s14" value="&lt;b&gt;15&lt;/b&gt;　GBiz案内済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s14" value="&lt;b&gt;15&lt;/b&gt;　GBiz記入済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2030" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s15" value="&lt;b&gt;16&lt;/b&gt;　GBiz記入済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s15" value="&lt;b&gt;16&lt;/b&gt;　計画届済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2160" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s16" value="&lt;b&gt;17&lt;/b&gt;　計画届済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s16" value="&lt;b&gt;17&lt;/b&gt;　入金確認済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2290" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s17" value="&lt;b&gt;18&lt;/b&gt;　入金確認済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s17" value="&lt;b&gt;18&lt;/b&gt;　研修中" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2420" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s18" value="&lt;b&gt;19&lt;/b&gt;　研修中" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s18" value="&lt;b&gt;19&lt;/b&gt;　研修完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2550" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s19" value="&lt;b&gt;20&lt;/b&gt;　研修完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s19" value="&lt;b&gt;20&lt;/b&gt;　支給申請連絡済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2680" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s20" value="&lt;b&gt;21&lt;/b&gt;　支給申請連絡済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s20" value="&lt;b&gt;21&lt;/b&gt;　必要書類収集中" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2810" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s21" value="&lt;b&gt;22&lt;/b&gt;　必要書類収集中" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s21" value="&lt;b&gt;22&lt;/b&gt;　必要書類収集完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2940" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s22" value="&lt;b&gt;23&lt;/b&gt;　必要書類収集完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s22" value="&lt;b&gt;23&lt;/b&gt;　助成金の支給申請完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="3070" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s23" value="&lt;b&gt;24&lt;/b&gt;　助成金の支給申請完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s23" value="&lt;b&gt;24&lt;/b&gt;　完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="3200" width="330" height="50" as="geometry"/>
-        </mxCell>
-        <mxCell id="s24" value="&lt;b&gt;25&lt;/b&gt;　完了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
-          <mxGeometry x="90" y="3330" width="330" height="50" as="geometry"/>
         </mxCell>
         <mxCell id="e0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s0" target="s1">
           <mxGeometry relative="1" as="geometry"/>
@@ -132,7 +129,7 @@
         <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s2" target="s3">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c2" value="事務員が本システムから契約書の送付操作を実行し、FREE SIGNへ連携する（5.8）&lt;br&gt;署名依頼メールはFREE SIGNから会社の担当者メールアドレスへ送信される" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c2" value="事務員が本システムから契約書の送付操作を実行し、FREE SIGNへ連携する（5.8）&lt;br&gt;契約書はfreeeサインのテンプレートから生成する" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="525" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s3" target="s4">
@@ -162,61 +159,61 @@
         <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s7" target="s8">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c7" value="【未確定】申請案件としての実務開始。案件番号を自動発行する（5.15）&lt;br&gt;&lt;b&gt;「新規」の意味と、レコードを作成する時点との関係が未整理&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c7" value="クライアントの予約申請を事務員が承認し、担当講師を指定して&lt;br&gt;講義スケジュールを確定する（5.5）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1175" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s8" target="s9">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c8" value="クライアントの予約申請を事務員が承認し、担当講師を指定して&lt;br&gt;講義スケジュールを確定する（5.5）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c8" value="事務員またはシステム管理者が、チームを作成してコースを登録する（5.6, 5.7）&lt;br&gt;紐づけ時にコース・講義コマ・日別割当をチームへ複製する" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1305" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s9" target="s10">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c9" value="事務員またはシステム管理者が、チームを作成してコースを登録する（5.6, 5.7）&lt;br&gt;紐づけ時にコース・講義コマ・日別割当をチームへ複製する" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c9" value="見積もり兼発注書を登録データから自動生成し、事務員が送付操作を実行する（5.9）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1435" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s10" target="s11">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c10" value="見積もり兼発注書を登録データから自動生成し、事務員が送付操作を実行する（5.9）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c10" value="クライアントが署名・押印済みの書類をアップロードし、&lt;br&gt;事務員が内容を確認したうえで手動で進める（5.9）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1565" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s11" target="s12">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c11" value="クライアントが署名・押印済みの書類をアップロードし、&lt;br&gt;事務員が内容を確認したうえで手動で進める（5.9）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c11" value="請求書を登録データから自動生成し、事務員が送付操作を実行する（5.10）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1695" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s12" target="s13">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c12" value="請求書を登録データから自動生成し、事務員が送付操作を実行する（5.10）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c12" value="【未確定】GビズIDの取得案内を行ったことを記録する操作が未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ。GビズID等の補足情報は管理しない&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1825" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s13" target="s14">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c13" value="【未確定】GビズIDの取得案内をクライアントへ行ったことを記録する操作が未定&lt;br&gt;&lt;b&gt;要件定義書に記載がない工程&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c13" value="【未確定】GビズIDの登録完了をどう確認するかが未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1955" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s14" target="s15">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c14" value="【未確定】クライアントによるGビズIDの登録完了をどう確認するかが未定&lt;br&gt;&lt;b&gt;要件定義書に記載がない工程&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c14" value="【未確定】訓練計画届の提出完了を記録する操作が未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ。提出日等は管理しない&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="2085" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s15" target="s16">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c15" value="【未確定】訓練計画届の提出完了を記録する操作が未定&lt;br&gt;&lt;b&gt;要件定義書に記載がない工程&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c15" value="入金を確認したうえで、事務員が手動で進める（5.10）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="2215" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s16" target="s17">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c16" value="入金を確認したうえで、事務員が手動で進める（5.10）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c16" value="事務員が手動で進める（5.11）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="2345" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s17" target="s18">
@@ -228,71 +225,65 @@
         <mxCell id="e18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s18" target="s19">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c18" value="事務員が手動で進める（5.11）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c18" value="【未確定】支給申請の案内を行ったことを記録する操作が未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="2605" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s19" target="s20">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c19" value="【未確定】支給申請の案内をクライアントへ行ったことを記録する操作が未定&lt;br&gt;&lt;b&gt;要件定義書に記載がない工程&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c19" value="&lt;b&gt;支給申請用の書類&lt;/b&gt;の収集を開始する。要件5.2の必要書類とは別の書類&lt;br&gt;project_documents で管理する" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="2735" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s20" target="s21">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c20" value="【未確定】支給申請に必要な書類の収集を開始する状態と想定&lt;br&gt;要件5.2の「必要書類の提出・確認フロー」との関係が未整理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c20" value="支給申請用の書類がすべて承認済みであること（5.2）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="2865" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s21" target="s22">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c21" value="案件共通の必要書類がすべて承認済みであること（5.2）&lt;br&gt;受講者の雇用契約書は7〜8で担保されるため、ここでは案件共通の書類が対象と解釈している" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c21" value="【未確定】事務員が助成金の支給申請を行い、完了を記録する操作が未定" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="2995" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s22" target="s23">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c22" value="【未確定】事務員が助成金の支給申請を行い、完了を記録する操作が未定&lt;br&gt;&lt;b&gt;要件定義書に記載がない工程&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c22" value="助成金の受給までには半年から1年程度のラグがあるため、&lt;br&gt;本システムでは受給を確認せず、支給申請の完了をもって完了とする（5.11）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="3125" width="720" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="e23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s23" target="s24">
+        <mxCell id="inq" value="&lt;b&gt;25&lt;/b&gt;　問い合わせ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="460" y="3200" width="330" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_inq_out" value="問い合わせ発生" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#B85450;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#B85450;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="s23" target="inq">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c23" value="助成金の受給までには半年から1年程度のラグがあるため、&lt;br&gt;本システムでは受給を確認せず、支給申請の完了をもって完了とする（5.11）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="460" y="3255" width="720" height="70" as="geometry"/>
-        </mxCell>
-        <mxCell id="inq" value="&lt;b&gt;26&lt;/b&gt;　問い合わせ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
-          <mxGeometry x="460" y="3330" width="330" height="50" as="geometry"/>
-        </mxCell>
-        <mxCell id="e_inq_out" value="問い合わせ発生" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#B85450;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#B85450;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="s24" target="inq">
+        <mxCell id="e_inq_back" value="対応完了" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#B85450;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#B85450;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="inq" target="s23">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="e_inq_back" value="対応完了" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#B85450;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#B85450;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="inq" target="s24">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="terminal_note" value="&lt;b&gt;24 完了 が終端です。&lt;/b&gt;　助成金の受給までには半年から1年程度のラグがあるため、本システムでは受給を確認せず、支給申請の完了をもって完了として扱います（5.11）。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#82B366;dashed=1;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="90" y="3275" width="1080" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="terminal_note" value="&lt;b&gt;25 完了 が終端です。&lt;/b&gt;　助成金の受給までには半年から1年程度のラグがあるため、本システムでは受給を確認せず、支給申請の完了をもって完了として扱います（5.11）。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#82B366;dashed=1;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="90" y="3405" width="1080" height="70" as="geometry"/>
-        </mxCell>
-        <mxCell id="p_scope" value="&lt;b style=&quot;font-size:16px&quot;&gt;この図について&lt;/b&gt;&lt;br&gt;&lt;br&gt;申請案件のステータスです。営業開始から支給申請までを1本の流れで管理します。&lt;br&gt;&lt;br&gt;以前は顧客（会社）と申請案件で2軸に分けていましたが、1本にマージしました。&lt;br&gt;&lt;b&gt;会社にステータスを持たせる概念はありません。&lt;/b&gt;&lt;br&gt;&lt;br&gt;1〜8は旧「顧客ステータス」、9〜24は旧「案件ステータス」に相当する区間です。&lt;br&gt;24 助成金の支給申請完了 の後、25 完了 が終端です。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="p_scope" value="&lt;b style=&quot;font-size:16px&quot;&gt;この図について&lt;/b&gt;&lt;br&gt;&lt;br&gt;申請案件のステータスです。営業開始から完了までを1本の流れで管理します。&lt;br&gt;&lt;br&gt;顧客（会社）と申請案件で分けず、1本にマージした構成です。&lt;br&gt;&lt;b&gt;会社にステータスを持たせる概念はありません。&lt;/b&gt;&lt;br&gt;&lt;br&gt;1〜8は顧客の受入に相当する区間、9〜24は案件の実務に相当する区間です。&lt;br&gt;&lt;b&gt;申請案件は 1 営業中 の時点で作成し、1レコードが1〜24を保持します。&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="1230" y="210" width="740" height="200" as="geometry"/>
         </mxCell>
-        <mxCell id="p_inquiry" value="&lt;b style=&quot;font-size:16px&quot;&gt;完了後の問い合わせ対応（26）&lt;/b&gt;&lt;br&gt;&lt;br&gt;25 完了 の後に問い合わせが発生した場合、&lt;br&gt;26 問い合わせ へ変更し、対応が終われば 25 へ戻します。&lt;br&gt;&lt;br&gt;&lt;b&gt;これは本フローで唯一、前の状態へ戻る遷移です。&lt;/b&gt;&lt;br&gt;要件5.1の「原則として、前のステータスには戻せない」に対する例外として、&lt;br&gt;要件定義書へ明記する必要があります。&lt;br&gt;&lt;br&gt;未確定：問い合わせの内容を本システムで記録するか（案件掲示板で足りるか）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="1230" y="450" width="740" height="220" as="geometry"/>
+        <mxCell id="p_inquiry" value="&lt;b style=&quot;font-size:16px&quot;&gt;完了後の問い合わせ対応（25）&lt;/b&gt;&lt;br&gt;&lt;br&gt;24 完了 の後に問い合わせが発生した場合、&lt;br&gt;25 問い合わせ へ変更し、対応が終われば 24 へ戻します。&lt;br&gt;&lt;br&gt;&lt;b&gt;これは本フローで唯一、前の状態へ戻る遷移です。&lt;/b&gt;&lt;br&gt;要件5.1の「原則として、前のステータスには戻せない」に対する例外です。&lt;br&gt;&lt;br&gt;未確定：問い合わせの内容を本システムで記録するか（案件掲示板で足りるか）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="450" width="740" height="200" as="geometry"/>
         </mxCell>
-        <mxCell id="p_rule" value="&lt;b style=&quot;font-size:16px&quot;&gt;ステータス変更ルール（5.1）&lt;/b&gt;&lt;br&gt;&lt;br&gt;ステータスを主に次へ進めるのは事務員とする&lt;br&gt;ステータスは決められた順序で進める&lt;br&gt;原則として、前のステータスには戻せない（例外は26 問い合わせ）&lt;br&gt;原則として、途中のステータスを飛ばせない&lt;br&gt;事務員が手動で次のステータスへ進める&lt;br&gt;現時点では、ステータスの自動変更は行わない&lt;br&gt;誤操作時のみ、システム管理者がステータスを修正できる" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="1230" y="710" width="740" height="200" as="geometry"/>
+        <mxCell id="p_rule" value="&lt;b style=&quot;font-size:16px&quot;&gt;ステータス変更ルール（5.1）&lt;/b&gt;&lt;br&gt;&lt;br&gt;ステータスを主に次へ進めるのは事務員とする&lt;br&gt;ステータスは決められた順序で進める&lt;br&gt;原則として、前のステータスには戻せない（例外は25 問い合わせ）&lt;br&gt;原則として、途中のステータスを飛ばせない&lt;br&gt;事務員が手動で次のステータスへ進める&lt;br&gt;現時点では、ステータスの自動変更は行わない&lt;br&gt;誤操作時のみ、システム管理者がステータスを修正できる" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="690" width="740" height="200" as="geometry"/>
         </mxCell>
-        <mxCell id="p_gap" value="&lt;b style=&quot;font-size:16px&quot;&gt;要件定義書との差分（要確認）&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. 申請案件レコードを作成する時点&lt;br&gt;　　1〜8を申請案件が保持するなら、レコードは「営業中」から存在する。&lt;br&gt;　　その場合、9「新規」が何を指すのかを整理する必要がある。&lt;br&gt;&lt;br&gt;2. 要件5.2の必要書類を、2箇所に分けて解釈している&lt;br&gt;　　受講者別の雇用契約書　→　7 雇用契約書提出中 〜 8 雇用契約書提出済&lt;br&gt;　　案件共通の必要書類　　→　22 必要書類収集中 〜 23 必要書類収集完了&lt;br&gt;　　この解釈でよいか、22〜23が支給申請用の別の書類かを確認する。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="1230" y="950" width="740" height="220" as="geometry"/>
+        <mxCell id="p_doc" value="&lt;b style=&quot;font-size:16px&quot;&gt;必要書類との対応（5.2）&lt;/b&gt;&lt;br&gt;&lt;br&gt;必要書類は2種類です。申請案件ごとに提出する「案件共通の書類」は設けません。&lt;br&gt;&lt;br&gt;受講者別の雇用契約書　→　7 雇用契約書提出中 〜 8 雇用契約書提出済&lt;br&gt;　会社に紐づけて管理し、承認は会社単位で一度だけ行う。&lt;br&gt;&lt;br&gt;支給申請用の書類　　　→　21 必要書類収集中 〜 22 必要書類収集完了&lt;br&gt;　申請案件に紐づけて管理する。種類と名称は未確定。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="930" width="740" height="200" as="geometry"/>
         </mxCell>
-        <mxCell id="p_todo" value="&lt;b style=&quot;font-size:16px&quot;&gt;確定させる必要がある点&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. 1〜3、6、9、15〜17、21、24 の遷移条件&lt;br&gt;2. 各ステータスを変更できるアクター&lt;br&gt;3. GBiz・計画届・支給申請の各工程でシステムが何を管理するか&lt;br&gt;4. 26 問い合わせ の内容を本システムで記録するか&lt;br&gt;5. 左記「要件定義書との差分」2点の整理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#7F6000;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="1230" y="1210" width="740" height="160" as="geometry"/>
+        <mxCell id="p_todo" value="&lt;b style=&quot;font-size:16px&quot;&gt;確定させる必要がある点&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. 遷移条件が未定の箇所&lt;br&gt;　　1→2、2→3、5→6、6→7、13→14、14→15、15→16、19→20、22→23&lt;br&gt;2. 各ステータスを変更できるアクター&lt;br&gt;3. 支給申請用の書類の種類と名称&lt;br&gt;4. 25 問い合わせ の内容を本システムで記録するか" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#7F6000;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="1170" width="740" height="160" as="geometry"/>
         </mxCell>
-        <mxCell id="p_legend" value="&lt;b style=&quot;font-size:16px&quot;&gt;凡例&lt;/b&gt;&lt;br&gt;&lt;br&gt;実線枠　ヒアリングで確定した状態（25が終端）&lt;br&gt;赤枠　　完了後の例外的な状態と、その往復遷移&lt;br&gt;白枠　　要件定義書に根拠がある遷移条件&lt;br&gt;黄破線枠　遷移条件が未確定、または要件定義書に記載がない工程&lt;br&gt;左端の破線　業務フェーズの区切り（説明用。仕様ではない）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="1230" y="1410" width="740" height="160" as="geometry"/>
+        <mxCell id="p_legend" value="&lt;b style=&quot;font-size:16px&quot;&gt;凡例&lt;/b&gt;&lt;br&gt;&lt;br&gt;実線枠　確定した状態（24 完了 が終端）&lt;br&gt;赤枠　　完了後の例外的な状態と、その往復遷移&lt;br&gt;白枠　　遷移条件が確定している箇所&lt;br&gt;黄破線枠　遷移条件が未確定の箇所&lt;br&gt;左端の破線　業務フェーズの区切り（説明用。仕様ではない）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="1370" width="740" height="160" as="geometry"/>
         </mxCell>
-        <mxCell id="footer" value="遷移条件と要件定義書との差分は未整理。確定後に本図と 01_要件定義.md・04_DB論理設計.md を更新する。" style="whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;fontColor=#666666;align=right;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="40" y="3505" width="1930" height="35" as="geometry"/>
+        <mxCell id="footer" value="遷移条件の一部が未確定。確定後に本図と 01_要件定義.md・04_DB論理設計.md を更新する。" style="whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;fontColor=#666666;align=right;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3375" width="1930" height="35" as="geometry"/>
         </mxCell>
       </root>
     </mxGraphModel>
