@@ -180,7 +180,7 @@ CREATE TABLE `projects` (
 	`updated_by` bigint unsigned,
 	CONSTRAINT `projects_id` PRIMARY KEY(`id`),
 	CONSTRAINT `uq_projects_project_number` UNIQUE(`project_number`),
-	CONSTRAINT `chk_projects_status` CHECK(`status` in ('prospecting', 'verbal_agreement', 'subsidy_explained', 'contract_sent', 'contract_concluded', 'company_info_entry', 'employment_contract_pending', 'employment_contract_completed', 'schedule_confirmed', 'curriculum_selected', 'quotation_sent', 'quotation_received', 'invoice_sent', 'gbiz_guided', 'gbiz_registered', 'plan_submitted', 'payment_confirmed', 'training_in_progress', 'training_completed', 'subsidy_application_notified', 'documents_collecting', 'documents_collected', 'subsidy_application_completed', 'completed', 'inquiry'))
+	CONSTRAINT `chk_projects_status` CHECK(`status` in ('prospecting', 'verbal_agreement', 'subsidy_explained', 'contract_sent', 'contract_concluded', 'company_info_entry', 'employment_contract_pending', 'employment_contract_completed', 'schedule_confirmed', 'curriculum_selected', 'quotation_sent', 'quotation_received', 'gbiz_guided', 'gbiz_registered', 'invoice_sent', 'plan_submitted', 'payment_confirmed', 'training_in_progress', 'training_completed', 'subsidy_application_notified', 'documents_collecting', 'documents_collected', 'subsidy_application_completed', 'completed', 'inquiry'))
 );
 --> statement-breakpoint
 CREATE TABLE `quotations` (

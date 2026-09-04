@@ -68,9 +68,9 @@ export const PROJECT_STATUSES = [
   "curriculum_selected", // 10. カリキュラム選定済
   "quotation_sent", // 11. 見積もり兼発注書送付済
   "quotation_received", // 12. 見積もり兼発注書受領済
-  "invoice_sent", // 13. 請求書送付済
-  "gbiz_guided", // 14. GBiz案内済
-  "gbiz_registered", // 15. GBiz記入済
+  "gbiz_guided", // 13. GBiz案内済
+  "gbiz_registered", // 14. GBiz記入済
+  "invoice_sent", // 15. 請求書送付済
   "plan_submitted", // 16. 計画届済
   "payment_confirmed", // 17. 入金確認済
   "training_in_progress", // 18. 研修中

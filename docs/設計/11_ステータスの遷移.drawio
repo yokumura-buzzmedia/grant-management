@@ -24,14 +24,14 @@
         <mxCell id="ph8" value="案件準備" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="40" y="1244" width="26" height="192" as="geometry"/>
         </mxCell>
-        <mxCell id="ph10" value="見積・請求" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1504" width="26" height="322" as="geometry"/>
+        <mxCell id="ph10" value="見積" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1504" width="26" height="192" as="geometry"/>
         </mxCell>
         <mxCell id="ph13" value="助成金申請手続き" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1894" width="26" height="322" as="geometry"/>
+          <mxGeometry x="40" y="1764" width="26" height="192" as="geometry"/>
         </mxCell>
-        <mxCell id="ph16" value="入金" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="40" y="2284" width="26" height="62" as="geometry"/>
+        <mxCell id="ph16" value="請求・計画届・入金" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2024" width="26" height="322" as="geometry"/>
         </mxCell>
         <mxCell id="ph17" value="研修" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#AAAAAA;dashed=1;fontColor=#555555;align=center;verticalAlign=middle;horizontal=0;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="40" y="2414" width="26" height="192" as="geometry"/>
@@ -78,16 +78,16 @@
         <mxCell id="s11" value="&lt;b&gt;12&lt;/b&gt;　見積もり兼発注書受領済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1640" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s12" value="&lt;b&gt;13&lt;/b&gt;　請求書送付済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s12" value="&lt;b&gt;13&lt;/b&gt;　GBiz案内済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1770" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s13" value="&lt;b&gt;14&lt;/b&gt;　GBiz案内済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s13" value="&lt;b&gt;14&lt;/b&gt;　GBiz記入済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="1900" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s14" value="&lt;b&gt;15&lt;/b&gt;　GBiz記入済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s14" value="&lt;b&gt;15&lt;/b&gt;　請求書送付済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2030" width="330" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="s15" value="&lt;b&gt;16&lt;/b&gt;　計画届済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="s15" value="&lt;b&gt;16&lt;/b&gt;　計画届済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="90" y="2160" width="330" height="50" as="geometry"/>
         </mxCell>
         <mxCell id="s16" value="&lt;b&gt;17&lt;/b&gt;　入金確認済" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
@@ -183,19 +183,19 @@
         <mxCell id="e11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s11" target="s12">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c11" value="請求書を登録データから自動生成し、事務員が送付操作を実行する（5.10）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c11" value="【未確定】GビズIDの取得案内を行ったことを記録する操作が未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ。GビズID等の補足情報は管理しない&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1695" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s12" target="s13">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c12" value="【未確定】GビズIDの取得案内を行ったことを記録する操作が未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ。GビズID等の補足情報は管理しない&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c12" value="【未確定】GビズIDの登録完了をどう確認するかが未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1825" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s13" target="s14">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="c13" value="【未確定】GビズIDの登録完了をどう確認するかが未定&lt;br&gt;&lt;b&gt;ステータスの記録のみ&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;dashed=1;fontColor=#7F6000;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="c13" value="請求書を登録データから自動生成し、事務員が送付操作を実行する（5.10）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B3B3B3;fontColor=#1F2937;align=left;verticalAlign=middle;spacing=12;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="460" y="1955" width="720" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="e14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5A5A5A;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s14" target="s15">
@@ -276,7 +276,7 @@
         <mxCell id="p_doc" value="&lt;b style=&quot;font-size:16px&quot;&gt;必要書類との対応（5.2）&lt;/b&gt;&lt;br&gt;&lt;br&gt;必要書類は2種類です。申請案件ごとに提出する「案件共通の書類」は設けません。&lt;br&gt;&lt;br&gt;受講者別の雇用契約書　→　7 雇用契約書提出中 〜 8 雇用契約書提出済&lt;br&gt;　会社に紐づけて管理し、承認は会社単位で一度だけ行う。&lt;br&gt;&lt;br&gt;支給申請用の書類　　　→　21 必要書類収集中 〜 22 必要書類収集完了&lt;br&gt;　申請案件に紐づけて管理する。種類と名称は未確定。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="1230" y="930" width="740" height="200" as="geometry"/>
         </mxCell>
-        <mxCell id="p_todo" value="&lt;b style=&quot;font-size:16px&quot;&gt;確定させる必要がある点&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. 遷移条件が未定の箇所&lt;br&gt;　　1→2、2→3、5→6、6→7、13→14、14→15、15→16、19→20、22→23&lt;br&gt;2. 各ステータスを変更できるアクター&lt;br&gt;3. 支給申請用の書類の種類と名称&lt;br&gt;4. 25 問い合わせ の内容を本システムで記録するか" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#7F6000;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="p_todo" value="&lt;b style=&quot;font-size:16px&quot;&gt;確定させる必要がある点&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. 遷移条件が未定の箇所&lt;br&gt;　　1→2、2→3、5→6、6→7、12→13、13→14、15→16、19→20、22→23&lt;br&gt;2. 各ステータスを変更できるアクター&lt;br&gt;3. 支給申請用の書類の種類と名称&lt;br&gt;4. 25 問い合わせ の内容を本システムで記録するか" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#7F6000;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="1230" y="1170" width="740" height="160" as="geometry"/>
         </mxCell>
         <mxCell id="p_legend" value="&lt;b style=&quot;font-size:16px&quot;&gt;凡例&lt;/b&gt;&lt;br&gt;&lt;br&gt;実線枠　確定した状態（24 完了 が終端）&lt;br&gt;赤枠　　完了後の例外的な状態と、その往復遷移&lt;br&gt;白枠　　遷移条件が確定している箇所&lt;br&gt;黄破線枠　遷移条件が未確定の箇所&lt;br&gt;左端の破線　業務フェーズの区切り（説明用。仕様ではない）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;align=left;verticalAlign=top;spacing=16;spacingTop=14;fontSize=13;" vertex="1" parent="1">
