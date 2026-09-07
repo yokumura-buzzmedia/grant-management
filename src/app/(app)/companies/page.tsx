@@ -4,6 +4,20 @@ import { db } from "@/db/client"
 import { companies } from "@/db/schema"
 import { requireRoles } from "@/lib/auth/guards"
 import { formatJst } from "@/lib/datetime"
+import {
+  buttonGhost,
+  buttonPrimary,
+  buttonSecondary,
+  controlClass,
+  Notice,
+  PageHeader,
+  Pagination,
+  ResultCount,
+  rowLinkClass,
+  SortLink,
+  type SortState,
+  Th,
+} from "@/components/ui"
 
 /** 一覧は1ページ50件（06_画面設計.md 2.2）。 */
 const PAGE_SIZE = 50
@@ -25,7 +39,7 @@ const escapeLike = (value: string) => value.replace(/[\\%_]/g, (c) => `\\${c}`)
 export default async function CompaniesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; sort?: string; dir?: string; page?: string }>
+  searchParams: Promise<{ q?: string; sort?: string; dir?: string; page?: string; notice?: string }>
 }) {
   await requireRoles(["staff", "admin"])
   const params = await searchParams
@@ -81,61 +95,79 @@ export default async function CompaniesPage({
     return text ? `/companies?${text}` : "/companies"
   }
 
+  const from = count === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
+  const to = Math.min(page * PAGE_SIZE, count)
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-bold">
-          <span className="mr-2 rounded bg-slate-200 px-2 py-0.5 font-mono text-sm">D-01</span>
-          会社一覧
-        </h1>
-        <Link
-          href="/companies/new"
-          className="ml-auto rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-        >
-          会社を登録
-        </Link>
+    <div className="flex flex-col gap-5">
+      <PageHeader
+        screenId="D-01"
+        title="会社一覧"
+        action={
+          <Link href="/companies/new" className={buttonPrimary}>
+            会社を登録
+          </Link>
+        }
+      />
+
+      {params.notice === "deleted" ? (
+        <Notice>会社を削除しました。削除履歴に記録しています。</Notice>
+      ) : null}
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <form role="search" className="flex flex-wrap gap-2">
+          <label htmlFor="q" className="sr-only">
+            会社名・法人番号で検索
+          </label>
+          <input
+            id="q"
+            name="q"
+            defaultValue={query}
+            placeholder="会社名・法人番号で検索"
+            className={`${controlClass} w-72`}
+          />
+          <button type="submit" className={buttonSecondary}>
+            検索
+          </button>
+          {query ? (
+            <Link href="/companies" className={buttonGhost}>
+              解除
+            </Link>
+          ) : null}
+        </form>
+
+        <ResultCount page={page} pageSize={PAGE_SIZE} count={count} />
       </div>
 
-      <form className="flex gap-2">
-        <input
-          name="q"
-          defaultValue={query}
-          placeholder="会社名・法人番号で検索"
-          className="w-full max-w-sm rounded-md border border-slate-300 bg-white px-3 py-2 text-base outline-none focus:border-slate-900"
-        />
-        <button type="submit" className="rounded-md border border-slate-300 bg-white px-4 text-sm">
-          検索
-        </button>
-        {query ? (
-          <Link
-            href="/companies"
-            className="flex items-center rounded-md px-3 text-sm text-slate-600 underline"
-          >
-            解除
-          </Link>
-        ) : null}
-      </form>
-
-      <p className="text-sm text-slate-600">
-        {count} 件{count > PAGE_SIZE ? `（${page} / ${lastPage} ページ）` : ""}
-      </p>
-
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+      {/* relative が要る。sr-only は position:absolute のため、位置指定された祖先が
+          ないと overflow-x-auto の外へ出てしまい、ページ全体が横スクロールする */}
+      <div className="relative overflow-x-auto rounded-lg border border-slate-200 bg-white">
         <table className="w-full min-w-[720px] text-sm">
+          <caption className="sr-only">
+            {query ? `「${query}」で検索した会社の一覧。` : "会社の一覧。"}
+            {count === 0 ? "該当なし。" : `全 ${count} 件のうち ${from} 件目から ${to} 件目を表示。`}
+          </caption>
           <thead className="border-b border-slate-200 bg-slate-50 text-left">
             <tr>
               {(Object.keys(SORTABLE) as SortKey[]).map((key) => {
                 const active = sort === key
+                const state: SortState = active
+                  ? dir === "asc"
+                    ? "ascending"
+                    : "descending"
+                  : "none"
                 return (
-                  <th key={key} className="px-4 py-3 font-medium text-slate-600">
-                    <Link
-                      href={href({ sort: key, dir: active && dir === "asc" ? "desc" : "asc", page: 1 })}
-                      className="hover:underline"
-                    >
-                      {SORTABLE[key].label}
-                      {active ? (dir === "asc" ? " ▲" : " ▼") : ""}
-                    </Link>
-                  </th>
+                  <Th key={key} ariaSort={state}>
+                    <SortLink
+                      href={href({
+                        sort: key,
+                        dir: active && dir === "asc" ? "desc" : "asc",
+                        page: 1,
+                      })}
+                      label={SORTABLE[key].label}
+                      state={state}
+                    />
+                  </Th>
                 )
               })}
             </tr>
@@ -143,22 +175,41 @@ export default async function CompaniesPage({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                  {query ? "検索条件に一致する会社がありません。" : "登録されている会社がありません。"}
+                <td colSpan={5} className="px-4 py-12 text-center text-slate-500">
+                  {query ? (
+                    <>
+                      「{query}」に一致する会社がありません。
+                      <Link href="/companies" className={`${buttonGhost} ml-2`}>
+                        検索を解除
+                      </Link>
+                    </>
+                  ) : (
+                    "登録されている会社がありません。"
+                  )}
                 </td>
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="border-b border-slate-100 last:border-0">
-                  <td className="px-4 py-3">
-                    <Link href={`/companies/${row.id}`} className="font-medium underline">
+                <tr
+                  key={row.id}
+                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                >
+                  <th scope="row" className="px-4 py-2.5 text-left font-medium">
+                    <Link
+                      href={`/companies/${row.id}`}
+                      className={rowLinkClass}
+                    >
                       {row.name}
                     </Link>
+                  </th>
+                  <td className="px-4 py-2.5 font-mono tabular-nums text-slate-600">
+                    {row.corporateNumber ?? "—"}
                   </td>
-                  <td className="px-4 py-3 font-mono text-slate-600">{row.corporateNumber ?? "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{row.contactName ?? "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{row.phone ?? "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{formatJst(row.updatedAt)}</td>
+                  <td className="px-4 py-2.5 text-slate-600">{row.contactName ?? "—"}</td>
+                  <td className="px-4 py-2.5 tabular-nums text-slate-600">{row.phone ?? "—"}</td>
+                  <td className="px-4 py-2.5 tabular-nums text-slate-600">
+                    {formatJst(row.updatedAt)}
+                  </td>
                 </tr>
               ))
             )}
@@ -166,23 +217,7 @@ export default async function CompaniesPage({
         </table>
       </div>
 
-      {lastPage > 1 ? (
-        <div className="flex items-center gap-4 text-sm">
-          {page > 1 ? (
-            <Link href={href({ page: page - 1 })} className="underline">
-              前へ
-            </Link>
-          ) : null}
-          <span className="text-slate-600">
-            {page} / {lastPage}
-          </span>
-          {page < lastPage ? (
-            <Link href={href({ page: page + 1 })} className="underline">
-              次へ
-            </Link>
-          ) : null}
-        </div>
-      ) : null}
+      <Pagination page={page} lastPage={lastPage} href={(next) => href({ page: next })} />
     </div>
   )
 }

@@ -2,15 +2,6 @@ import { redirect } from "next/navigation"
 import type { UserRole } from "@/db/schema"
 import { getCurrentUser, type CurrentUser } from "./current-user"
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-  client: "クライアント",
-  staff: "事務員",
-  instructor: "講師",
-  advisor: "社会保険労務士",
-  agency: "代理店",
-  admin: "システム管理者",
-}
-
 /** ログインしていなければログイン画面へ送る。 */
 export const requireUser = async (): Promise<CurrentUser> => {
   const user = await getCurrentUser()

@@ -1,7 +1,10 @@
 import Link from "next/link"
 import { AnnouncementBanner } from "@/components/announcement-banner"
+import { NavLink } from "@/components/nav-link"
+import { buttonGhost, linkClass } from "@/components/ui"
 import { logoutAction } from "@/lib/auth/actions"
-import { ROLE_LABELS, requireActiveUser } from "@/lib/auth/guards"
+import { requireActiveUser } from "@/lib/auth/guards"
+import { ROLE_LABELS } from "@/lib/roles"
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   // 権限は毎リクエスト user_roles を参照する（5.19）
@@ -14,31 +17,32 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-          <Link href="/" className="font-bold">
+          <Link href="/" className="rounded-sm font-bold text-slate-900">
             助成金管理システム
           </Link>
           {canManage ? (
-            <nav className="flex gap-3 text-sm">
-              <Link href="/companies" className="text-slate-600 underline">
-                会社
-              </Link>
+            <nav aria-label="主要メニュー" className="flex gap-1">
+              <NavLink href="/companies">会社</NavLink>
+              <NavLink href="/accounts">アカウント</NavLink>
+              <NavLink href="/deletion-logs">削除履歴</NavLink>
             </nav>
           ) : null}
           <div className="ml-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span>
-              {user.displayName}
-              <span className="ml-2 text-slate-500">
+            <span className="flex flex-col leading-tight">
+              <span className="font-medium text-slate-900">{user.displayName}</span>
+              <span className="text-xs text-slate-500">
                 {user.roles.map((role) => ROLE_LABELS[role]).join("・") || "権限なし"}
               </span>
             </span>
-            <Link href="/password/change" className="text-slate-600 underline">
+            <span aria-hidden className="h-5 w-px bg-slate-200" />
+            <Link href="/password/change" className={linkClass}>
               パスワード変更
             </Link>
-            <Link href="/login-id" className="text-slate-600 underline">
+            <Link href="/login-id" className={linkClass}>
               ログインID変更
             </Link>
             <form action={logoutAction}>
-              <button type="submit" className="text-slate-600 underline">
+              <button type="submit" className={buttonGhost + " px-2 py-1"}>
                 ログアウト
               </button>
             </form>

@@ -13,7 +13,7 @@ export default async function LoginIdPage() {
       </p>
       <LoginIdForm />
       <p className="text-xs leading-relaxed text-slate-500">
-        変更するとログアウトします。新しいログインIDで再度ログインしてください（5.4）。
+        変更するとログアウトします。新しいログインIDで再度ログインしてください。
       </p>
     </div>
   )

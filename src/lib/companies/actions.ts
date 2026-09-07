@@ -13,14 +13,21 @@ import { companySchema } from "./schema"
 /** D-01・D-02 を操作できるのは事務員とシステム管理者（06_画面設計.md 5）。 */
 const EDITORS = ["staff", "admin"] as const
 
-const parse = (formData: FormData) => {
-  const values = Object.fromEntries(formData.entries())
-  return companySchema.safeParse(values)
-}
+/** 入力値をそのまま取り出す。エラー時の復元にも使う。 */
+const rawValues = (formData: FormData) =>
+  Object.fromEntries(
+    [...formData.entries()].map(([key, value]) => [key, String(value)]),
+  ) as Record<string, string>
 
-const toFieldErrors = (error: import("zod").ZodError): FormState => ({
+const invalid = (
+  prev: FormState,
+  values: Record<string, string>,
+  fieldErrors: Record<string, string[]>,
+): FormState => ({
   errors: [],
-  fieldErrors: error.flatten().fieldErrors as Record<string, string[]>,
+  fieldErrors,
+  values,
+  attempt: (prev.attempt ?? 0) + 1,
 })
 
 /** 法人番号は重複を許さない（5.3）。一意制約と併せてアプリ側でも確認する。 */
@@ -41,15 +48,18 @@ const duplicateCorporateNumber = async (corporateNumber: string | null, excludeI
 const DUPLICATE_MESSAGE = "この法人番号はすでに登録されています。"
 
 export async function createCompanyAction(
-  _prev: FormState,
+  prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
   const user = await requireRoles(EDITORS)
-  const parsed = parse(formData)
-  if (!parsed.success) return toFieldErrors(parsed.error)
+  const values = rawValues(formData)
+  const parsed = companySchema.safeParse(values)
+  if (!parsed.success) {
+    return invalid(prev, values, parsed.error.flatten().fieldErrors as Record<string, string[]>)
+  }
 
   if (await duplicateCorporateNumber(parsed.data.corporateNumber)) {
-    return { errors: [], fieldErrors: { corporateNumber: [DUPLICATE_MESSAGE] } }
+    return invalid(prev, values, { corporateNumber: [DUPLICATE_MESSAGE] })
   }
 
   const current = now()
@@ -67,15 +77,18 @@ export async function createCompanyAction(
 
 export async function updateCompanyAction(
   companyId: number,
-  _prev: FormState,
+  prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
   const user = await requireRoles(EDITORS)
-  const parsed = parse(formData)
-  if (!parsed.success) return toFieldErrors(parsed.error)
+  const values = rawValues(formData)
+  const parsed = companySchema.safeParse(values)
+  if (!parsed.success) {
+    return invalid(prev, values, parsed.error.flatten().fieldErrors as Record<string, string[]>)
+  }
 
   if (await duplicateCorporateNumber(parsed.data.corporateNumber, companyId)) {
-    return { errors: [], fieldErrors: { corporateNumber: [DUPLICATE_MESSAGE] } }
+    return invalid(prev, values, { corporateNumber: [DUPLICATE_MESSAGE] })
   }
 
   await db

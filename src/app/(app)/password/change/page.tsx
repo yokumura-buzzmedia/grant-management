@@ -8,7 +8,7 @@ export default function PasswordChangePage() {
       <h1 className="text-xl font-bold">パスワードの変更</h1>
       <PasswordForm action={changePasswordAction} submitLabel="変更する" />
       <p className="text-xs leading-relaxed text-slate-500">
-        変更するとこの端末を含むすべての端末からログアウトします（5.19）。
+        変更するとこの端末を含むすべての端末からログアウトします。
       </p>
     </div>
   )

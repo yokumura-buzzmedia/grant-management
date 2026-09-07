@@ -10,6 +10,7 @@ const NOTICES: Record<string, string> = {
   "password-changed":
     "パスワードを変更しました。すべての端末からログアウトしています。新しいパスワードでログインしてください。",
   "login-id-changed": "ログインIDを変更しました。新しいログインIDでログインしてください。",
+  "self-deleted": "自分のアカウントを削除しました。ログアウトしています。",
 }
 
 export default async function LoginPage({

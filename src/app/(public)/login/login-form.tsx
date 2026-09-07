@@ -1,7 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
-import { ErrorList, Field, SubmitButton } from "@/components/form"
+import { ErrorList, Field, PasswordField, SubmitButton } from "@/components/form"
 import { loginAction } from "@/lib/auth/actions"
 import { EMPTY_STATE } from "@/lib/auth/form-state"
 
@@ -17,7 +17,7 @@ export function LoginForm() {
         autoComplete="username"
         hint="大文字と小文字を区別します"
       />
-      <Field label="パスワード" name="password" type="password" autoComplete="current-password" />
+      <PasswordField label="パスワード" name="password" autoComplete="current-password" />
       <SubmitButton>ログイン</SubmitButton>
     </form>
   )
