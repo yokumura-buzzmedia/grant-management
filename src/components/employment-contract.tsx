@@ -61,8 +61,13 @@ export function EmploymentContract({
       return
     }
 
-    // ここだけはアプリケーションサーバーを経由しない
-    const response = await fetch(ticket.url, { method: "PUT", body: file })
+    // ここだけはアプリケーションサーバーを経由せず、保管先へ直接送る。
+    // Content-Type は署名に含まれているので、発行時と同じ値を必ず付ける
+    const response = await fetch(ticket.url, {
+      method: "PUT",
+      body: file,
+      headers: { "content-type": file.type },
+    })
     if (!response.ok) {
       setError("アップロードに失敗しました。時間をおいてもう一度お試しください。")
       return
@@ -96,23 +101,53 @@ export function EmploymentContract({
       </p>
 
       {contract ? (
-        <dl className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[6rem_1fr]">
-          <dt className="text-slate-500">ファイル</dt>
-          <dd>
-            <a href={contract.downloadUrl} className={linkClass}>
-              {contract.originalFilename}
-            </a>
-            <span className="ml-2 text-xs text-slate-500">（押すと保存します）</span>
-          </dd>
-          <dt className="text-slate-500">提出</dt>
-          <dd className="tabular-nums text-slate-700">{contract.submittedAtText}</dd>
-          {contract.approvedAtText ? (
-            <>
-              <dt className="text-slate-500">承認</dt>
-              <dd className="tabular-nums text-slate-700">{contract.approvedAtText}</dd>
-            </>
-          ) : null}
-        </dl>
+        // ファイルそのものへの操作は、ファイルの情報と同じ帯に置く
+        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          {/* 一覧側を縮められるようにしないと、ボタンが下の行へ折り返す */}
+          <dl className="grid min-w-0 flex-1 gap-x-4 gap-y-1 text-sm sm:grid-cols-[5rem_minmax(0,1fr)]">
+            <dt className="text-slate-500">ファイル</dt>
+            <dd className="min-w-0 break-all">
+              <a href={contract.downloadUrl} className={linkClass}>
+                {contract.originalFilename}
+              </a>
+              <span className="ml-2 whitespace-nowrap text-xs text-slate-500">
+                （押すと保存します）
+              </span>
+            </dd>
+            <dt className="text-slate-500">提出</dt>
+            <dd className="tabular-nums text-slate-700">{contract.submittedAtText}</dd>
+            {contract.approvedAtText ? (
+              <>
+                <dt className="text-slate-500">承認</dt>
+                <dd className="tabular-nums text-slate-700">{contract.approvedAtText}</dd>
+              </>
+            ) : null}
+          </dl>
+
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <FilePreviewDialog
+              url={contract.previewUrl}
+              filename={contract.originalFilename}
+              contentType={contract.contentType}
+            />
+            {/* 削除は承認と同じ権限。差し替えで足りる場面で消させない */}
+            {canManage ? (
+              <DeleteDialog
+                action={deleteContractAction.bind(null, traineeId, companyId)}
+                buttonLabel="ファイルを削除"
+                title="雇用契約書を削除しますか"
+                targetName={contract.originalFilename}
+                consequences={[
+                  "保管しているファイルを削除します。差し替えではなく未提出の状態に戻ります。",
+                  ...(contract.status === "approved"
+                    ? ["承認が取り消され、進行中の申請案件はステータスを先へ進められなくなります。"]
+                    : []),
+                  "削除履歴には記録されません。",
+                ]}
+              />
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {error ? (
@@ -146,36 +181,12 @@ export function EmploymentContract({
         </SubmitButton>
       </form>
 
-      {contract ? (
-        <div className="flex flex-wrap items-center gap-3">
-          <FilePreviewDialog
-            url={contract.previewUrl}
-            filename={contract.originalFilename}
-            contentType={contract.contentType}
-          />
-
-          {canManage && contract.status === "submitted" ? (
-            <form action={approveContractAction.bind(null, traineeId, companyId)}>
-              <SubmitButton fullWidth={false}>承認する</SubmitButton>
-            </form>
-          ) : null}
-
-          {/* 削除も承認と同じ権限。差し替えで足りる場面で消させない */}
-          {canManage ? (
-            <DeleteDialog
-              action={deleteContractAction.bind(null, traineeId, companyId)}
-              buttonLabel="ファイルを削除"
-              title="雇用契約書を削除しますか"
-              targetName={contract.originalFilename}
-              consequences={[
-                "保管しているファイルを削除します。差し替えではなく未提出の状態に戻ります。",
-                ...(contract.status === "approved"
-                  ? ["承認が取り消され、進行中の申請案件はステータスを先へ進められなくなります。"]
-                  : []),
-                "削除履歴には記録されません。",
-              ]}
-            />
-          ) : null}
+      {/* 承認は書類の状態を進める操作なので、ファイルへの操作とは分けて下に置く */}
+      {canManage && contract?.status === "submitted" ? (
+        <div>
+          <form action={approveContractAction.bind(null, traineeId, companyId)}>
+            <SubmitButton fullWidth={false}>承認する</SubmitButton>
+          </form>
         </div>
       ) : null}
     </section>

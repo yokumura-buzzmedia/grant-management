@@ -106,9 +106,10 @@ export default async function CompanyPage({
     .where(eq(trainees.companyId, company.id))
     .orderBy(asc(trainees.nameKana), asc(trainees.name))
 
-  // ダウンロードURLは署名付きで、開くたびに発行し直す（03_技術選定.md 4.6）
-  const traineeList = traineeRows.map(
-    ({
+  // 取り出し用のURLは署名付きで、開くたびに発行し直す（03_技術選定.md 4.6）
+  const traineeList = await Promise.all(
+    traineeRows.map(
+    async ({
       contractStatus,
       contractFileKey,
       contractFilename,
@@ -116,24 +117,32 @@ export default async function CompanyPage({
       contractSubmittedAt,
       contractApprovedAt,
       ...trainee
-    }) => ({
-      ...trainee,
-      contract:
-        contractStatus &&
-        contractFileKey &&
-        contractFilename &&
-        contractContentType &&
-        contractSubmittedAt
-          ? {
-              status: contractStatus,
-              originalFilename: contractFilename,
-              contentType: contractContentType,
-              submittedAtText: formatJst(contractSubmittedAt),
-              approvedAtText: contractApprovedAt ? formatJst(contractApprovedAt) : null,
-              downloadUrl: createDownloadUrl(contractFileKey, contractFilename, contractContentType),
-              previewUrl: createPreviewUrl(contractFileKey, contractFilename, contractContentType),
-            }
-          : null,
+    }) => {
+      if (
+        !contractStatus ||
+        !contractFileKey ||
+        !contractFilename ||
+        !contractContentType ||
+        !contractSubmittedAt
+      ) {
+        return { ...trainee, contract: null }
+      }
+      const [downloadUrl, previewUrl] = await Promise.all([
+        createDownloadUrl(contractFileKey, contractFilename, contractContentType),
+        createPreviewUrl(contractFileKey, contractFilename, contractContentType),
+      ])
+      return {
+        ...trainee,
+        contract: {
+          status: contractStatus,
+          originalFilename: contractFilename,
+          contentType: contractContentType,
+          submittedAtText: formatJst(contractSubmittedAt),
+          approvedAtText: contractApprovedAt ? formatJst(contractApprovedAt) : null,
+          downloadUrl,
+          previewUrl,
+        },
+      }
     }),
   )
 

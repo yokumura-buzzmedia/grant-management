@@ -8,8 +8,12 @@ import { db } from "@/db/client"
 import { employmentContracts, MAX_FILE_SIZE, trainees } from "@/db/schema"
 import { canManageCompanies, requireCompanyEditor } from "@/lib/companies/authorize"
 import { now } from "@/lib/datetime"
-import { ALLOWED_CONTENT_TYPES, createUploadUrl, isAllowedContentType } from "@/lib/storage"
-import { deleteObject } from "@/lib/storage/local"
+import {
+  ALLOWED_CONTENT_TYPES,
+  createUploadUrl,
+  deleteObject,
+  isAllowedContentType,
+} from "@/lib/storage"
 
 /**
  * D-04 受講者ごとの雇用契約書（5.2）。
@@ -62,7 +66,7 @@ export async function requestContractUploadAction(
 
   // 保存名は推測できない値にする。元のファイル名は列で持つ
   const key = `employment-contracts/${traineeId}/${randomUUID()}.${ALLOWED_CONTENT_TYPES[contentType]}`
-  return { ok: true, key, url: createUploadUrl(key, contentType) }
+  return { ok: true, key, url: await createUploadUrl(key, contentType) }
 }
 
 /** アップロード済みのファイルを登録する。差し替えのときは前のファイルを消す（5.2） */

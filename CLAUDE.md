@@ -125,13 +125,18 @@ npm run db:studio    # Drizzle Studio
 **サーバーが署名付きURLを発行し、ブラウザから保管先へ直接送ります**（`03_技術選定.md` 4.6）。
 送信後にファイルキーだけをサーバーへ登録します。
 
-- **本番は S3。ただし S3 ドライバは未実装です。** いまあるのは開発用のローカル保管ドライバで、
-  `.uploads/` に保存し、`src/app/api/uploads/route.ts` が PUT と GET を受けます。
-  S3 へ移すときは `createUploadUrl` / `createDownloadUrl` / `deleteObject` の3つを差し替えます。
-- 受け口の認可はセッションではなく**署名**で行います。URLを発行する側（サーバーアクション）が
-  権限を検証しているためで、S3 の署名付きURLと同じ考え方です。
-- `FILE_STORAGE_SECRET` が未設定なら例外にします。既定値を持たせると、
-  鍵がないまま誰でも任意のキーへ書ける状態で動いてしまいます。
+- **本番は S3、ローカルは S3 互換の MinIO**（`docker-compose.yml` の `storage`）。
+  同じ AWS SDK・同じ署名付きURLで動かし、差し替わるのは接続先だけです。
+  保管先ごとに実装を分けると、本番でだけ通る経路ができて検証できなくなります。
+- `npm run db:up` が MySQL と MinIO を起動し、`storage-init` がバケットを作ります。
+  MinIO のコンソールは http://localhost:9001（grant / grantgrant）。
+- **ブラウザから直接 PUT するため、MinIO 側で CORS を許可しています**
+  （`MINIO_API_CORS_ALLOW_ORIGIN`）。本番の S3 でも同じ設定が要ります。
+- 認可は署名そのものです。URLを発行するサーバーアクションが権限を検証しています。
+- **保存と画面内表示は別の署名**です。`ResponseContentDisposition` は署名に含まれるので、
+  保存用に出したURLを表示用へ書き換えることはできません。
+- ローカルは `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` を使いますが、
+  **本番では設定しません。** ECS のタスクロールから取るため、未設定なら SDK の既定の解決に任せます。
 
 ## DB スキーマの規約（`src/db/schema/`）
 

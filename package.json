@@ -8,9 +8,9 @@
     "build": "NEXT_DIST_DIR=.next-build next build",
     "start": "NEXT_DIST_DIR=.next-build next start",
     "typecheck": "tsc --noEmit",
-    "db:up": "docker compose up -d --wait",
+    "db:up": "docker compose up -d --wait mysql storage && docker compose up storage-init",
     "db:down": "docker compose down",
-    "db:reset": "docker compose down -v && docker compose up -d --wait",
+    "db:reset": "docker compose down -v && npm run db:up",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs migrate",
     "db:studio": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs studio",
@@ -19,6 +19,8 @@
     "db:postal": "node --env-file=.env.local --import tsx ./src/db/import-postal-codes.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1127.0",
+    "@aws-sdk/s3-request-presigner": "^3.1127.0",
     "@hookform/resolvers": "^3.10.0",
     "@node-rs/argon2": "^2.2.0",
     "drizzle-orm": "^0.44.0",
