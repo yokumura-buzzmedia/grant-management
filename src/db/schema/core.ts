@@ -18,6 +18,7 @@ import {
   COMPANY_TYPES,
   DOCUMENT_STATUSES,
   EMPLOYMENT_TYPES,
+  GENDERS,
   MAX_FILE_SIZE,
   USER_ROLES,
   inList,
@@ -229,11 +230,22 @@ export const trainees = mysqlTable(
       .notNull()
       .references((): AnyMySqlColumn => companies.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }).notNull(),
+    /** 氏名のフリガナ。全角カタカナ */
+    nameKana: varchar("name_kana", { length: 100 }).notNull(),
     /** 雇用保険被保険者番号。ハイフンなし11桁 */
     insuranceNumber: char("insurance_number", { length: 11 }).notNull(),
     employmentType: varchar("employment_type", { length: 32 })
       .notNull()
       .$type<(typeof EMPLOYMENT_TYPES)[number]>(),
+    /**
+     * 職種。自由入力。
+     * カリキュラムの職種カテゴリマスタとは結び付けない。マスタは研修コースを選ぶためのもので、
+     * 受講者の実際の職種はそこに収まらない。
+     */
+    jobType: varchar("job_type", { length: 100 }).notNull(),
+    /** 職務内容 */
+    jobDescription: varchar("job_description", { length: 255 }).notNull(),
+    gender: varchar("gender", { length: 16 }).notNull().$type<(typeof GENDERS)[number]>(),
     ...audit(),
   },
   (t) => [
@@ -241,6 +253,7 @@ export const trainees = mysqlTable(
     uniqueIndex("uq_trainees_company_insurance").on(t.companyId, t.insuranceNumber),
     index("idx_trainees_name").on(t.name),
     check("chk_trainees_employment_type", inList("employment_type", EMPLOYMENT_TYPES)),
+    check("chk_trainees_gender", inList("gender", GENDERS)),
   ],
 )
 

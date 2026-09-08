@@ -10,6 +10,7 @@ import { deleteCompanyAction } from "@/lib/deletions/actions"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { Tabs } from "@/components/tabs"
 import { CompanyAccounts } from "@/components/company-accounts"
+import { CompanyTrainees } from "@/components/company-trainees"
 import { BackLink, Notice, PageHeader } from "@/components/ui"
 import { formatJst } from "@/lib/datetime"
 
@@ -21,6 +22,10 @@ const NOTICES: Record<string, string> = {
   "account-activated": "アカウントを有効にしました。",
   "account-deactivated": "アカウントを無効にしました。ログイン中の端末はログアウトされました。",
   "account-deleted": "アカウントを削除しました。削除履歴に記録しています。",
+  // trainee- は受講者の操作
+  "trainee-created": "受講者を登録しました。",
+  "trainee-saved": "受講者を保存しました。",
+  "trainee-deleted": "受講者を削除しました。",
 }
 
 const ERRORS: Record<string, string> = {
@@ -69,13 +74,30 @@ export default async function CompanyPage({
         .orderBy(asc(users.displayName))
     : []
 
-  // 削除で一緒に消えるものの件数（5.3）
-  const [[traineeCount], [projectCount]] = manager
-    ? await Promise.all([
-        db.select({ count: sql<number>`count(*)` }).from(trainees).where(eq(trainees.companyId, company.id)),
-        db.select({ count: sql<number>`count(*)` }).from(projects).where(eq(projects.companyId, company.id)),
-      ])
-    : [[{ count: 0 }], [{ count: 0 }]]
+  // 受講者はクライアントも編集できる（5.6）。アカウントと違い、権限で出し分けない
+  const traineeRows = await db
+    .select({
+      id: trainees.id,
+      name: trainees.name,
+      nameKana: trainees.nameKana,
+      insuranceNumber: trainees.insuranceNumber,
+      employmentType: trainees.employmentType,
+      jobType: trainees.jobType,
+      jobDescription: trainees.jobDescription,
+      gender: trainees.gender,
+      updatedAt: trainees.updatedAt,
+    })
+    .from(trainees)
+    .where(eq(trainees.companyId, company.id))
+    .orderBy(asc(trainees.nameKana), asc(trainees.name))
+
+  // 削除で一緒に消えるものの件数（5.3）。受講者は取得済みの行から数える
+  const [projectCount] = manager
+    ? await db
+        .select({ count: sql<number>`count(*)` })
+        .from(projects)
+        .where(eq(projects.companyId, company.id))
+    : [{ count: 0 }]
 
   return (
     <div className="flex flex-col gap-6">
@@ -95,14 +117,7 @@ export default async function CompanyPage({
         </p>
       ) : null}
 
-      {/* クライアントは基本情報しか扱えない。タブが1枚だけなら見出しごと出さない */}
-      {!manager ? (
-        <CompanyForm
-          action={updateCompanyAction.bind(null, companyId)}
-          values={company}
-          submitLabel="保存する"
-        />
-      ) : (
+      {/* 受講者はクライアントも編集できるため（5.6）、タブは権限によらず2枚以上ある */}
       <Tabs
         label="会社情報"
         defaultTabId={tab}
@@ -118,46 +133,58 @@ export default async function CompanyPage({
                   submitLabel="保存する"
                 />
 
-                <section className="flex flex-col gap-4 rounded-lg border border-red-200 bg-white p-6">
-                  <div>
-                    <h2 className="text-base font-semibold text-red-700">会社の削除</h2>
-                    <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                      会社を削除すると、紐づく申請案件・案件専用データ・クライアントアカウント・
-                      受講者もすべて完全削除されます。削除履歴には会社名と法人番号が残ります。
-                    </p>
-                  </div>
-                  <div>
-                    <DeleteDialog
-                      action={deleteCompanyAction.bind(null, company.id)}
-                      title="会社を完全に削除しますか"
-                      targetName={company.name}
-                      consequences={[
-                        `クライアントアカウント ${clientAccounts.length} 件が削除されます。`,
-                        `受講者 ${Number(traineeCount?.count ?? 0)} 件が削除されます。`,
-                        `申請案件 ${Number(projectCount?.count ?? 0)} 件と、その案件専用データが削除されます。`,
-                        "削除履歴に会社名と法人番号が残ります。",
-                      ]}
-                    />
-                  </div>
-                </section>
+                {/* 会社の削除は事務員・システム管理者だけ（06_画面設計.md 5） */}
+                {manager ? (
+                  <section className="flex flex-col gap-4 rounded-lg border border-red-200 bg-white p-6">
+                    <div>
+                      <h2 className="text-base font-semibold text-red-700">会社の削除</h2>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                        会社を削除すると、紐づく申請案件・案件専用データ・クライアントアカウント・
+                        受講者もすべて完全削除されます。削除履歴には会社名と法人番号が残ります。
+                      </p>
+                    </div>
+                    <div>
+                      <DeleteDialog
+                        action={deleteCompanyAction.bind(null, company.id)}
+                        title="会社を完全に削除しますか"
+                        targetName={company.name}
+                        consequences={[
+                          `クライアントアカウント ${clientAccounts.length} 件が削除されます。`,
+                          `受講者 ${traineeRows.length} 件が削除されます。`,
+                          `申請案件 ${Number(projectCount?.count ?? 0)} 件と、その案件専用データが削除されます。`,
+                          "削除履歴に会社名と法人番号が残ります。",
+                        ]}
+                      />
+                    </div>
+                  </section>
+                ) : null}
               </>
             ),
           },
           {
-            id: "accounts",
-            label: "アカウント",
-            count: clientAccounts.length,
-            panel: (
-              <CompanyAccounts
-                companyId={company.id}
-                companyName={company.name}
-                accounts={clientAccounts}
-              />
-            ),
+            id: "trainees",
+            label: "受講者",
+            count: traineeRows.length,
+            panel: <CompanyTrainees companyId={company.id} trainees={traineeRows} />,
           },
+          ...(manager
+            ? [
+                {
+                  id: "accounts",
+                  label: "アカウント",
+                  count: clientAccounts.length,
+                  panel: (
+                    <CompanyAccounts
+                      companyId={company.id}
+                      companyName={company.name}
+                      accounts={clientAccounts}
+                    />
+                  ),
+                },
+              ]
+            : []),
         ]}
       />
-      )}
     </div>
   )
 }

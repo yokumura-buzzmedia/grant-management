@@ -44,6 +44,14 @@ export const EMPLOYMENT_TYPES = [
 ] as const
 export type EmploymentType = (typeof EMPLOYMENT_TYPES)[number]
 
+/** 受講者の性別（01_要件定義.md 5.6） */
+export const GENDERS = [
+  "male", // 男性
+  "female", // 女性
+  "other", // その他
+] as const
+export type Gender = (typeof GENDERS)[number]
+
 /**
  * 申請案件のステータス（01_要件定義.md 5、11_ステータスの遷移.drawio）
  *

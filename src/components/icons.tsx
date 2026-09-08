@@ -61,6 +61,16 @@ export function TrashIcon(props: IconProps) {
   )
 }
 
+/** 編集 */
+export function EditIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M16.6 3.7a1.6 1.6 0 0 1 2.3 0l1.4 1.4a1.6 1.6 0 0 1 0 2.3L9.1 19.6a1.5 1.5 0 0 1-.7.4l-4 1.1a.5.5 0 0 1-.6-.6l1.1-4a1.5 1.5 0 0 1 .4-.7Z" />
+      <path d="m14.8 5.5 3.7 3.7" />
+    </Icon>
+  )
+}
+
 /** 閉じる */
 export function CloseIcon(props: IconProps) {
   return (

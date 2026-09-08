@@ -14,9 +14,12 @@ import { LOGIN_ID_RULE } from "@/lib/auth/policy"
 export function ClientAccountForm({
   companyId,
   companyName,
+  framed = true,
 }: {
   companyId: number
   companyName: string
+  /** 枠を持つカードとして出すか。既に枠の中に置く場合は false */
+  framed?: boolean
 }) {
   // 作成結果は useActionState が持つため、続けて作成するには作り直すしかない
   const [round, setRound] = useState(0)
@@ -25,6 +28,7 @@ export function ClientAccountForm({
       key={round}
       companyId={companyId}
       companyName={companyName}
+      framed={framed}
       onAgain={() => setRound((current) => current + 1)}
     />
   )
@@ -33,10 +37,12 @@ export function ClientAccountForm({
 function ClientAccountFormRound({
   companyId,
   companyName,
+  framed,
   onAgain,
 }: {
   companyId: number
   companyName: string
+  framed: boolean
   onAgain: () => void
 }) {
   const action = createClientAccountAction.bind(null, companyId)
@@ -60,7 +66,13 @@ function ClientAccountFormRound({
     >
       <ErrorList errors={state.errors} />
 
-      <section className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6">
+      <section
+        className={
+          framed
+            ? "flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6"
+            : "flex flex-col gap-4"
+        }
+      >
         <p className="rounded-md bg-slate-100 p-3 text-xs leading-relaxed text-slate-600">
           所属会社は <span className="font-medium">{companyName}</span> になります。
           作成後に所属会社は変更できません。
