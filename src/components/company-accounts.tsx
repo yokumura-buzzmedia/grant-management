@@ -43,7 +43,7 @@ export function CompanyAccounts({
             この会社の担当者がログインするためのアカウントです。所属会社は作成後に変更できません。
           </p>
         </div>
-        {/* 仮パスワードはこの中で一度だけ出す。自動で閉じると読む前に消えるので closeToken は渡さない */}
+        {/* 作成結果（仮パスワード）はこの中に出る。redirect しないので開いたまま残る */}
         <FormDialog
           triggerLabel="新規作成"
           triggerDescription="クライアントアカウント"
@@ -104,8 +104,8 @@ export function CompanyAccounts({
                   </td>
                   <td className="px-4 py-2.5 text-right">
                     {/*
-                      仮パスワードの再生成の結果はこの中に出る。自動で閉じると読む前に消えるので
-                      closeToken は渡さない。閉じるのは利用者の操作に任せる。
+                      保存・有効／無効・削除は redirect するため、画面遷移でこのダイアログごと消える。
+                      仮パスワードの再生成だけは状態を返すので、開いたまま結果がこの中に出る。
                     */}
                     <FormDialog
                       triggerVariant="icon"

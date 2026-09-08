@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useId, useRef, useState } from "react"
+import { useId, useRef, useState } from "react"
 import { CloseIcon, EditIcon } from "@/components/icons"
 import { buttonPrimary, focusRing } from "@/components/ui"
 
@@ -13,13 +13,17 @@ import { buttonPrimary, focusRing } from "@/components/ui"
  *
  * 中身は開いている間だけ描画する。閉じても残すと、前回の入力や作成結果が
  * 次に開いたときそのまま出てくる。
+ *
+ * 閉じるきっかけは中のフォーム次第になる。
+ * 保存後に redirect するアクションは画面遷移でこのダイアログごと消えるため、
+ * 結果は背面の通知帯で伝わる。状態を返すだけのアクション（仮パスワードの発行など）は
+ * 開いたままになり、結果はこの中に出る。
  */
 export function FormDialog({
   triggerLabel,
   triggerDescription,
   triggerVariant = "primary",
   title,
-  closeToken,
   children,
 }: {
   triggerLabel: string
@@ -34,23 +38,11 @@ export function FormDialog({
    */
   triggerVariant?: "primary" | "icon"
   title: string
-  /**
-   * 値が変わったら閉じる。
-   * 作成が成功して一覧が増えたことを検知する。結果をダイアログの中に出す場合は渡さない。
-   */
-  closeToken?: string | number
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
   const dialog = useRef<HTMLDialogElement>(null)
   const titleId = useId()
-  const seenToken = useRef(closeToken)
-
-  useEffect(() => {
-    if (closeToken === seenToken.current) return
-    seenToken.current = closeToken
-    if (closeToken !== undefined) dialog.current?.close()
-  }, [closeToken])
 
   const open_ = () => {
     dialog.current?.showModal()

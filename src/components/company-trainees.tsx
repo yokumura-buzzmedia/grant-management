@@ -1,5 +1,6 @@
 import type { EmploymentType, Gender } from "@/db/schema"
 import { DeleteDialog } from "@/components/delete-dialog"
+import { EmploymentContract, type ContractView } from "@/components/employment-contract"
 import { FormDialog } from "@/components/form-dialog"
 import { Th } from "@/components/ui"
 import { TraineeForm } from "@/components/trainee-form"
@@ -19,8 +20,19 @@ export type CompanyTrainee = {
   jobType: string
   jobDescription: string
   gender: Gender
-  /** 保存できたらダイアログを閉じるための目印。保存のたびに必ず変わる */
-  updatedAt: Date
+  /** 雇用契約書（5.2）。未提出なら null */
+  contract: ContractView | null
+}
+
+/** 一覧に出す雇用契約書の状態。未提出と承認待ちは事務員が動く必要がある */
+function ContractStatus({ contract }: { contract: ContractView | null }) {
+  if (contract === null) {
+    return <span className="rounded bg-amber-100 px-2 py-0.5 text-amber-900">未提出</span>
+  }
+  if (contract.status === "submitted") {
+    return <span className="rounded bg-sky-100 px-2 py-0.5 text-sky-900">承認待ち</span>
+  }
+  return <span className="text-slate-600">承認済</span>
 }
 
 /**
@@ -34,9 +46,12 @@ export type CompanyTrainee = {
 export function CompanyTrainees({
   companyId,
   trainees,
+  canManage,
 }: {
   companyId: number
   trainees: CompanyTrainee[]
+  /** 雇用契約書を承認・削除できるか。事務員とシステム管理者だけ（5.2） */
+  canManage: boolean
 }) {
   return (
     <div className="flex flex-col gap-6">
@@ -48,13 +63,7 @@ export function CompanyTrainees({
             受講者が1人以上登録されている必要があります。
           </p>
         </div>
-        {/* 登録できたら閉じる。件数が増えたことで判定する */}
-        <FormDialog
-          triggerLabel="新規作成"
-          triggerDescription="受講者"
-          title="受講者を登録"
-          closeToken={trainees.length}
-        >
+        <FormDialog triggerLabel="新規作成" triggerDescription="受講者" title="受講者を登録">
           <TraineeForm
             action={createTraineeAction.bind(null, companyId)}
             submitLabel="登録する"
@@ -69,7 +78,7 @@ export function CompanyTrainees({
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full min-w-[900px] text-sm">
+          <table className="w-full min-w-[1040px] text-sm">
             <caption className="sr-only">この会社の受講者の一覧。全 {trainees.length} 件。</caption>
             <thead className="border-b border-slate-200 bg-slate-50 text-left">
               <tr>
@@ -80,6 +89,7 @@ export function CompanyTrainees({
                 <Th>職種</Th>
                 <Th>職務内容</Th>
                 <Th>性別</Th>
+                <Th>雇用契約書</Th>
                 {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す */}
                 <Th className="w-px">
                   <span className="sr-only">操作</span>
@@ -105,13 +115,14 @@ export function CompanyTrainees({
                   <td className="px-4 py-2.5 text-slate-600">{trainee.jobType}</td>
                   <td className="px-4 py-2.5 text-slate-600">{trainee.jobDescription}</td>
                   <td className="px-4 py-2.5 text-slate-600">{GENDER_LABELS[trainee.gender]}</td>
+                  <td className="px-4 py-2.5">
+                    <ContractStatus contract={trainee.contract} />
+                  </td>
                   <td className="px-4 py-2.5 text-right">
                     <FormDialog
                       triggerVariant="icon"
                       triggerLabel={`${trainee.name} を編集`}
                       title={`${trainee.name} の編集`}
-                      // 保存できたら閉じる。updatedAt は保存のたびに必ず変わる
-                      closeToken={trainee.updatedAt.getTime()}
                     >
                       <div className="flex flex-col gap-6">
                         <TraineeForm
@@ -128,6 +139,15 @@ export function CompanyTrainees({
                           submitLabel="保存する"
                           framed={false}
                         />
+
+                        <div className="border-t border-slate-200 pt-6">
+                          <EmploymentContract
+                            traineeId={trainee.id}
+                            companyId={companyId}
+                            contract={trainee.contract}
+                            canManage={canManage}
+                          />
+                        </div>
 
                         <div className="flex flex-col gap-3 border-t border-slate-200 pt-6">
                           <h3 className="text-sm font-bold text-red-700">受講者の削除</h3>
