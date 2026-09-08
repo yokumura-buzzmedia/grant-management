@@ -15,8 +15,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: grant_management
-      MYSQL_USER: grant
-      MYSQL_PASSWORD: grant
+      # grant は MySQL の予約語で RDS がマスターユーザー名に使わせないため、
+      # 本番に合わせて grant_app にしている
+      MYSQL_USER: grant_app
+      MYSQL_PASSWORD: password
       TZ: UTC
     ports:
       - "3307:3306"

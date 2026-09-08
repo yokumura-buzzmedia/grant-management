@@ -138,6 +138,28 @@ npm run db:studio    # Drizzle Studio
 - ローカルは `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` を使いますが、
   **本番では設定しません。** ECS のタスクロールから取るため、未設定なら SDK の既定の解決に任せます。
 
+## インフラ（`infra/`）
+
+`docs/設計/03_技術選定.md` 5章の構成を Terraform で管理します。詳細は `infra/README.md`。
+AWS プロファイルは `grant`（`024430211741` へ AssumeRole）、state は
+`s3://grant-management-tfstate-024430211741` に置いています。
+
+```bash
+export AWS_PROFILE=grant
+terraform -chdir=infra/environments/prod plan
+```
+
+本番の VPC・RDS・S3・ECR・ALB・ECS は作成済みです。次の点に注意してください。
+
+- **ALB は当面 HTTP のみ。** ドメインが未定で ACM 証明書を発行できないためです。
+  HTTPS・Route 53・SES・S3 の CORS は、ドメインが決まるまで着手できません。
+- **ECS のタスク数は 0 です。** ECR が空なので、イメージを push してから
+  `terraform.tfvars` の `desired_count` を 2 にします。
+- **セキュリティグループの `description` に日本語は使えません。** EC2 API が
+  ASCII の一部しか受け付けないため、説明は Terraform 側のコメントに書きます。
+- **RDS のマスターユーザー名は `grant_app`。** `grant` は MySQL の予約語で
+  RDS が拒否します。ローカルの docker-compose も同じ名前に揃えています。
+
 ## DB スキーマの規約（`src/db/schema/`）
 
 論理設計は `docs/設計/04_DB論理設計.md`。ファイル分割は循環参照の回避が理由です。
