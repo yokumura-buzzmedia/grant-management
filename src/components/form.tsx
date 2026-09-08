@@ -156,6 +156,32 @@ export function Field({
 }
 
 /**
+ * 変更できない項目。
+ *
+ * input に readOnly を付けると、押せば直せそうに見えるうえ、なぜ直せないのかが伝わらない。
+ * 値は文字として出し、変更できない理由は注記に書く。
+ */
+export function ReadOnlyField({
+  label,
+  value,
+  hint,
+}: {
+  label: string
+  value: string
+  hint?: string
+}) {
+  return (
+    <div>
+      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
+      <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-base text-slate-700">
+        {value}
+      </p>
+      {hint ? <span className="mt-1 block text-xs text-slate-500">{hint}</span> : null}
+    </div>
+  )
+}
+
+/**
  * パスワード入力欄。表示切替を持つ。
  *
  * 仮パスワードは管理者が口頭や LINE で伝える運用のため、打ち間違いなのか

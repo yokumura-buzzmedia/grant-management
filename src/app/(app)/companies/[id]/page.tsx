@@ -83,7 +83,6 @@ export default async function CompanyPage({
         {/* クライアントは会社一覧（D-01）を利用できないため、戻り先を出さない */}
         {manager ? <BackLink href="/companies">会社一覧</BackLink> : null}
         <PageHeader
-          screenId="D-02"
           title={company.name}
           description={`最終更新 ${formatJst(company.updatedAt)}`}
         />

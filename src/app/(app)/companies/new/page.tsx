@@ -11,7 +11,7 @@ export default async function NewCompanyPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         <BackLink href="/companies">会社一覧</BackLink>
-        <PageHeader screenId="D-02" title="会社の登録" />
+        <PageHeader title="会社の登録" />
       </div>
       <CompanyForm action={createCompanyAction} submitLabel="登録する" />
     </div>

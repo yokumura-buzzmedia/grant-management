@@ -52,7 +52,17 @@ export default async function AccountPage({
 
   const { notice, error } = await searchParams
   const assignable = creatableRoles(actor.roles)
+  const editableRoles = account.roles.filter((role) => assignable.includes(role))
   const fixedRoles = account.roles.filter((role) => !assignable.includes(role))
+
+  /**
+   * クライアントは所属会社と対になる権限で、この画面では付け外ししない。
+   * 付け外しできる権限が1つもなければ、空のチェックボックスを並べても選べる先がないので、
+   * 権限欄そのものを出さず、代わりに所属会社を読み取り専用で見せる。
+   * 他の権限も併せ持つ場合は、保存で黙って外れないよう権限欄を残す。
+   */
+  const isClient = account.roles.includes("client")
+  const showRoles = !isClient || editableRoles.length > 0
 
   // 無効にできない条件（5.4）
   const otherActiveAdmins = await countActiveAdmins(account.id)
@@ -74,7 +84,6 @@ export default async function AccountPage({
       <div className="flex flex-col gap-3">
         <BackLink href="/accounts">アカウント一覧</BackLink>
         <PageHeader
-          screenId="G-02"
           title={account.displayName}
           description={[
             account.loginId,
@@ -97,9 +106,12 @@ export default async function AccountPage({
         accountId={account.id}
         loginId={account.loginId}
         displayName={account.displayName}
-        roles={account.roles.filter((role) => assignable.includes(role))}
-        roleOptions={assignable.map((role) => ({ value: role, label: ROLE_LABELS[role] }))}
+        roles={editableRoles}
+        roleOptions={
+          showRoles ? assignable.map((role) => ({ value: role, label: ROLE_LABELS[role] })) : []
+        }
         fixedRoleLabels={fixedRoles.map((role) => ROLE_LABELS[role])}
+        companyName={isClient ? (company?.name ?? "未設定") : null}
       />
 
       <AccountStatusControl

@@ -101,7 +101,6 @@ export default async function CompaniesPage({
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        screenId="D-01"
         title="会社一覧"
         action={
           <Link href="/companies/new" className={buttonPrimary}>

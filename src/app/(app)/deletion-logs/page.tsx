@@ -72,7 +72,6 @@ export default async function DeletionLogsPage({
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        screenId="G-04"
         title="削除履歴"
         description="削除の記録は誰も消せません。閲覧のみです。"
       />

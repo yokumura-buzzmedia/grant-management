@@ -1,7 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
-import { CheckboxGroup, ErrorList, Field, SubmitButton } from "@/components/form"
+import { CheckboxGroup, ErrorList, Field, ReadOnlyField, SubmitButton } from "@/components/form"
 import { updateAccountAction } from "@/lib/accounts/actions"
 import { EMPTY_ACCOUNT_STATE } from "@/lib/accounts/state"
 import { LOGIN_ID_RULE } from "@/lib/auth/policy"
@@ -14,6 +14,7 @@ export function AccountEditForm({
   roles,
   roleOptions,
   fixedRoleLabels,
+  companyName = null,
   returnCompanyId = null,
   framed = true,
 }: {
@@ -29,6 +30,8 @@ export function AccountEditForm({
   roleOptions: readonly { value: string; label: string }[]
   /** 画面から変更できない権限（クライアント・代理店） */
   fixedRoleLabels: string[]
+  /** クライアントの所属会社。読み取り専用で出す。対象外なら null */
+  companyName?: string | null
   /** 会社詳細から使う場合の会社ID。保存後にその画面へ戻す */
   returnCompanyId?: number | null
   /** 枠を持つカードとして出すか。既に枠の中に置く場合は false */
@@ -72,6 +75,13 @@ export function AccountEditForm({
           defaultValue={submitted?.displayName ?? displayName}
           errors={e("displayName")}
         />
+        {companyName === null ? null : (
+          <ReadOnlyField
+            label="所属会社"
+            value={companyName}
+            hint="所属会社はクライアント権限と対になるため、この画面では変更できません"
+          />
+        )}
         {roleOptions.length > 0 ? (
           <>
             <CheckboxGroup

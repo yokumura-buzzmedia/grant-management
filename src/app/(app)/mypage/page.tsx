@@ -25,7 +25,7 @@ export default async function MyPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader screenId="A-05" title="マイページ" />
+      <PageHeader title="マイページ" />
 
       <FormSection title="アカウント情報">
         <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-[8rem_1fr]">

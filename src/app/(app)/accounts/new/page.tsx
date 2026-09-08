@@ -11,7 +11,7 @@ export default async function NewAccountPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         <BackLink href="/accounts">アカウント一覧</BackLink>
-        <PageHeader screenId="G-02" title="アカウントの作成" />
+        <PageHeader title="アカウントの作成" />
       </div>
 
       <AccountForm

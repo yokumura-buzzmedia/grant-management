@@ -6,12 +6,6 @@ import Link from "next/link"
  */
 
 /**
- * 画面ID（D-01 など）は設計書との対応を追うための開発者向けの情報で、
- * 利用者には意味がない。本番ビルドでは出さない。
- */
-const SHOW_SCREEN_ID = process.env.NODE_ENV !== "production"
-
-/**
  * キーボード操作時の現在位置。
  * outline-none でブラウザ既定の輪郭を消す場合は、必ずこれを併せて付ける（WCAG 2.4.7）。
  */
@@ -80,15 +74,14 @@ export function BackLink({ href, children }: { href: string; children: React.Rea
 
 /**
  * 画面上部の見出し。
- * 画面ID（D-01 など）は設計書との対応を追うためのもので、見出し本文には含めない。
+ * 画面ID（D-01 など）は設計書との対応を追うための開発者向けの情報なので、画面には出さない。
+ * コードから設計書を引くための対応は、各ページの JSDoc に残している。
  */
 export function PageHeader({
-  screenId,
   title,
   description,
   action,
 }: {
-  screenId?: string
   title: string
   description?: string
   action?: React.ReactNode
@@ -96,9 +89,6 @@ export function PageHeader({
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
-        {screenId && SHOW_SCREEN_ID ? (
-          <p className="font-mono text-xs text-slate-500">{screenId}</p>
-        ) : null}
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
         {description ? <p className="mt-1 text-sm text-slate-600">{description}</p> : null}
       </div>
@@ -244,6 +234,54 @@ export function FilterChip({
     >
       {children}
     </Link>
+  )
+}
+
+/**
+ * 画面を切り替えるタブ。
+ *
+ * ARIA の tabs パターン（components/tabs.tsx）は、同じ文書の中でパネルを差し替える前提。
+ * ここは切り替えが画面遷移になり、並び替えやページ送りのリンクにも状態が乗るので、
+ * ボタンではなくリンクにして現在地を aria-current で示す。
+ */
+export function TabLinks({
+  label,
+  tabs,
+}: {
+  /** タブ一覧そのものの説明。読み上げに使う */
+  label: string
+  tabs: readonly { href: string; label: string; current: boolean; count?: number }[]
+}) {
+  return (
+    <nav aria-label={label} className="flex gap-1 border-b border-slate-200">
+      {tabs.map((tab) => (
+        <Link
+          key={tab.href}
+          href={tab.href}
+          aria-current={tab.current ? "page" : undefined}
+          className={
+            "-mb-px flex items-center gap-2 rounded-t-md border-b-2 px-4 py-2.5 text-sm " +
+            (tab.current
+              ? "border-slate-900 font-semibold text-slate-900"
+              : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900") +
+            " " +
+            focusRing
+          }
+        >
+          {tab.label}
+          {tab.count === undefined ? null : (
+            <span
+              className={
+                "rounded-full px-2 py-0.5 text-xs tabular-nums " +
+                (tab.current ? "bg-slate-900 text-white" : "bg-slate-200 text-slate-700")
+              }
+            >
+              {tab.count}
+            </span>
+          )}
+        </Link>
+      ))}
+    </nav>
   )
 }
 
