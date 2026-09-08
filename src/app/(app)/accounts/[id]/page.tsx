@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import { eq } from "drizzle-orm"
 import { db } from "@/db/client"
@@ -8,6 +7,7 @@ import { AccountPasswordReset } from "@/components/account-password-reset"
 import { AccountStatusControl } from "@/components/account-status-control"
 import { canManage, countActiveAdmins, findAccount } from "@/lib/accounts/authorize"
 import { DeleteDialog } from "@/components/delete-dialog"
+import { BackLink, Notice, PageHeader } from "@/components/ui"
 import { deleteAccountAction } from "@/lib/deletions/actions"
 import { requireRoles } from "@/lib/auth/guards"
 import { ROLE_LABELS, creatableRoles } from "@/lib/roles"
@@ -71,29 +71,24 @@ export default async function AccountPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <Link href="/accounts" className="text-sm text-slate-600 underline">
-          ← アカウント一覧
-        </Link>
-        <h1 className="mt-2 text-xl font-bold">
-          <span className="mr-2 rounded bg-slate-200 px-2 py-0.5 font-mono text-sm">G-02</span>
-          {account.displayName}
-        </h1>
-        <p className="mt-1 text-xs text-slate-500">
-          <span className="font-mono">{account.loginId}</span>
-          {" ／ "}
-          {account.roles.map((role) => ROLE_LABELS[role]).join("・")}
-          {company ? ` ／ ${company.name}` : ""}
-        </p>
+      <div className="flex flex-col gap-3">
+        <BackLink href="/accounts">アカウント一覧</BackLink>
+        <PageHeader
+          screenId="G-02"
+          title={account.displayName}
+          description={[
+            account.loginId,
+            account.roles.map((role) => ROLE_LABELS[role]).join("・"),
+            company?.name,
+          ]
+            .filter(Boolean)
+            .join(" ／ ")}
+        />
       </div>
 
-      {notice && NOTICES[notice] ? (
-        <p className="rounded-md border border-sky-300 bg-sky-50 p-3 text-sm text-sky-900">
-          {NOTICES[notice]}
-        </p>
-      ) : null}
+      {notice && NOTICES[notice] ? <Notice>{NOTICES[notice]}</Notice> : null}
       {error && ERRORS[error] ? (
-        <p className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+        <p role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
           {ERRORS[error]}
         </p>
       ) : null}
@@ -109,11 +104,16 @@ export default async function AccountPage({
 
       <AccountStatusControl
         accountId={account.id}
+        accountName={account.displayName}
         isActive={account.isActive}
         disabledReason={disabledReason}
       />
 
-      <AccountPasswordReset accountId={account.id} />
+      <AccountPasswordReset
+        accountId={account.id}
+        accountName={account.displayName}
+        isTemporaryPassword={account.isTemporaryPassword}
+      />
 
       <section className="flex flex-col gap-4 rounded-lg border border-red-200 bg-white p-6">
         <h2 className="text-sm font-bold text-red-700">アカウントの削除</h2>
@@ -127,7 +127,7 @@ export default async function AccountPage({
             </p>
             <div>
               <DeleteDialog
-                action={deleteAccountAction.bind(null, account.id)}
+                action={deleteAccountAction.bind(null, account.id, null)}
                 title="アカウントを完全に削除しますか"
                 targetName={`${account.displayName}（${account.loginId}）`}
                 consequences={[

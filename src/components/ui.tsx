@@ -66,6 +66,19 @@ export const rowLinkClass =
   focusRing
 
 /**
+ * 一覧や親画面へ戻る導線。見出しの上に置く。
+ * 矢印は装飾なので、読み上げには行き先の名前だけを渡す。
+ */
+export function BackLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} className={linkClass + " self-start text-sm"}>
+      <span aria-hidden>← </span>
+      {children}
+    </Link>
+  )
+}
+
+/**
  * 画面上部の見出し。
  * 画面ID（D-01 など）は設計書との対応を追うためのもので、見出し本文には含めない。
  */

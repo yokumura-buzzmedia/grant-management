@@ -1,9 +1,9 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import { eq } from "drizzle-orm"
 import { db } from "@/db/client"
 import { companies } from "@/db/schema"
 import { ClientAccountForm } from "@/components/client-account-form"
+import { BackLink, PageHeader } from "@/components/ui"
 import { requireRoles } from "@/lib/auth/guards"
 
 /** 会社詳細からのクライアントアカウント作成（5.3, 5.4）。 */
@@ -27,11 +27,9 @@ export default async function NewClientAccountPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <Link href={`/companies/${company.id}`} className="text-sm text-slate-600 underline">
-          ← {company.name}
-        </Link>
-        <h1 className="mt-2 text-xl font-bold">クライアントアカウントの作成</h1>
+      <div className="flex flex-col gap-3">
+        <BackLink href={`/companies/${company.id}?tab=accounts`}>{company.name}</BackLink>
+        <PageHeader title="クライアントアカウントの作成" />
       </div>
       <ClientAccountForm companyId={company.id} companyName={company.name} />
     </div>

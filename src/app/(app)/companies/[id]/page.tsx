@@ -4,17 +4,29 @@ import { and, asc, eq, sql } from "drizzle-orm"
 import { db } from "@/db/client"
 import { companies, projects, trainees, userRoles, users } from "@/db/schema"
 import { CompanyForm } from "@/components/company-form"
-import { requireRoles } from "@/lib/auth/guards"
+import { canManageCompanies, requireCompanyEditor } from "@/lib/companies/authorize"
 import { updateCompanyAction } from "@/lib/companies/actions"
 import { deleteCompanyAction } from "@/lib/deletions/actions"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { Tabs } from "@/components/tabs"
-import { buttonPrimary, FormSection, linkClass, Notice, PageHeader } from "@/components/ui"
+import { CompanyAccounts } from "@/components/company-accounts"
+import { BackLink, Notice, PageHeader } from "@/components/ui"
 import { formatJst } from "@/lib/datetime"
 
 const NOTICES: Record<string, string> = {
   created: "会社を登録しました。",
   saved: "会社情報を保存しました。",
+  // account- はクライアントアカウントの操作。会社自身の通知と文言が違うため分ける
+  "account-saved": "アカウントを保存しました。",
+  "account-activated": "アカウントを有効にしました。",
+  "account-deactivated": "アカウントを無効にしました。ログイン中の端末はログアウトされました。",
+  "account-deleted": "アカウントを削除しました。削除履歴に記録しています。",
+}
+
+const ERRORS: Record<string, string> = {
+  "account-forbidden": "このアカウントを操作する権限がありません。",
+  "account-self": "自分自身のアカウントは無効にできません。",
+  "account-lastAdmin": "有効なシステム管理者が1人だけのため、操作できません。",
 }
 
 /** D-02 会社情報の編集（5.3）。 */
@@ -23,45 +35,53 @@ export default async function CompanyPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ notice?: string; tab?: string }>
+  searchParams: Promise<{ notice?: string; error?: string; tab?: string }>
 }) {
-  await requireRoles(["staff", "admin"])
-
   const { id } = await params
   const companyId = Number(id)
   if (!Number.isInteger(companyId) || companyId <= 0) notFound()
 
+  // クライアントは自社だけ編集できる（06_画面設計.md 5 の ○）
+  const user = await requireCompanyEditor(companyId)
+  const manager = canManageCompanies(user)
+
   const [company] = await db.select().from(companies).where(eq(companies.id, companyId)).limit(1)
   if (!company) notFound()
 
-  const { notice, tab } = await searchParams
+  const { notice, error, tab } = await searchParams
   const message = notice ? NOTICES[notice] : undefined
+  const errorMessage = error ? ERRORS[error] : undefined
 
-  // この会社に所属するクライアントアカウント（5.3）。1社に複数登録できる
-  const clientAccounts = await db
-    .select({
-      id: users.id,
-      loginId: users.loginId,
-      displayName: users.displayName,
-      isActive: users.isActive,
-    })
-    .from(users)
-    .innerJoin(userRoles, and(eq(userRoles.userId, users.id), eq(userRoles.role, "client")))
-    .where(eq(users.companyId, company.id))
-    .orderBy(asc(users.displayName))
+  // アカウント管理と削除は事務員・システム管理者だけ。
+  // クライアントには出さないので、そのための問い合わせも行わない
+  const clientAccounts = manager
+    ? await db
+        .select({
+          id: users.id,
+          loginId: users.loginId,
+          displayName: users.displayName,
+          isActive: users.isActive,
+          isTemporaryPassword: users.isTemporaryPassword,
+        })
+        .from(users)
+        .innerJoin(userRoles, and(eq(userRoles.userId, users.id), eq(userRoles.role, "client")))
+        .where(eq(users.companyId, company.id))
+        .orderBy(asc(users.displayName))
+    : []
 
   // 削除で一緒に消えるものの件数（5.3）
-  const [[traineeCount], [projectCount]] = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(trainees).where(eq(trainees.companyId, company.id)),
-    db.select({ count: sql<number>`count(*)` }).from(projects).where(eq(projects.companyId, company.id)),
-  ])
+  const [[traineeCount], [projectCount]] = manager
+    ? await Promise.all([
+        db.select({ count: sql<number>`count(*)` }).from(trainees).where(eq(trainees.companyId, company.id)),
+        db.select({ count: sql<number>`count(*)` }).from(projects).where(eq(projects.companyId, company.id)),
+      ])
+    : [[{ count: 0 }], [{ count: 0 }]]
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <Link href="/companies" className={linkClass + " self-start text-sm"}>
-          ← 会社一覧
-        </Link>
+        {/* クライアントは会社一覧（D-01）を利用できないため、戻り先を出さない */}
+        {manager ? <BackLink href="/companies">会社一覧</BackLink> : null}
         <PageHeader
           screenId="D-02"
           title={company.name}
@@ -70,7 +90,20 @@ export default async function CompanyPage({
       </div>
 
       {message ? <Notice>{message}</Notice> : null}
+      {errorMessage ? (
+        <p role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+          {errorMessage}
+        </p>
+      ) : null}
 
+      {/* クライアントは基本情報しか扱えない。タブが1枚だけなら見出しごと出さない */}
+      {!manager ? (
+        <CompanyForm
+          action={updateCompanyAction.bind(null, companyId)}
+          values={company}
+          submitLabel="保存する"
+        />
+      ) : (
       <Tabs
         label="会社情報"
         defaultTabId={tab}
@@ -116,53 +149,16 @@ export default async function CompanyPage({
             label: "アカウント",
             count: clientAccounts.length,
             panel: (
-              <FormSection
-                title="クライアントアカウント"
-                description="この会社の担当者がログインするためのアカウントです。所属会社は作成後に変更できません。"
-              >
-                {clientAccounts.length === 0 ? (
-                  <p className="text-sm text-slate-500">
-                    この会社のクライアントアカウントはまだありません。
-                  </p>
-                ) : (
-                  <ul className="divide-y divide-slate-100 text-sm">
-                    {clientAccounts.map((account) => (
-                      <li
-                        key={account.id}
-                        className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5"
-                      >
-                        <Link
-                          href={`/accounts/${account.id}`}
-                          className={"rounded-sm font-medium text-slate-900 hover:underline " + linkClass}
-                        >
-                          {account.displayName}
-                        </Link>
-                        <span className="font-mono text-slate-600">{account.loginId}</span>
-                        <span
-                          className={
-                            "ml-auto rounded px-2 py-0.5 text-xs " +
-                            (account.isActive
-                              ? "bg-emerald-50 text-emerald-800"
-                              : "bg-slate-200 text-slate-700")
-                          }
-                        >
-                          {account.isActive ? "有効" : "無効"}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                <div>
-                  <Link href={`/companies/${company.id}/accounts/new`} className={buttonPrimary}>
-                    アカウントを作成
-                  </Link>
-                </div>
-              </FormSection>
+              <CompanyAccounts
+                companyId={company.id}
+                companyName={company.name}
+                accounts={clientAccounts}
+              />
             ),
           },
         ]}
       />
+      )}
     </div>
   )
 }

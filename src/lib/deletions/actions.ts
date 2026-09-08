@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { accountReturnPath } from "@/lib/accounts/return-path"
 import { eq } from "drizzle-orm"
 import { db } from "@/db/client"
 import { companies, deletionLogs, users } from "@/db/schema"
@@ -57,19 +58,25 @@ export async function deleteCompanyAction(companyId: number) {
  * - システム管理者は自分自身を削除できる。その場合はログイン画面へ戻す
  * - クライアントアカウントを削除しても、所属会社や業務データは残す
  */
-export async function deleteAccountAction(targetId: number) {
+export async function deleteAccountAction(
+  targetId: number,
+  /** 会社詳細から呼ばれた場合の会社ID。削除後にその画面へ戻す */
+  returnCompanyId: number | null = null,
+) {
   const actor = await requireRoles(DELETERS)
 
   const target = await findAccount(targetId)
   if (!target) redirect("/accounts")
-  if (!canManage(actor.roles, target)) redirect(`/accounts/${targetId}?error=forbidden`)
+  const back = (kind: "notice" | "error", value: string) =>
+    accountReturnPath(targetId, returnCompanyId, kind, value)
+  if (!canManage(actor.roles, target)) redirect(back("error", "forbidden"))
 
   if (
     target.roles.includes("admin") &&
     target.isActive &&
     (await countActiveAdmins(target.id)) === 0
   ) {
-    redirect(`/accounts/${targetId}?error=lastAdmin`)
+    redirect(back("error", "lastAdmin"))
   }
 
   await db.transaction(async (tx) => {
@@ -86,11 +93,16 @@ export async function deleteAccountAction(targetId: number) {
 
   revalidatePath("/accounts")
   revalidatePath("/deletion-logs")
+  if (returnCompanyId) revalidatePath(`/companies/${returnCompanyId}`)
 
   // 自分自身を削除した場合はセッションも連鎖削除されている
   if (target.id === actor.id) {
     await clearSessionCookie()
     redirect("/login?notice=self-deleted")
   }
-  redirect("/accounts?notice=deleted")
+  redirect(
+    returnCompanyId
+      ? `/companies/${returnCompanyId}?tab=accounts&notice=account-deleted`
+      : "/accounts?notice=deleted",
+  )
 }

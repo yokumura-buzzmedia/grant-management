@@ -14,7 +14,8 @@ export default function PasswordSetupPage() {
       </p>
       <PasswordForm action={setPasswordAction} submitLabel="設定する" />
       <p className="text-xs leading-relaxed text-slate-500">
-        設定するとすべての端末からログアウトします。新しいパスワードで再度ログインしてください。
+        設定するとそのまま利用を始められます。再度のログインは必要ありません。
+        仮パスワードで開いていた他の端末はログアウトします。
       </p>
     </>
   )

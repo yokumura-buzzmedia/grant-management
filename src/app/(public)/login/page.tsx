@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation"
 import { AnnouncementBanner } from "@/components/announcement-banner"
+import { Notice } from "@/components/ui"
 import { getCurrentUser } from "@/lib/auth/current-user"
 import { initialPath } from "@/lib/auth/guards"
 import { LoginForm } from "./login-form"
 
 /** 再ログインを促す画面から渡される案内。 */
 const NOTICES: Record<string, string> = {
-  "password-set": "新しいパスワードを設定しました。新しいパスワードでログインしてください。",
   "password-changed":
     "パスワードを変更しました。すべての端末からログアウトしています。新しいパスワードでログインしてください。",
   "login-id-changed": "ログインIDを変更しました。新しいログインIDでログインしてください。",
@@ -30,11 +30,7 @@ export default async function LoginPage({
       <main className="mx-auto flex max-w-md flex-col gap-6 px-4 py-12">
         <h1 className="text-center text-xl font-bold">助成金管理システム</h1>
 
-        {message ? (
-          <p className="rounded-md border border-sky-300 bg-sky-50 p-3 text-sm text-sky-900">
-            {message}
-          </p>
-        ) : null}
+        {message ? <Notice>{message}</Notice> : null}
 
         <LoginForm />
 

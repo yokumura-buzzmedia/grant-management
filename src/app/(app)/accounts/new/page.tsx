@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { AccountForm } from "@/components/account-form"
+import { BackLink, linkClass, PageHeader } from "@/components/ui"
 import { requireRoles } from "@/lib/auth/guards"
 import { ROLE_LABELS, creatableRoles } from "@/lib/roles"
 
@@ -8,14 +9,9 @@ export default async function NewAccountPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <Link href="/accounts" className="text-sm text-slate-600 underline">
-          ← アカウント一覧
-        </Link>
-        <h1 className="mt-2 text-xl font-bold">
-          <span className="mr-2 rounded bg-slate-200 px-2 py-0.5 font-mono text-sm">G-02</span>
-          アカウントの作成
-        </h1>
+      <div className="flex flex-col gap-3">
+        <BackLink href="/accounts">アカウント一覧</BackLink>
+        <PageHeader screenId="G-02" title="アカウントの作成" />
       </div>
 
       <AccountForm
@@ -25,9 +21,9 @@ export default async function NewAccountPage() {
         }))}
       />
 
-      <div className="text-xs leading-relaxed text-slate-500">
+      <div className="flex flex-col gap-1 text-xs leading-relaxed text-slate-600">
         <p>
-          <Link href="/companies" className="underline">
+          <Link href="/companies" className={linkClass}>
             クライアントアカウントは会社詳細から作成します
           </Link>
           。所属会社が1社に決まるためです。

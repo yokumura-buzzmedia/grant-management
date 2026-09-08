@@ -1,5 +1,5 @@
-import Link from "next/link"
 import { CompanyForm } from "@/components/company-form"
+import { BackLink, PageHeader } from "@/components/ui"
 import { requireRoles } from "@/lib/auth/guards"
 import { createCompanyAction } from "@/lib/companies/actions"
 
@@ -9,14 +9,9 @@ export default async function NewCompanyPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <Link href="/companies" className="text-sm text-slate-600 underline">
-          ← 会社一覧
-        </Link>
-        <h1 className="mt-2 text-xl font-bold">
-          <span className="mr-2 rounded bg-slate-200 px-2 py-0.5 font-mono text-sm">D-02</span>
-          会社の登録
-        </h1>
+      <div className="flex flex-col gap-3">
+        <BackLink href="/companies">会社一覧</BackLink>
+        <PageHeader screenId="D-02" title="会社の登録" />
       </div>
       <CompanyForm action={createCompanyAction} submitLabel="登録する" />
     </div>

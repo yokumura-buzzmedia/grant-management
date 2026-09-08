@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { accountReturnPath } from "@/lib/accounts/return-path"
 import { eq } from "drizzle-orm"
 import { db } from "@/db/client"
 import { companies, userRoles, users, type UserRole } from "@/db/schema"
@@ -209,6 +210,8 @@ const FIXED_ROLES: UserRole[] = ["client", "agency"]
 
 export async function updateAccountAction(
   targetId: number,
+  /** 会社詳細から呼ばれた場合の会社ID。保存後にその画面へ戻す */
+  returnCompanyId: number | null,
   prev: AccountFormState,
   formData: FormData,
 ): Promise<AccountFormState> {
@@ -295,25 +298,33 @@ export async function updateAccountAction(
 
   revalidatePath("/accounts")
   revalidatePath(`/accounts/${target.id}`)
-  redirect(`/accounts/${target.id}?notice=saved`)
+  if (returnCompanyId) revalidatePath(`/companies/${returnCompanyId}`)
+  redirect(accountReturnPath(target.id, returnCompanyId, "notice", "saved"))
 }
 
 /**
  * 有効・無効の切り替え（5.4, 5.19）。
  * 無効にしたアカウントは直ちに全端末からログアウトさせる。
  */
-export async function setAccountActiveAction(targetId: number, nextActive: boolean) {
+export async function setAccountActiveAction(
+  targetId: number,
+  nextActive: boolean,
+  /** 会社詳細から呼ばれた場合の会社ID。切り替え後にその画面へ戻す */
+  returnCompanyId: number | null = null,
+) {
   const actor = await requireRoles(CREATORS)
   const target = await findAccount(targetId)
   if (!target) redirect("/accounts")
-  if (!canManage(actor.roles, target)) redirect(`/accounts/${targetId}?error=forbidden`)
+  const back = (kind: "notice" | "error", value: string) =>
+    accountReturnPath(targetId, returnCompanyId, kind, value)
+  if (!canManage(actor.roles, target)) redirect(back("error", "forbidden"))
 
   if (!nextActive) {
     // システム管理者は自分自身を無効にできない（5.4）
-    if (target.id === actor.id) redirect(`/accounts/${targetId}?error=self`)
+    if (target.id === actor.id) redirect(back("error", "self"))
     // 有効なシステム管理者が1人だけの場合は無効にできない（5.4）
     if (target.roles.includes("admin") && (await countActiveAdmins(target.id)) === 0) {
-      redirect(`/accounts/${targetId}?error=lastAdmin`)
+      redirect(back("error", "lastAdmin"))
     }
   }
 
@@ -325,7 +336,8 @@ export async function setAccountActiveAction(targetId: number, nextActive: boole
   if (!nextActive) await destroyAllSessions(target.id)
 
   revalidatePath("/accounts")
-  redirect(`/accounts/${target.id}?notice=${nextActive ? "activated" : "deactivated"}`)
+  if (returnCompanyId) revalidatePath(`/companies/${returnCompanyId}`)
+  redirect(back("notice", nextActive ? "activated" : "deactivated"))
 }
 
 /**

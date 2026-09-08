@@ -1,3 +1,4 @@
+import { BackLink } from "@/components/ui"
 import { requireActiveUser } from "@/lib/auth/guards"
 import { LoginIdForm } from "./login-id-form"
 
@@ -7,6 +8,7 @@ export default async function LoginIdPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
+      <BackLink href="/mypage">マイページ</BackLink>
       <h1 className="text-xl font-bold">ログインIDの変更</h1>
       <p className="text-sm text-slate-600">
         現在のログインID: <span className="font-mono font-medium">{user.loginId}</span>

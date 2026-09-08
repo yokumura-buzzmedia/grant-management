@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import { AccountCreated } from "@/components/account-created"
 import { ErrorList, Field, SubmitButton } from "@/components/form"
 import { createClientAccountAction } from "@/lib/accounts/actions"
@@ -18,6 +18,27 @@ export function ClientAccountForm({
   companyId: number
   companyName: string
 }) {
+  // 作成結果は useActionState が持つため、続けて作成するには作り直すしかない
+  const [round, setRound] = useState(0)
+  return (
+    <ClientAccountFormRound
+      key={round}
+      companyId={companyId}
+      companyName={companyName}
+      onAgain={() => setRound((current) => current + 1)}
+    />
+  )
+}
+
+function ClientAccountFormRound({
+  companyId,
+  companyName,
+  onAgain,
+}: {
+  companyId: number
+  companyName: string
+  onAgain: () => void
+}) {
   const action = createClientAccountAction.bind(null, companyId)
   const [state, formAction] = useActionState(action, EMPTY_ACCOUNT_STATE)
   const e = (name: string) => state.fieldErrors?.[name]
@@ -25,12 +46,8 @@ export function ClientAccountForm({
 
   if (state.created) {
     return (
-      <AccountCreated
-        created={state.created}
-        backHref={`/companies/${companyId}?tab=accounts`}
-        backLabel="会社情報へ"
-        againHref={`/companies/${companyId}/accounts/new`}
-      />
+      // 会社詳細の中に置くため、画面を移らずその場で続けて作成できるようにする
+      <AccountCreated created={state.created} onAgain={onAgain} />
     )
   }
 

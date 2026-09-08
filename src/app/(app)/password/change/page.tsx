@@ -1,3 +1,4 @@
+import { BackLink } from "@/components/ui"
 import { PasswordForm } from "@/components/password-form"
 import { changePasswordAction } from "@/lib/auth/actions"
 
@@ -5,6 +6,7 @@ import { changePasswordAction } from "@/lib/auth/actions"
 export default function PasswordChangePage() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
+      <BackLink href="/mypage">マイページ</BackLink>
       <h1 className="text-xl font-bold">パスワードの変更</h1>
       <PasswordForm action={changePasswordAction} submitLabel="変更する" />
       <p className="text-xs leading-relaxed text-slate-500">

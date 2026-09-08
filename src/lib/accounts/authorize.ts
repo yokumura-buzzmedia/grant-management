@@ -15,6 +15,8 @@ export type TargetAccount = {
   loginId: string
   displayName: string
   isActive: boolean
+  /** 仮パスワードのまま。本人がまだ自分のパスワードを設定していない */
+  isTemporaryPassword: boolean
   companyId: number | null
   roles: UserRole[]
 }
@@ -27,6 +29,7 @@ export const findAccount = async (userId: number): Promise<TargetAccount | null>
       loginId: users.loginId,
       displayName: users.displayName,
       isActive: users.isActive,
+      isTemporaryPassword: users.isTemporaryPassword,
       companyId: users.companyId,
     })
     .from(users)

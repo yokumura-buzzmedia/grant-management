@@ -313,6 +313,18 @@ export function CheckboxGroup({
   )
 }
 
+/**
+ * 送信ボタンの強さ。
+ * 1画面に primary が複数あると、どれが主たる操作か分からなくなる。
+ * その画面の目的そのものでない送信（状態の切り替えなど）は secondary にする。
+ */
+const SUBMIT_VARIANTS = {
+  primary: "bg-slate-900 px-5 py-2.5 text-base text-white hover:bg-slate-700",
+  secondary:
+    "border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50",
+  danger: "bg-red-700 px-5 py-2.5 text-base text-white hover:bg-red-800",
+} as const
+
 export function SubmitButton({
   children,
   fullWidth = true,
@@ -321,8 +333,8 @@ export function SubmitButton({
   children: React.ReactNode
   /** 縦積みのフォームでは全幅。横に並べるときは false */
   fullWidth?: boolean
-  /** 取り消せない操作を確定するときは danger。確認ダイアログの中でだけ使う */
-  variant?: "primary" | "danger"
+  /** danger は確認ダイアログの中だけ。secondary は主たる操作ではない送信 */
+  variant?: keyof typeof SUBMIT_VARIANTS
 }) {
   const { pending } = useFormStatus()
   return (
@@ -331,8 +343,9 @@ export function SubmitButton({
       disabled={pending}
       className={
         (fullWidth ? "w-full " : "") +
-        "rounded-md px-5 py-2.5 text-base font-medium text-white disabled:opacity-50 " +
-        (variant === "danger" ? "bg-red-700 hover:bg-red-800 " : "bg-slate-900 hover:bg-slate-700 ") +
+        "inline-flex items-center justify-center rounded-md font-medium disabled:opacity-50 " +
+        SUBMIT_VARIANTS[variant] +
+        " " +
         focusRing
       }
     >

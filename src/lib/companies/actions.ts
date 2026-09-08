@@ -7,10 +7,11 @@ import { db } from "@/db/client"
 import { companies } from "@/db/schema"
 import type { FormState } from "@/lib/auth/form-state"
 import { requireRoles } from "@/lib/auth/guards"
+import { requireCompanyEditor } from "@/lib/companies/authorize"
 import { now } from "@/lib/datetime"
 import { companySchema } from "./schema"
 
-/** D-01・D-02 を操作できるのは事務員とシステム管理者（06_画面設計.md 5）。 */
+/** 会社を新しく作れるのは事務員とシステム管理者だけ（06_画面設計.md 5 の D-01）。 */
 const EDITORS = ["staff", "admin"] as const
 
 /** 入力値をそのまま取り出す。エラー時の復元にも使う。 */
@@ -80,7 +81,8 @@ export async function updateCompanyAction(
   prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const user = await requireRoles(EDITORS)
+  // クライアントは自社だけ編集できる（06_画面設計.md 5 の ○）。他社のIDを渡されても通さない
+  const user = await requireCompanyEditor(companyId)
   const values = rawValues(formData)
   const parsed = companySchema.safeParse(values)
   if (!parsed.success) {

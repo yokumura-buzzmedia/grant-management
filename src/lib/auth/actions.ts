@@ -89,6 +89,8 @@ const savePassword = async (
   userId: number,
   formData: FormData,
   redirectTo: string,
+  /** 操作した端末のログイン状態を保つか。他の端末はいずれの場合もログアウトさせる */
+  keepSignedIn = false,
 ): Promise<FormState> => {
   const password = text(formData, "password")
   const confirmation = text(formData, "confirmation")
@@ -108,15 +110,34 @@ const savePassword = async (
     })
     .where(eq(users.id, userId))
 
+  // 仮パスワードは本人以外の目に触れる経路（メール・LINE）で渡っているため、
+  // 操作を続ける端末であっても、それまでのセッションは一度すべて捨てる
   await destroyAllSessions(userId)
-  await clearSessionCookie()
+
+  if (keepSignedIn) {
+    const header = await headers()
+    await createSession(userId, {
+      userAgent: header.get("user-agent"),
+      ipAddress: parseIpAddress(header.get("x-forwarded-for") ?? header.get("x-real-ip")),
+    })
+  } else {
+    await clearSessionCookie()
+  }
+
   redirect(redirectTo)
 }
 
-/** A-02 初回パスワード設定。仮パスワードでログインした直後に必ず経由する。 */
+/**
+ * A-02 初回パスワード設定。仮パスワードでログインした直後に必ず経由する。
+ *
+ * 設定したらそのまま利用を続けられるようにする。
+ * 5.19 が全端末ログアウトを求めるのは「通常パスワードを変更した場合」で、
+ * 仮パスワードからの初回設定はこれにあたらない。
+ * それまでのセッションは捨てたうえで、この端末のセッションだけ発行し直す。
+ */
 export async function setPasswordAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await requireUser()
-  return savePassword(user.id, formData, "/login?notice=password-set")
+  return savePassword(user.id, formData, initialPath(user.roles), true)
 }
 
 /** A-03 パスワード変更。 */
