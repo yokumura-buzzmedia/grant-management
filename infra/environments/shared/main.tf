@@ -36,3 +36,15 @@ resource "aws_route53_record" "delegation" {
   ttl      = 172800
   records  = aws_route53_zone.app[0].name_servers
 }
+
+# メール送信。ドメイン認証はアカウント単位なので、本番とステージングで共有する。
+# サブドメインからの送信もこの認証で賄えるため、識別子は1つでよい。
+module "ses" {
+  source = "../../modules/ses"
+  count  = local.dns_enabled ? 1 : 0
+
+  domain                 = var.zone_name
+  zone_id                = aws_route53_zone.app[0].zone_id
+  notification_email     = var.notification_email
+  configuration_set_name = "grant-management"
+}

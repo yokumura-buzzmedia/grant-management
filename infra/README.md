@@ -124,6 +124,16 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
   `drizzle-kit` は devDependency で、`drizzle-orm` は Next.js のバンドルに
   取り込まれるため、どちらもアプリのイメージには独立して入りません。
   Dockerfile の `migrate` ステージが `node_modules` 一式と `drizzle/` を持ちます。
+- **SES のドメイン認証は `shared` に1つ。** SES の識別子はアカウント単位で、
+  サブドメインからの送信も親ドメインの認証で賄えます。本番は
+  `noreply@grant-management.buzzmedia-app.com`、ステージングは
+  `noreply@staging.grant-management.buzzmedia-app.com` を使い、
+  DMARC レポート上でも区別できるようにします。
+- **カスタム MAIL FROM を設定しています**（`mail.grant-management.buzzmedia-app.com`）。
+  既定のままだと Return-Path が `amazonses.com` になり、SPF が送信元ドメインと
+  揃わず DMARC のアライメントが取れません。
+- **DMARC は `p=none` から始めます。** レポートを受け取って実態を見てから厳しくします。
+  最初から `quarantine` にすると、設定の不備で正当なメールが届かなくなります。
 - **踏み台を1台置いています**（`t4g.nano`、月3USD程度）。SSM Session Manager の
   ポートフォワードで、手元から RDS を見るためです。SSH は使わず、受信は許可していません。
   使わない期間は停止できます。
@@ -132,7 +142,7 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
 
 | 項目 | 前提 |
 | --- | --- |
-| SES のドメイン検証・SPF/DKIM/DMARC・サンドボックス解除申請 | 5.8。解除に数日かかるため早めに |
+| SES のサンドボックス解除申請 | 解除まで数日。それまで検証済みアドレスにしか送れない |
 | GitHub Actions からの ECR push と ECS デプロイ（当面は手動） | 5.6 |
 | AWS WAF レートベースルール（`/login`、100req/5分/IP、まずカウントモード） | 5.4 |
 | AWS Backup（日次・30日保持・Vault Lock） | 5.3。本番のみ |

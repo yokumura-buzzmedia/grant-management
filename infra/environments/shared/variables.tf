@@ -26,3 +26,9 @@ variable "zone_name" {
   type        = string
   default     = ""
 }
+
+variable "notification_email" {
+  description = "バウンス・苦情と監視アラームの通知先"
+  type        = string
+  default     = "representative@buzzmedia.co.jp"
+}
