@@ -1,4 +1,4 @@
-# 親アカウント（982227460789）でドメインを登録したら、
-# 次の2行のコメントを外して apply する。子ゾーンの作成と NS 委譲が入る。
-# parent_zone_name = "buzzmedia-app.com"
-# zone_name        = "grant-management.buzzmedia-app.com"
+# ドメインは Organization の管理アカウント（982227460789）で登録している。
+# このサブドメインだけを NS 委譲で GrantManagement アカウントが受け取る。
+parent_zone_name = "buzzmedia-app.com"
+zone_name        = "grant-management.buzzmedia-app.com"

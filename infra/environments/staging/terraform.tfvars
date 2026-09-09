@@ -2,12 +2,10 @@
 # ステージングは縮小版なので1（03_技術選定.md 5.5）。
 desired_count = 1
 
-# shared スタックでゾーンを作ったら、次の2行のコメントを外して apply する。
-# zone_id は `terraform -chdir=infra/environments/shared output zone_id` で取れる。
-# 1回目の apply で証明書が発行・検証され、Route 53 のレコードができる。
-# zone_id = "Z..."
-# fqdn    = "staging.grant-management.buzzmedia-app.com"
+# ゾーンは shared スタックが持つ（NS 委譲済み）。
+zone_id = "Z04713861BXOX0SEERX5W"
+fqdn    = "staging.grant-management.buzzmedia-app.com"
 
-# 2回目の apply で HTTPS リスナーを有効にする。
-# 値は 1回目の apply 後に `terraform output certificate_arn` で取れる。
-# certificate_arn = "arn:aws:acm:ap-northeast-1:024430211741:certificate/..."
+# module.dns が発行した証明書。同じ apply の中では ARN が確定しないため、
+# 1回目で発行してからここに写して2回目で HTTPS を有効にする。
+certificate_arn = "arn:aws:acm:ap-northeast-1:024430211741:certificate/2a875933-f7df-4fda-aad2-ae2d836d4c4e"
