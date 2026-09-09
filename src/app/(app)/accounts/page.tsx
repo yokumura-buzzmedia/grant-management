@@ -3,6 +3,7 @@ import { and, asc, desc, eq, like, or, sql } from "drizzle-orm"
 import { db } from "@/db/client"
 import { companies, userRoles, users, USER_ROLES, type UserRole } from "@/db/schema"
 import { requireRoles } from "@/lib/auth/guards"
+import { listStateQuery } from "@/lib/list-state"
 import { formatJst } from "@/lib/datetime"
 import { ROLE_LABELS } from "@/lib/roles"
 import {
@@ -189,6 +190,17 @@ export default async function AccountsPage({
   const from = count === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
   const to = Math.min(page * PAGE_SIZE, count)
 
+  // 詳細へ持ち回る絞り込み状態。既定値は送らず、URL を短く保つ。
+  const listQuery = listStateQuery({
+    q: query || undefined,
+    sort,
+    dir: sort ? dir : undefined,
+    page: page === 1 ? undefined : String(page),
+    kind: kind === "internal" ? undefined : kind,
+    role,
+    active: activeFilter === "true" ? undefined : activeFilter,
+  })
+
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
@@ -347,7 +359,11 @@ export default async function AccountsPage({
                   className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
                 >
                   <th scope="row" className="px-4 py-2.5 text-left font-medium">
-                    <Link href={`/accounts/${row.id}`} className={rowLinkClass}>
+                    {/* 検索や並び順を詳細へ渡し、戻ったときに復元できるようにする */}
+                    <Link
+                      href={`/accounts/${row.id}${listQuery ? `?${listQuery}` : ""}`}
+                      className={rowLinkClass}
+                    >
                       {row.displayName}
                     </Link>
                   </th>

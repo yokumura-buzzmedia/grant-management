@@ -7,6 +7,7 @@ import { AccountPasswordReset } from "@/components/account-password-reset"
 import { AccountStatusControl } from "@/components/account-status-control"
 import { canManage, countActiveAdmins, findAccount } from "@/lib/accounts/authorize"
 import { DeleteDialog } from "@/components/delete-dialog"
+import { listHref, pickListState } from "@/lib/list-state"
 import { BackLink, Notice, PageHeader } from "@/components/ui"
 import { deleteAccountAction } from "@/lib/deletions/actions"
 import { requireRoles } from "@/lib/auth/guards"
@@ -30,7 +31,8 @@ export default async function AccountPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ notice?: string; error?: string }>
+  // 一覧から渡される絞り込み状態も受け取る（pickListState が既知のキーだけ選り分ける）
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const actor = await requireRoles(["staff", "admin"])
 
@@ -50,7 +52,10 @@ export default async function AccountPage({
         .limit(1)
     : []
 
-  const { notice, error } = await searchParams
+  const query = await searchParams
+  const notice = typeof query.notice === "string" ? query.notice : undefined
+  const error = typeof query.error === "string" ? query.error : undefined
+  const listState = pickListState(query)
   const assignable = creatableRoles(actor.roles)
   const editableRoles = account.roles.filter((role) => assignable.includes(role))
   const fixedRoles = account.roles.filter((role) => !assignable.includes(role))
@@ -82,7 +87,7 @@ export default async function AccountPage({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <BackLink href="/accounts">アカウント一覧</BackLink>
+        <BackLink href={listHref("/accounts", listState)}>アカウント一覧</BackLink>
         <PageHeader
           title={account.displayName}
           description={[

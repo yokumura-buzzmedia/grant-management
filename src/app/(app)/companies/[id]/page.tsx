@@ -9,6 +9,7 @@ import { updateCompanyAction } from "@/lib/companies/actions"
 import { deleteCompanyAction } from "@/lib/deletions/actions"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { Tabs } from "@/components/tabs"
+import { listHref, pickListState } from "@/lib/list-state"
 import { CompanyAccounts } from "@/components/company-accounts"
 import { CompanyTrainees } from "@/components/company-trainees"
 import { BackLink, Notice, PageHeader } from "@/components/ui"
@@ -48,7 +49,9 @@ export default async function CompanyPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ notice?: string; error?: string; tab?: string }>
+  // 一覧から渡される絞り込み状態（q・sort・dir・page）も受け取る。
+  // 戻りリンクと保存後のリダイレクトで復元する（pickListState が選り分ける）
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const { id } = await params
   const companyId = Number(id)
@@ -61,7 +64,11 @@ export default async function CompanyPage({
   const [company] = await db.select().from(companies).where(eq(companies.id, companyId)).limit(1)
   if (!company) notFound()
 
-  const { notice, error, tab } = await searchParams
+  const query = await searchParams
+  const notice = typeof query.notice === "string" ? query.notice : undefined
+  const error = typeof query.error === "string" ? query.error : undefined
+  const tab = typeof query.tab === "string" ? query.tab : undefined
+  const listState = pickListState(query)
   const message = notice ? NOTICES[notice] : undefined
   const errorMessage = error ? ERRORS[error] : undefined
 
@@ -158,7 +165,9 @@ export default async function CompanyPage({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         {/* クライアントは会社一覧（D-01）を利用できないため、戻り先を出さない */}
-        {manager ? <BackLink href="/companies">会社一覧</BackLink> : null}
+        {manager ? (
+          <BackLink href={listHref("/companies", listState)}>会社一覧</BackLink>
+        ) : null}
         <PageHeader
           title={company.name}
           description={`最終更新 ${formatJst(company.updatedAt)}`}
@@ -183,7 +192,7 @@ export default async function CompanyPage({
             panel: (
               <>
                 <CompanyForm
-                  action={updateCompanyAction.bind(null, companyId)}
+                  action={updateCompanyAction.bind(null, companyId, listState)}
                   values={company}
                   submitLabel="保存する"
                 />

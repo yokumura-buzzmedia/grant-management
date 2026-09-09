@@ -4,6 +4,7 @@ import { db } from "@/db/client"
 import { companies } from "@/db/schema"
 import { requireRoles } from "@/lib/auth/guards"
 import { formatJst } from "@/lib/datetime"
+import { listStateQuery } from "@/lib/list-state"
 import {
   buttonGhost,
   buttonPrimary,
@@ -97,6 +98,14 @@ export default async function CompaniesPage({
 
   const from = count === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
   const to = Math.min(page * PAGE_SIZE, count)
+
+  // 詳細へ持ち回る絞り込み状態。1ページ目は既定なので送らない。
+  const listQuery = listStateQuery({
+    q: query || undefined,
+    sort,
+    dir: sort ? dir : undefined,
+    page: page === 1 ? undefined : String(page),
+  })
 
   return (
     <div className="flex flex-col gap-5">
@@ -201,8 +210,9 @@ export default async function CompaniesPage({
                   className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
                 >
                   <th scope="row" className="px-4 py-2.5 text-left font-medium">
+                    {/* 検索や並び順を詳細へ渡し、戻ったときに復元できるようにする */}
                     <Link
-                      href={`/companies/${row.id}`}
+                      href={`/companies/${row.id}${listQuery ? `?${listQuery}` : ""}`}
                       className={rowLinkClass}
                     >
                       {row.name}

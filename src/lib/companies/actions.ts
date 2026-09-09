@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { detailHref, type ListState } from "@/lib/list-state"
 import { revalidatePath } from "next/cache"
 import { and, eq, ne } from "drizzle-orm"
 import { db } from "@/db/client"
@@ -78,6 +79,9 @@ export async function createCompanyAction(
 
 export async function updateCompanyAction(
   companyId: number,
+  // 一覧から来たときの絞り込み状態。保存後も戻り先を保つために持ち回る。
+  // サーバー側で bind した値なので、クライアントから差し替えられない
+  listState: ListState,
   prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
@@ -99,5 +103,5 @@ export async function updateCompanyAction(
     .where(eq(companies.id, companyId))
 
   revalidatePath("/companies")
-  redirect(`/companies/${companyId}?notice=saved`)
+  redirect(detailHref(`/companies/${companyId}`, listState, { notice: "saved" }))
 }
