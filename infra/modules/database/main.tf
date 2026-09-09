@@ -2,10 +2,16 @@
 # MySQL 8 の既定 utf8mb4_0900_ai_ci は濁点・半濁点を区別せず（「ハ」＝「バ」）、
 # 氏名・会社名の検索と重複判定が壊れる。
 
+# 名前を変えるとサブネットグループは作り直しになる。RDS インスタンス自体は
+# 残ったまま参照し続けるので、先に新しい方を作らないと削除に失敗する。
 resource "aws_db_subnet_group" "this" {
   name       = var.name
   subnet_ids = var.subnet_ids
   tags       = { Name = var.name }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # ECS からの 3306 は、循環参照を避けるため呼び出し側で許可ルールを足す。
@@ -15,6 +21,11 @@ resource "aws_security_group" "this" {
   vpc_id      = var.vpc_id
 
   tags = { Name = "${var.name}-db" }
+
+  # サブネットグループと同じ理由で、先に新しい方を作る。
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_parameter_group" "this" {

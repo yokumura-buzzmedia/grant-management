@@ -17,7 +17,7 @@ provider "aws" {
   default_tags {
     tags = {
       Project     = "grant-management"
-      Environment = "prod"
+      Environment = "staging"
       ManagedBy   = "terraform"
     }
   }

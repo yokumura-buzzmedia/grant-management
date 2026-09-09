@@ -146,15 +146,20 @@ AWS プロファイルは `grant`（`024430211741` へ AssumeRole）、state は
 
 ```bash
 export AWS_PROFILE=grant
-terraform -chdir=infra/environments/prod plan
+terraform -chdir=infra/environments/staging plan
 ```
 
-本番の VPC・RDS・S3・ECR・ALB・ECS は作成済みです。次の点に注意してください。
+**あるのはステージングだけで、本番環境はまだありません。** ドメインが決まらないと
+HTTPS・Route 53・SES を作れないため、先にステージングを立ち上げています。
+VPC・RDS・S3・ECR・ALB・ECS と、業務時間外の自動停止までができています。
 
-- **ALB は当面 HTTP のみ。** ドメインが未定で ACM 証明書を発行できないためです。
+- **ALB は HTTP のみ。** ドメインが未定で ACM 証明書を発行できないためです。
   HTTPS・Route 53・SES・S3 の CORS は、ドメインが決まるまで着手できません。
 - **ECS のタスク数は 0 です。** ECR が空なので、イメージを push してから
-  `terraform.tfvars` の `desired_count` を 2 にします。
+  `terraform.tfvars` の `desired_count` を 1 にします。
+- **平日 9:30〜19:30（JST）だけ動きます。** EventBridge Scheduler が ECS の
+  タスク数と RDS の起動停止を切り替えます。祝日は判定しません。
+  止めたいときは `schedule_enabled = false` にして apply します。
 - **セキュリティグループの `description` に日本語は使えません。** EC2 API が
   ASCII の一部しか受け付けないため、説明は Terraform 側のコメントに書きます。
 - **RDS のマスターユーザー名は `grant_app`。** `grant` は MySQL の予約語で

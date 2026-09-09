@@ -31,6 +31,12 @@ module "database" {
   name       = var.name
   vpc_id     = module.network.vpc_id
   subnet_ids = module.network.private_subnet_ids
+
+  # ステージングは検証用のダミーデータしか持たない（03_技術選定.md 5.5）。
+  # 作り直しを妨げないよう、削除保護と最終スナップショットを外す。
+  instance_class      = var.db_instance_class
+  deletion_protection = false
+  skip_final_snapshot = true
 }
 
 module "compute" {
@@ -53,6 +59,23 @@ module "compute" {
     S3_REGION = var.region
     S3_BUCKET = module.storage.bucket_name
   }
+}
+
+# 業務時間外は ECS のタスク数を0にし、RDS を停止する（03_技術選定.md 5.5）。
+module "scheduler" {
+  source = "../../modules/scheduler"
+
+  name    = var.name
+  enabled = var.schedule_enabled
+
+  cluster_name  = module.compute.cluster_name
+  cluster_arn   = module.compute.cluster_arn
+  service_name  = module.compute.service_name
+  service_arn   = module.compute.service_arn
+  desired_count = var.desired_count
+
+  db_instance_identifier = module.database.instance_identifier
+  db_instance_arn        = module.database.instance_arn
 }
 
 # database と compute が相互に依存しないよう、許可ルールだけここで足す。
