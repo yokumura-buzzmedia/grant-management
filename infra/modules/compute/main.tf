@@ -213,9 +213,11 @@ resource "aws_ecs_task_definition" "this" {
   execution_role_arn       = aws_iam_role.execution.arn
   task_role_arn            = aws_iam_role.task.arn
 
+  # Graviton。開発機（Apple Silicon）でエミュレーションなしにビルドでき、
+  # Fargate の料金も X86_64 より約2割安い。RDS も t4g で揃えている。
   runtime_platform {
     operating_system_family = "LINUX"
-    cpu_architecture        = "X86_64"
+    cpu_architecture        = "ARM64"
   }
 
   container_definitions = jsonencode([{

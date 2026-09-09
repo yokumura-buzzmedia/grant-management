@@ -15,82 +15,24 @@ GitHub Actions による自動化（`03_技術選定.md` 5.6）は未整備で�
 
 ---
 
-## 0. 先に用意するもの
+## 0. 前提
 
-**この2つはまだリポジトリにありません。** 初回だけ作成してコミットしてください。
+必要なファイルはリポジトリに入っています。用意するのは手元の環境だけです。
 
-### 0-1. `next.config.ts` に `output` を足す
+- Docker Desktop が起動していること
+- AWS プロファイル `grant` が使えること（`aws sts get-caller-identity --profile grant`）
 
-standalone 出力にしないと、実行に必要なファイルだけを取り出せず、
-イメージに `node_modules` 全体を入れることになります。
-
-```ts
-const nextConfig: NextConfig = {
-  output: "standalone",
-  distDir: process.env.NEXT_DIST_DIR ?? ".next",
-  serverExternalPackages: ["@node-rs/argon2", "mysql2"],
-  poweredByHeader: false,
-}
-```
+| ファイル | 役割 |
+| --- | --- |
+| `Dockerfile` | 3段構成。`npm ci` はコンテナの中で通す |
+| `.dockerignore` | `node_modules` と `.next-build` を送らない |
+| `next.config.ts` | `output: "standalone"` |
 
 `npm run build` は `NEXT_DIST_DIR=.next-build` を指定するため、
-出力先は `.next-build/standalone` になります。
-
-### 0-2. `Dockerfile`
-
-```dockerfile
-# syntax=docker/dockerfile:1
-
-# @node-rs/argon2 はネイティブモジュールなので、実行環境と同じ Linux の中で
-# npm ci を通す。ホスト（macOS）の node_modules を持ち込むと動かない。
-FROM node:22-slim AS deps
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-
-FROM node:22-slim AS builder
-WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npm run build
-
-FROM node:22-slim AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
-
-RUN groupadd --system --gid 1001 nodejs \
- && useradd --system --uid 1001 --gid nodejs nextjs
-
-# standalone には server.js と、実行に必要な node_modules だけが入る。
-# 静的ファイルは別なので distDir と同じ位置へ置く。
-COPY --from=builder /app/.next-build/standalone ./
-COPY --from=builder /app/.next-build/static ./.next-build/static
-
-USER nextjs
-EXPOSE 3000
-CMD ["node", "server.js"]
-```
+standalone の出力先は `.next-build/standalone` です。Dockerfile はそこを見ています。
 
 `public/` は現時点で存在しないため COPY していません。作った場合は
-`COPY --from=builder /app/public ./public` を足してください。
-
-### 0-3. `.dockerignore`
-
-```
-node_modules
-.next
-.next-build
-.git
-.env
-.env.local
-docs
-infra
-*.log
-```
+Dockerfile に `COPY --from=builder /app/public ./public` を足してください。
 
 ---
 
@@ -108,21 +50,19 @@ aws ecr get-login-password --region ap-northeast-1 \
 
 ## 2. ビルド
 
-**ECS のタスクは X86_64 です。** Apple Silicon の Mac では
-`--platform linux/amd64` を付けないと、起動時に `exec format error` で落ちます。
-エミュレーションで動くため、初回は10〜20分かかることがあります。
+**ECS のタスクは ARM64（Graviton）です。** Apple Silicon の Mac ならエミュレーションなしで
+ビルドできます。Intel Mac や x86 の Linux から実行する場合はエミュレーションになり、
+10〜20分かかることがあります。
 
 ```bash
 TAG=$(git rev-parse --short HEAD)
 REPO=024430211741.dkr.ecr.ap-northeast-1.amazonaws.com/grant-management
 
-docker build --platform linux/amd64 -t "$REPO:$TAG" .
+docker build --platform linux/arm64 -t "$REPO:$TAG" .
 ```
 
-> ビルド時間が問題になるなら、ECS を ARM64 に変えるとエミュレーションが不要になり、
-> Fargate の料金も約2割下がります。`infra/modules/compute/main.tf` の
-> `runtime_platform.cpu_architecture` を `ARM64` にして apply し、
-> 上の `--platform` を `linux/arm64` に読み替えます。RDS はすでに Graviton（t4g）です。
+`--platform` は省略しないでください。省くとビルドした機械のアーキテクチャになり、
+x86 の環境から push すると ECS 上で `exec format error` になります。
 
 ## 3. push
 
@@ -257,7 +197,8 @@ standalone のイメージには入りません。次のいずれかが要りま
 
 | 症状 | 原因 |
 | --- | --- |
-| タスクが起動せず `exec format error` | `--platform linux/amd64` を付け忘れた |
+| タスクが起動せず `exec format error` | `--platform linux/arm64` を付け忘れた |
+| ビルドが `Failed to collect page data` で落ちる | `src/db/client.ts` が読み込み時に `DATABASE_URL` を要求する。Dockerfile の builder ステージにダミーを置いてある |
 | `no basic auth credentials` | ECR のログイントークンが切れた（12時間） |
 | push しても内容が変わらない | `latest` を push していない。タスク定義は `:latest` を見る |
 | タスクは動くが ALB が 5xx | ヘルスチェック先は `/login`。DB に届かないと 200 を返さない |

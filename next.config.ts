@@ -2,6 +2,12 @@ import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   /**
+   * 実行に必要なファイルだけを .next-build/standalone に出す。
+   * コンテナイメージに node_modules 全体を入れずに済む。
+   * 詳細は docs/手順書/ECRへのイメージ登録とデプロイ.md。
+   */
+  output: "standalone",
+  /**
    * 出力先。`npm run build` は .next-build を使う。
    * 開発サーバーを動かしたままビルドすると .next が上書きされ、
    * 開いているページが参照するチャンクが 404 になるため分けている。
