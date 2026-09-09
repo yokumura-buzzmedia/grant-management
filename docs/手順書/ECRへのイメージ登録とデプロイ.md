@@ -70,10 +70,14 @@ x86 の環境から push すると ECS 上で `exec format error` になりま�
 戻せるように、コミットのハッシュを付けたタグも一緒に push します。
 
 ```bash
-docker tag "$REPO:$TAG" "$REPO:latest"
-docker push "$REPO:$TAG"
-docker push "$REPO:latest"
+docker tag "${REPO}:${TAG}" "${REPO}:latest"
+docker push "${REPO}:${TAG}"
+docker push "${REPO}:latest"
 ```
+
+**`"$REPO:latest"` と書かないでください。** zsh は `$REPO:l` の `:l` を
+小文字化のモディファイアとして解釈するため、`grant-managementatest` という
+存在しないリポジトリへ push しようとして失敗します。`${REPO}` と波かっこで囲みます。
 
 登録されたか確認します。
 
@@ -90,14 +94,25 @@ aws ecr describe-images --repository-name grant-management \
 
 ### 初回だけ
 
-タスク数が 0 のままなので、1 に上げます。
+`terraform.tfvars` の `desired_count` は **起動スケジュールが毎朝設定する値**で、
+サービスの現在のタスク数ではありません。サービスの `desired_count` は Terraform の
+`ignore_changes` に入れてあるため、apply では変わりません。いま動かすには別途上げます。
 
 ```bash
-# infra/environments/staging/terraform.tfvars の desired_count を 1 にしてから
-terraform -chdir=infra/environments/staging apply
+aws ecs update-service --cluster grant-management-staging \
+  --service grant-management-staging --desired-count 1
 ```
 
-この値は起動スケジュールが毎朝設定するタスク数にもなります。
+### Terraform でタスク定義を変えたとき
+
+環境変数やアーキテクチャなど、タスク定義に関わる変更を apply すると新しい
+リビジョンが登録され、サービスもそこへ切り替わります。切り替わったか確認します。
+
+```bash
+aws ecs describe-services --cluster grant-management-staging \
+  --services grant-management-staging \
+  --query 'services[0].taskDefinition'
+```
 
 ### 2回目以降
 
@@ -302,6 +317,8 @@ aws ssm describe-instance-information \
 | タスクは動くが ALB が 5xx | ヘルスチェック先は `/login`。DB に届かないと 200 を返さない |
 | DB に接続できない | 業務時間外で RDS が停止している |
 | `CannotPullContainerError` | ECR にそのタグが無い。`describe-images` で確認する |
+| `image Manifest does not contain descriptor matching platform 'linux/amd64'` | サービスが古いタスク定義（X86_64）を参照している。`describe-services` でリビジョンを確認する |
+| `grant-managementatest does not exist` | zsh の `:l` モディファイア。`${REPO}:latest` と書く |
 
 ログイン画面までは DB を使うため、RDS が停止しているとヘルスチェックが通りません。
 確認は RDS を起こしてから行ってください。

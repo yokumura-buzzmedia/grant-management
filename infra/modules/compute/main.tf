@@ -276,9 +276,14 @@ resource "aws_ecs_service" "this" {
     rollback = true
   }
 
-  # タスク数と実行中のリビジョンは CI が更新するため、Terraform では追わない。
+  # タスク数はスケジューラが業務時間に合わせて変えるので追わない。
+  #
+  # task_definition は追う。手動デプロイでは毎回タスク定義を作り直さず、
+  # 同じ latest タグを force-new-deployment で入れ替えるだけなので、
+  # Terraform 側の変更（アーキテクチャや環境変数）が反映されないほうが困る。
+  # CI がリビジョンを発行するようになったら、ここに task_definition を戻す。
   lifecycle {
-    ignore_changes = [task_definition, desired_count]
+    ignore_changes = [desired_count]
   }
 
   depends_on = [aws_lb_listener.http]
