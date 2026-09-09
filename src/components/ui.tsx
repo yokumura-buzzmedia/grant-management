@@ -133,6 +133,11 @@ export function Th({
 /**
  * 並び替えできる列見出しのリンク。
  * 矢印は並び替え中でない列でも表示し、押せることが分かるようにする。
+ *
+ * 押すたびに 昇順 → 降順 → 既定 と一巡する。既定へ戻す手段がないと、
+ * 一度並べ替えたあとに初期表示順へ戻せなくなるため。
+ * 3回目で解除されることは見ただけでは分からないので、
+ * マウスでも読み上げでも次の動作が分かるようにしている。
  */
 export function SortLink({
   href,
@@ -143,9 +148,17 @@ export function SortLink({
   label: string
   state: SortState
 }) {
+  const hint =
+    state === "ascending"
+      ? "昇順で並べ替え中。押すと降順になります"
+      : state === "descending"
+        ? "降順で並べ替え中。押すと既定の並び順に戻ります"
+        : "この列で並べ替える"
+
   return (
     <Link
       href={href}
+      title={hint}
       className={"group inline-flex items-center gap-1 rounded-sm hover:text-slate-900 " + focusRing}
     >
       {label}
@@ -157,13 +170,7 @@ export function SortLink({
       >
         {state === "ascending" ? "↑" : state === "descending" ? "↓" : "↕"}
       </span>
-      <span className="sr-only">
-        {state === "ascending"
-          ? "昇順で並べ替え中。押すと降順になります"
-          : state === "descending"
-            ? "降順で並べ替え中。押すと昇順になります"
-            : "この列で並べ替える"}
-      </span>
+      <span className="sr-only">{hint}</span>
     </Link>
   )
 }

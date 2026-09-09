@@ -115,6 +115,10 @@ export default async function CompaniesPage({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <form role="search" className="flex flex-wrap gap-2">
+          {/* 検索しても並び順が外れないように持ち回る。ページ番号は送らない
+              （絞り込みが変わるので1ページ目に戻すのが正しい） */}
+          {sort ? <input type="hidden" name="sort" value={sort} /> : null}
+          {sort ? <input type="hidden" name="dir" value={dir} /> : null}
           <label htmlFor="q" className="sr-only">
             会社名・法人番号で検索
           </label>
@@ -155,14 +159,17 @@ export default async function CompaniesPage({
                     ? "ascending"
                     : "descending"
                   : "none"
+                // 昇順 → 降順 → 既定（作成日時の新しい順）で一巡する。
+                // 既定に戻す手段がないと、一度並べ替えたら開き直すしかなくなる。
+                const next = !active
+                  ? { sort: key, dir: "asc" }
+                  : dir === "asc"
+                    ? { sort: key, dir: "desc" }
+                    : { sort: undefined, dir: undefined }
                 return (
                   <Th key={key} ariaSort={state}>
                     <SortLink
-                      href={href({
-                        sort: key,
-                        dir: active && dir === "asc" ? "desc" : "asc",
-                        page: 1,
-                      })}
+                      href={href({ ...next, page: 1 })}
                       label={SORTABLE[key].label}
                       state={state}
                     />

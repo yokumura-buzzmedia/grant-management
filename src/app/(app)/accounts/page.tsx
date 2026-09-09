@@ -227,6 +227,10 @@ export default async function AccountsPage({
         <form role="search" className="flex flex-wrap gap-2">
           {/* 検索してもタブが外れないように、いま見ている種別を持ち回る */}
           {kind === "internal" ? null : <input type="hidden" name="kind" value={kind} />}
+          {/* 並び順も同じ理由で持ち回る。ページ番号は送らない
+              （絞り込みが変わるので1ページ目に戻すのが正しい） */}
+          {sort ? <input type="hidden" name="sort" value={sort} /> : null}
+          {sort ? <input type="hidden" name="dir" value={dir} /> : null}
           <label htmlFor="q" className="sr-only">
             利用者名・ログインIDで検索
           </label>
@@ -306,14 +310,16 @@ export default async function AccountsPage({
                     ? "ascending"
                     : "descending"
                   : "none"
+                // 昇順 → 降順 → 既定で一巡する。既定に戻す手段を残すため。
+                const next = !isCurrent
+                  ? { sort: column.sort, dir: "asc" }
+                  : dir === "asc"
+                    ? { sort: column.sort, dir: "desc" }
+                    : { sort: undefined, dir: undefined }
                 return (
                   <Th key={column.label} ariaSort={state}>
                     <SortLink
-                      href={href({
-                        sort: column.sort,
-                        dir: isCurrent && dir === "asc" ? "desc" : "asc",
-                        page: 1,
-                      })}
+                      href={href({ ...next, page: 1 })}
                       label={column.label}
                       state={state}
                     />
