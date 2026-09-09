@@ -90,8 +90,9 @@ export function CompanyTrainees({
                 <Th>職務内容</Th>
                 <Th>性別</Th>
                 <Th>雇用契約書</Th>
-                {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す */}
-                <Th className="w-px">
+                {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す。
+                    列が多く横スクロールが出るため、右端に固定して常に押せるようにする */}
+                <Th className="sticky right-0 w-px bg-slate-50 shadow-[inset_1px_0_0_theme(colors.slate.200)]">
                   <span className="sr-only">操作</span>
                 </Th>
               </tr>
@@ -100,7 +101,7 @@ export function CompanyTrainees({
               {trainees.map((trainee) => (
                 <tr
                   key={trainee.id}
-                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                  className="group border-b border-slate-100 last:border-0 hover:bg-slate-50"
                 >
                   <th scope="row" className="px-4 py-2.5 text-left font-medium text-slate-900">
                     {trainee.name}
@@ -118,7 +119,9 @@ export function CompanyTrainees({
                   <td className="px-4 py-2.5">
                     <ContractStatus contract={trainee.contract} />
                   </td>
-                  <td className="px-4 py-2.5 text-right">
+                  {/* 見出しと同じく右端に固定する。背景を敷かないと下の列が透ける。
+                      行のホバーにも追従させるため、tr 側の group を使う */}
+                  <td className="sticky right-0 bg-white px-4 py-2.5 text-right shadow-[inset_1px_0_0_theme(colors.slate.200)] group-hover:bg-slate-50">
                     <FormDialog
                       triggerVariant="icon"
                       triggerLabel={`${trainee.name} を編集`}
