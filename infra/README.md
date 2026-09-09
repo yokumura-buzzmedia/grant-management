@@ -94,7 +94,9 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
 | Route 53 ホストゾーンと A レコード | ドメイン確定 |
 | SES のドメイン検証・SPF/DKIM/DMARC・サンドボックス解除申請 | ドメイン確定 |
 | S3 の CORS 設定（`cors_allowed_origins`） | ALB の DNS 名またはドメイン確定 |
-| GitHub Actions からの ECR push と ECS デプロイ | 5.6 |
+| Dockerfile と `output: "standalone"` の追加 | `docs/手順書/ECRへのイメージ登録とデプロイ.md` 0章 |
+| マイグレーションをステージングの DB へ流す手段 | 同上「マイグレーションについて」 |
+| GitHub Actions からの ECR push と ECS デプロイ（当面は手動） | 5.6 |
 | AWS WAF レートベースルール（`/login`、100req/5分/IP、まずカウントモード） | 5.4 |
 | AWS Backup（日次・30日保持・Vault Lock） | 5.3。本番のみ |
 | CloudWatch アラームと SNS 通知 | 通知先の決定（5.7） |
@@ -102,7 +104,4 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
 
 ## 初回デプロイの手順
 
-1. イメージをビルドして ECR へ push する
-2. `terraform.tfvars` の `desired_count` を 1 にして apply する
-3. マイグレーションを ECS の単発タスクとして実行する
-4. `alb_dns_name` にアクセスして疎通を確認する
+`docs/手順書/ECRへのイメージ登録とデプロイ.md` を参照してください。
