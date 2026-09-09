@@ -4,7 +4,7 @@ output "alb_dns_name" {
 }
 
 output "ecr_repository_url" {
-  value = module.registry.repository_url
+  value = data.aws_ecr_repository.app.repository_url
 }
 
 output "uploads_bucket" {

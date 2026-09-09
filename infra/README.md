@@ -13,14 +13,41 @@ infra/
     compute/    ALB・ECS Fargate・IAM ロール・ロググループ
     scheduler/  業務時間外の自動停止（EventBridge Scheduler）
     bastion/    SSM ポートフォワード用の踏み台
+    dns/        ACM 証明書と Route 53 レコード
   environments/
+    shared/     環境をまたいで共有するもの（ECR・ホストゾーン）
     staging/    ステージング
 ```
+
+`shared` は ECR とホストゾーンを持ちます。どちらも本番とステージングの両方が
+使うため、どちらかの環境の state に置くと、その環境を作り直したときに
+もう一方が壊れます。
 
 **本番環境はまだありません。** ドメインが決まっていないため、先にステージングだけを
 立ち上げています。本番を作るときは `environments/staging` を複製し、
 `name` と backend の `key` を変え、`db_instance_class` と `desired_count` を戻し、
 `schedule_enabled = false` にします。
+
+## ドメイン
+
+`buzzmedia-app.com` は組織で使い回すため、**Organization の管理アカウント
+（982227460789 / BUZZMEDIA）で登録**します。特定アプリのアカウントが
+全社ドメインの持ち主になると、そのアカウントを整理するときに巻き込まれます。
+
+そのうえで `grant-management.buzzmedia-app.com` を NS 委譲で
+GrantManagement アカウント（024430211741）が受け取ります。委譲しておかないと、
+ACM の証明書検証と SES の DKIM のたびに管理アカウント側での作業が発生します。
+
+```
+982227460789  buzzmedia-app.com
+                └─ NS grant-management → 委譲
+024430211741  grant-management.buzzmedia-app.com
+                ├─ A  grant-management.buzzmedia-app.com          → 本番 ALB
+                └─ A  staging.grant-management.buzzmedia-app.com  → ステージング ALB
+```
+
+委譲レコードは `shared` スタックが `aws.parent` プロバイダ経由で登録します。
+他のアプリを足すときも同じ形でいけます。
 
 ## 前提
 
@@ -29,9 +56,12 @@ infra/
 
 ```bash
 export AWS_PROFILE=grant
-terraform -chdir=infra/environments/staging init
+terraform -chdir=infra/environments/shared plan
 terraform -chdir=infra/environments/staging plan
 ```
+
+`shared` だけは2つのアカウントを触るため、プロバイダに profile を直接書いています
+（`grant` と `buzzmedia`）。他のスタックは `AWS_PROFILE` に従います。
 
 ## state
 
@@ -98,10 +128,8 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
 
 | 項目 | 前提 |
 | --- | --- |
-| ACM 証明書・HTTPS リスナー・HTTP→HTTPS リダイレクト | ドメイン確定 |
-| Route 53 ホストゾーンと A レコード | ドメイン確定 |
-| SES のドメイン検証・SPF/DKIM/DMARC・サンドボックス解除申請 | ドメイン確定 |
-| S3 の CORS 設定（`cors_allowed_origins`） | ALB の DNS 名またはドメイン確定 |
+| ドメイン登録（管理アカウントで `buzzmedia-app.com`） | 連絡先の入力が要るため手作業 |
+| SES のドメイン検証・SPF/DKIM/DMARC・サンドボックス解除申請 | 委譲の完了 |
 | GitHub Actions からの ECR push と ECS デプロイ（当面は手動） | 5.6 |
 | AWS WAF レートベースルール（`/login`、100req/5分/IP、まずカウントモード） | 5.4 |
 | AWS Backup（日次・30日保持・Vault Lock） | 5.3。本番のみ |

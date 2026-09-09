@@ -1,11 +1,7 @@
-# ホストゾーンはドメイン登録時に Route 53 が自動で作るため、
-# Terraform では参照するだけにする。ここで作ると登録済みのゾーンと二重になり、
-# ネームサーバーが食い違う。
-
-data "aws_route53_zone" "this" {
-  name         = var.zone_name
-  private_zone = false
-}
+# ホストゾーンは shared スタックが持つ。本番とステージングの両方が使うため、
+# どちらかの環境の state に置くと、その環境を作り直したときにもう一方が壊れる。
+# ドメイン自体は Organization の管理アカウントで登録し、
+# このサブドメインだけを NS 委譲で受け取っている（03_技術選定.md 5.8）。
 
 resource "aws_acm_certificate" "this" {
   domain_name       = var.fqdn
@@ -29,7 +25,7 @@ resource "aws_route53_record" "validation" {
     }
   }
 
-  zone_id         = data.aws_route53_zone.this.zone_id
+  zone_id         = var.zone_id
   name            = each.value.name
   type            = each.value.type
   records         = [each.value.record]
@@ -44,7 +40,7 @@ resource "aws_acm_certificate_validation" "this" {
 
 # ALB は IP が変わるため、A レコードではなくエイリアスで向ける。
 resource "aws_route53_record" "alb" {
-  zone_id = data.aws_route53_zone.this.zone_id
+  zone_id = var.zone_id
   name    = var.fqdn
   type    = "A"
 

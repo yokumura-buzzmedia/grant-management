@@ -2,10 +2,11 @@
 # ステージングは縮小版なので1（03_技術選定.md 5.5）。
 desired_count = 1
 
-# ドメイン登録が終わったら、次の2つのコメントを外して apply する。
+# shared スタックでゾーンを作ったら、次の2行のコメントを外して apply する。
+# zone_id は `terraform -chdir=infra/environments/shared output zone_id` で取れる。
 # 1回目の apply で証明書が発行・検証され、Route 53 のレコードができる。
-# zone_name = "buzzmedia-app.com"
-# fqdn      = "staging.grant-management.buzzmedia-app.com"
+# zone_id = "Z..."
+# fqdn    = "staging.grant-management.buzzmedia-app.com"
 
 # 2回目の apply で HTTPS リスナーを有効にする。
 # 値は 1回目の apply 後に `terraform output certificate_arn` で取れる。

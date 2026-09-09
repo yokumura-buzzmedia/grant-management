@@ -49,8 +49,8 @@ variable "migrate_image_tag" {
   default     = "migrate-latest"
 }
 
-variable "zone_name" {
-  description = "Route 53 の公開ホストゾーン。ドメイン登録まで空"
+variable "zone_id" {
+  description = "shared スタックが作る委譲済みホストゾーン。作成まで空"
   type        = string
   default     = ""
 }

@@ -2,8 +2,9 @@ locals {
   account_id     = data.aws_caller_identity.current.account_id
   uploads_bucket = "${var.name}-uploads-${local.account_id}"
 
-  # ドメインを登録するまでは空。HTTPS リスナーも Route 53 レコードも作らない。
-  dns_enabled = var.zone_name != "" && var.fqdn != ""
+  # shared スタックでゾーンを作るまでは空。
+  # HTTPS リスナーも Route 53 レコードも作らない。
+  dns_enabled = var.zone_id != "" && var.fqdn != ""
 
   # 署名付きURLで直接 PUT するオリジン。HTTPS で使うため証明書が要る。
   app_origins = local.dns_enabled ? ["https://${var.fqdn}"] : []
@@ -24,10 +25,9 @@ module "storage" {
   cors_allowed_origins = local.app_origins
 }
 
-# イメージは環境間で共有する。タグで本番とステージングを分ける。
-module "registry" {
-  source = "../../modules/registry"
-
+# ECR とホストゾーンは shared スタックが持つ。環境を作り直しても
+# 消えないようにするため、ここでは参照だけする。
+data "aws_ecr_repository" "app" {
   name = "grant-management"
 }
 
@@ -53,8 +53,8 @@ module "compute" {
   public_subnet_ids  = module.network.public_subnet_ids
   private_subnet_ids = module.network.private_subnet_ids
 
-  image         = "${module.registry.repository_url}:${var.image_tag}"
-  migrate_image = "${module.registry.repository_url}:${var.migrate_image_tag}"
+  image         = "${data.aws_ecr_repository.app.repository_url}:${var.image_tag}"
+  migrate_image = "${data.aws_ecr_repository.app.repository_url}:${var.migrate_image_tag}"
   desired_count = var.desired_count
 
   certificate_arn = var.certificate_arn
@@ -92,7 +92,7 @@ module "dns" {
   source = "../../modules/dns"
   count  = local.dns_enabled ? 1 : 0
 
-  zone_name    = var.zone_name
+  zone_id      = var.zone_id
   fqdn         = var.fqdn
   alb_dns_name = module.compute.alb_dns_name
   alb_zone_id  = module.compute.alb_zone_id

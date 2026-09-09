@@ -1,5 +1,5 @@
-variable "zone_name" {
-  description = "Route 53 の公開ホストゾーン。ドメイン登録時に自動で作られる"
+variable "zone_id" {
+  description = "shared スタックが作る委譲済みホストゾーン"
   type        = string
 }
 
