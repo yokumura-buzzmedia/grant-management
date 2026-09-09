@@ -29,3 +29,7 @@ output "cluster_arn" {
 output "service_arn" {
   value = aws_ecs_service.this.id
 }
+
+output "migrate_task_family" {
+  value = aws_ecs_task_definition.migrate.family
+}

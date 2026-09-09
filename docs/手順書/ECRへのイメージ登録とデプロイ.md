@@ -176,20 +176,118 @@ aws ecs update-service --cluster grant-management-staging \
 
 ---
 
-## マイグレーションについて（未整備）
+## マイグレーション
 
-**現時点では、ステージングの DB へマイグレーションを流す手段がありません。**
 RDS はプライベートサブネットにあり、手元から直接つなげません。
+手段は2つ用意しています。**通常は A、DB の中身を見たいときは B** です。
 
-`npm run db:migrate` は `drizzle-kit` に依存しますが、これは devDependency で、
-standalone のイメージには入りません。次のいずれかが要ります。
+`npm run db:migrate` が使う `drizzle-kit` は devDependency で、
+アプリのイメージには入りません。また `drizzle-orm` は Next.js のバンドルに
+取り込まれるため、standalone の `node_modules` にも独立して存在しません。
+そのため専用のイメージを分けています。
 
-- Dockerfile に migrate 用のステージを足し、`aws ecs run-task` で単発実行する
-- `drizzle-orm/mysql2/migrator` を呼ぶ小さなスクリプトを本体に同梱し、
-  タスク定義の command を上書きして実行する（drizzle-orm は本番依存なので追加が要らない）
+### A. ECS の単発タスクで流す（通常はこちら）
 
-後者のほうが軽く、`drizzle/` 配下の SQL と journal だけで動きます。
-どちらにするか決めてから、この節を書き足してください。
+設計書 5.6 の3にあたります。常時動くものが増えず、後で CI へ移すときもそのまま使えます。
+
+`Dockerfile` の `migrate` ステージを使います。中身は `node_modules` 一式と
+`drizzle/`、`scripts/migrate.mjs` だけです。
+
+```bash
+export AWS_PROFILE=grant
+TAG=$(git rev-parse --short HEAD)
+REPO=024430211741.dkr.ecr.ap-northeast-1.amazonaws.com/grant-management
+
+docker build --platform linux/arm64 --target migrate -t "$REPO:migrate-$TAG" .
+docker tag "$REPO:migrate-$TAG" "$REPO:migrate-latest"
+docker push "$REPO:migrate-$TAG"
+docker push "$REPO:migrate-latest"
+```
+
+タスク定義は `migrate-latest` を見ています。単発タスクとして起動します。
+
+```bash
+TASK=$(aws ecs run-task \
+  --cluster grant-management-staging \
+  --task-definition grant-management-staging-migrate \
+  --launch-type FARGATE \
+  --network-configuration 'awsvpcConfiguration={subnets=[subnet-0ae8b567cc98d4567,subnet-01bc49fb7015ea514],securityGroups=[sg-04a267cde159da5ef],assignPublicIp=DISABLED}' \
+  --query 'tasks[0].taskArn' --output text)
+
+aws ecs wait tasks-stopped --cluster grant-management-staging --tasks "$TASK"
+```
+
+終了コードを確認します。**0 以外なら失敗**です。
+
+```bash
+aws ecs describe-tasks --cluster grant-management-staging --tasks "$TASK" \
+  --query 'tasks[0].containers[0].{exitCode:exitCode,reason:reason}'
+
+aws logs tail /ecs/grant-management-staging --log-stream-name-prefix migrate --since 10m
+```
+
+成功すると `マイグレーションを適用しました。` が出ます。
+適用済みのものは飛ばされるので、繰り返し実行しても問題ありません。
+
+RDS が停止している時間帯は接続に失敗します。先に起こしてください。
+
+### B. 踏み台越しに手元から流す
+
+`t4g.nano` の踏み台を SSM Session Manager 経由で使い、RDS へポートフォワードします。
+手元の `drizzle-kit` がそのまま使えるので、**`npm run db:studio` で中身を見る、
+調査用の SQL を投げる**といったこともできます。
+
+初回だけ、Session Manager プラグインを入れます（管理者パスワードを聞かれます）。
+
+```bash
+brew install --cask session-manager-plugin
+```
+
+ポートフォワードを張ります。**このターミナルは開いたままにします。**
+
+```bash
+export AWS_PROFILE=grant
+aws ssm start-session --target i-0bd4b445b198bf174 \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters '{"host":["grant-management-staging.c9awqsog42gg.ap-northeast-1.rds.amazonaws.com"],"portNumber":["3306"],"localPortNumber":["13306"]}'
+```
+
+別のターミナルで、Secrets Manager からパスワードを取って流します。
+
+```bash
+export AWS_PROFILE=grant
+PASS=$(aws secretsmanager get-secret-value \
+  --secret-id grant-management-staging/database-url \
+  --query SecretString --output text | sed -E 's#^mysql://[^:]+:([^@]+)@.*#\1#')
+
+DATABASE_URL="mysql://grant_app:$PASS@127.0.0.1:13306/grant_management" \
+  npx drizzle-kit migrate
+```
+
+`npm run db:migrate` ではなく `npx drizzle-kit migrate` を使います。
+前者は `--env-file=.env.local` を付けるため、ローカルの DB につながってしまいます。
+
+中身を見るときも同じ経路です。
+
+```bash
+DATABASE_URL="mysql://grant_app:$PASS@127.0.0.1:13306/grant_management" \
+  npx drizzle-kit studio
+```
+
+踏み台は常時起動で月3USD程度です。しばらく使わないなら止められます。
+
+```bash
+aws ec2 stop-instances --instance-ids i-0bd4b445b198bf174
+aws ec2 start-instances --instance-ids i-0bd4b445b198bf174
+```
+
+止めている間は SSM にも現れません。起動後、`PingStatus` が `Online` に
+なるまで1分ほどかかります。
+
+```bash
+aws ssm describe-instance-information \
+  --query 'InstanceInformationList[].{id:InstanceId,ping:PingStatus}' --output table
+```
 
 ---
 

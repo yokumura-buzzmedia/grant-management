@@ -48,6 +48,7 @@ module "compute" {
   private_subnet_ids = module.network.private_subnet_ids
 
   image         = "${module.registry.repository_url}:${var.image_tag}"
+  migrate_image = "${module.registry.repository_url}:${var.migrate_image_tag}"
   desired_count = var.desired_count
 
   uploads_bucket_arn      = module.storage.bucket_arn
@@ -78,11 +79,29 @@ module "scheduler" {
   db_instance_arn        = module.database.instance_arn
 }
 
+# 手元から RDS を見るための踏み台。SSM のポートフォワードで使う。
+module "bastion" {
+  source = "../../modules/bastion"
+
+  name      = var.name
+  vpc_id    = module.network.vpc_id
+  subnet_id = module.network.private_subnet_ids[0]
+}
+
 # database と compute が相互に依存しないよう、許可ルールだけここで足す。
 resource "aws_vpc_security_group_ingress_rule" "db_from_service" {
   security_group_id            = module.database.security_group_id
   description                  = "From ECS tasks"
   referenced_security_group_id = module.compute.service_security_group_id
+  from_port                    = 3306
+  to_port                      = 3306
+  ip_protocol                  = "tcp"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_from_bastion" {
+  security_group_id            = module.database.security_group_id
+  description                  = "From bastion"
+  referenced_security_group_id = module.bastion.security_group_id
   from_port                    = 3306
   to_port                      = 3306
   ip_protocol                  = "tcp"

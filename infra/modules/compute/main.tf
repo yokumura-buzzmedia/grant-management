@@ -283,3 +283,40 @@ resource "aws_ecs_service" "this" {
 
   depends_on = [aws_lb_listener.http]
 }
+
+# マイグレーションはサービスではなく単発タスクとして流す（03_技術選定.md 5.6）。
+# ロールと接続情報はアプリと同じものを使い回す。
+resource "aws_ecs_task_definition" "migrate" {
+  family                   = "${var.name}-migrate"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = 512
+  memory                   = 1024
+  execution_role_arn       = aws_iam_role.execution.arn
+  task_role_arn            = aws_iam_role.task.arn
+
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "ARM64"
+  }
+
+  container_definitions = jsonencode([{
+    name      = "migrate"
+    image     = var.migrate_image
+    essential = true
+
+    secrets = [{
+      name      = "DATABASE_URL"
+      valueFrom = var.database_url_secret_arn
+    }]
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.this.name
+        "awslogs-region"        = data.aws_region.current.region
+        "awslogs-stream-prefix" = "migrate"
+      }
+    }
+  }])
+}

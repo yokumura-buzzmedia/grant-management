@@ -22,6 +22,17 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
+# マイグレーション用。ECS の単発タスクとして実行する（03_技術選定.md 5.6）。
+# アプリのイメージとは別に push する。standalone には drizzle-orm が
+# 独立して入らない（Next.js のバンドルに取り込まれる）ため、分けている。
+FROM node:22-slim AS migrate
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
+COPY drizzle ./drizzle
+COPY scripts/migrate.mjs ./scripts/migrate.mjs
+CMD ["node", "scripts/migrate.mjs"]
+
 FROM node:22-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production

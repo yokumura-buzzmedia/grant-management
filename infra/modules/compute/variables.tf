@@ -67,3 +67,8 @@ variable "environment" {
   type        = map(string)
   default     = {}
 }
+
+variable "migrate_image" {
+  description = "マイグレーション用のイメージ。ECS の単発タスクで使う"
+  type        = string
+}

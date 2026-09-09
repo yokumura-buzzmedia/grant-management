@@ -47,3 +47,9 @@ variable "schedule_enabled" {
   type        = bool
   default     = true
 }
+
+variable "migrate_image_tag" {
+  description = "マイグレーション用イメージのタグ。アプリとは別に push する"
+  type        = string
+  default     = "migrate-latest"
+}

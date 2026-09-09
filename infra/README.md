@@ -12,6 +12,7 @@ infra/
     registry/   ECR
     compute/    ALB・ECS Fargate・IAM ロール・ロググループ
     scheduler/  業務時間外の自動停止（EventBridge Scheduler）
+    bastion/    SSM ポートフォワード用の踏み台
   environments/
     staging/    ステージング
 ```
@@ -85,6 +86,13 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
 - **セキュリティグループのルールの `description` は英語。** EC2 API が
   ASCII の一部しか受け付けないためです。説明は Terraform 側のコメントに書きます。
 - **ALB は当面 HTTP のみ。** ドメインが未定で ACM 証明書を発行できないためです。
+- **マイグレーションは専用イメージを ECS の単発タスクで流します**（5.6）。
+  `drizzle-kit` は devDependency で、`drizzle-orm` は Next.js のバンドルに
+  取り込まれるため、どちらもアプリのイメージには独立して入りません。
+  Dockerfile の `migrate` ステージが `node_modules` 一式と `drizzle/` を持ちます。
+- **踏み台を1台置いています**（`t4g.nano`、月3USD程度）。SSM Session Manager の
+  ポートフォワードで、手元から RDS を見るためです。SSH は使わず、受信は許可していません。
+  使わない期間は停止できます。
 
 ## 残っている作業
 
@@ -94,8 +102,6 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
 | Route 53 ホストゾーンと A レコード | ドメイン確定 |
 | SES のドメイン検証・SPF/DKIM/DMARC・サンドボックス解除申請 | ドメイン確定 |
 | S3 の CORS 設定（`cors_allowed_origins`） | ALB の DNS 名またはドメイン確定 |
-| Dockerfile と `output: "standalone"` の追加 | `docs/手順書/ECRへのイメージ登録とデプロイ.md` 0章 |
-| マイグレーションをステージングの DB へ流す手段 | 同上「マイグレーションについて」 |
 | GitHub Actions からの ECR push と ECS デプロイ（当面は手動） | 5.6 |
 | AWS WAF レートベースルール（`/login`、100req/5分/IP、まずカウントモード） | 5.4 |
 | AWS Backup（日次・30日保持・Vault Lock） | 5.3。本番のみ |
