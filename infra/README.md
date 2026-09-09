@@ -132,6 +132,11 @@ RDS は起動に数分かかるため ECS より先に起こし、停止は逆�
 - **カスタム MAIL FROM を設定しています**（`mail.grant-management.buzzmedia-app.com`）。
   既定のままだと Return-Path が `amazonses.com` になり、SPF が送信元ドメインと
   揃わず DMARC のアライメントが取れません。
+- **SNS からの通知は迷惑メールに入りやすい。** 構築時、購読確認メールが
+  `buzzmedia.co.jp` の迷惑メールフォルダに入りました。バウンス通知も同じ
+  `no-reply@sns.amazonaws.com` から同じ経路で届くため、受信側で許可リストに
+  登録してください。気づけないとバウンス率の上昇を見逃し、SES 側で
+  送信が止まります（`05_外部連携仕様.md` 4.4）。
 - **DMARC は `p=none` から始めます。** レポートを受け取って実態を見てから厳しくします。
   最初から `quarantine` にすると、設定の不備で正当なメールが届かなくなります。
 - **踏み台を1台置いています**（`t4g.nano`、月3USD程度）。SSM Session Manager の
