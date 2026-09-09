@@ -9,9 +9,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 認証・マイページ（A-01〜A-05）
 - 会社（D-01 / D-02）と、その中の受講者（D-03）・雇用契約書（D-04）・クライアントアカウント
 - アカウント（G-01 / G-02）、削除履歴（G-04）
+- カリキュラムマスタ（F-01）。6つのマスタを1画面で絞り込みながら編集する
 
-申請案件・予約・カリキュラム・掲示板は未着手で、
+申請案件・予約・掲示板は未着手で、
 ダッシュボード・申請案件一覧・講義スケジュールはプレースホルダのみです。
+カリキュラムのCSVインポート画面（F-02）は作成後に取り下げました。
+CSVからの取り込みは `npm run db:curriculum` だけが入口です。
 
 ドキュメント・コメント・コミットメッセージはすべて日本語で記述します。
 
@@ -26,7 +29,7 @@ Remove all mannered prose.
 ## コマンド
 
 ```bash
-npm run setup        # db:up → db:migrate → db:seed（初回はこれだけでよい）
+npm run setup        # db:up → db:migrate → db:seed → db:curriculum（初回はこれだけでよい）
 npm run dev          # 開発サーバー http://localhost:3000
 npm run build        # 本番ビルド
 npm run typecheck    # tsc --noEmit
@@ -37,6 +40,7 @@ npm run db:reset     # ボリュームごと作り直す
 npm run db:generate  # スキーマから drizzle/ 配下へマイグレーションSQLを生成
 npm run db:migrate   # マイグレーションを適用
 npm run db:seed      # 初期システム管理者を作成し、仮パスワードを表示する
+npm run db:curriculum # docs/data/ のCSVからカリキュラムマスタを取り込む
 npm run db:studio    # Drizzle Studio
 ```
 
@@ -71,7 +75,8 @@ npm run db:studio    # Drizzle Studio
 CI/CD は未整備で、当面は手動です。
 
 `docs/data/` はカリキュラムマスタの初期データ（UTF-8 BOM付き CSV 6ファイル）です。
-`courses.csv` の「目的」列に改行を含むため、行分割ではなく必ず CSV パーサで読みます。
+`courses.csv` の「目的」列に改行を含むため、行分割ではなく必ず CSV パーサで読みます
+（`src/lib/csv/parse.ts`）。取り込みは `npm run db:curriculum` です。
 
 `.drawio` は XML です。プログラムで編集した場合は XML の妥当性を検証してください。
 

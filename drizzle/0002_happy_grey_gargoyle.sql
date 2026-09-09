@@ -1,0 +1,1 @@
+ALTER TABLE `training_programs` DROP COLUMN `subtitle`;

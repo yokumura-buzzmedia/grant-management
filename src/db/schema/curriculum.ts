@@ -29,7 +29,6 @@ export const trainingPrograms = mysqlTable("training_programs", {
   name: varchar("name", { length: 255 }).notNull(),
   /** 段階（例: 第1段階） */
   stage: varchar("stage", { length: 32 }).notNull(),
-  subtitle: varchar("subtitle", { length: 255 }),
   displayOrder: int("display_order").notNull(),
   isActive: boolean("is_active").notNull().default(true),
   ...timestamps(),
@@ -82,8 +81,8 @@ export const courses = mysqlTable(
 // ---------------------------------------------------------------------------
 
 /**
- * 1コースは13コマで構成し、所要時間の合計は10時間。
- * この2点はアプリケーション側で検証する。
+ * コマ数はコースごとに決める。所要時間の合計が10時間であることは
+ * アプリケーション側で検証する。
  */
 export const courseSessions = mysqlTable(
   "course_sessions",
@@ -121,10 +120,16 @@ export const sessionPatterns = mysqlTable("session_patterns", {
 })
 
 // ---------------------------------------------------------------------------
-// パターン日別コマ割当マスタ（初期データ52件 = 4パターン × 13コマ）
+// パターン日別コマ割当マスタ（初期データ6,864件 = 4パターン × 132コース × 13コマ）
 // ---------------------------------------------------------------------------
 
-/** 開催パターンごとに、各講義日へ割り当てる講義コマを定義する。全コースで共通。 */
+/**
+ * 開催パターンごとに、各講義日へ割り当てる講義コマを定義する。
+ *
+ * 割当はコースごとに持つ。1コースの講義コマ数は可変で、コース間でコマ記号も揃わないため、
+ * 1組の割当を全コースで使い回すことはできない。
+ * 講義コマを指すので、コマを削除すれば割当も一緒に消える。
+ */
 export const patternDaySessions = mysqlTable(
   "pattern_day_sessions",
   {
@@ -132,12 +137,15 @@ export const patternDaySessions = mysqlTable(
     patternCode: varchar("pattern_code", { length: 32 })
       .notNull()
       .references((): AnyMySqlColumn => sessionPatterns.code, { onDelete: "cascade" }),
+    courseSessionId: fk("course_session_id")
+      .notNull()
+      .references((): AnyMySqlColumn => courseSessions.id, { onDelete: "cascade" }),
     /** 何日目か */
     dayNumber: tinyint("day_number", { unsigned: true }).notNull(),
-    /** コマ記号。コースに依存しない共通の記号 */
-    sessionSymbol: varchar("session_symbol", { length: 16 }).notNull(),
     displayOrder: int("display_order").notNull(),
     ...timestamps(),
   },
-  (t) => [uniqueIndex("uq_pattern_day_sessions_pattern_symbol").on(t.patternCode, t.sessionSymbol)],
+  (t) => [
+    uniqueIndex("uq_pattern_day_sessions_pattern_session").on(t.patternCode, t.courseSessionId),
+  ],
 )

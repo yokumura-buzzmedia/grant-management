@@ -49,6 +49,16 @@ export function UsersIcon(props: IconProps) {
   )
 }
 
+/** カリキュラム */
+export function BookIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4.5 4.75A1.25 1.25 0 0 1 5.75 3.5H11a2 2 0 0 1 2 2v14a1.75 1.75 0 0 0-1.75-1.75H5.75A1.25 1.25 0 0 1 4.5 16.5Z" />
+      <path d="M19.5 4.75a1.25 1.25 0 0 0-1.25-1.25H13a2 2 0 0 0-2 2v14a1.75 1.75 0 0 1 1.75-1.75h5.5a1.25 1.25 0 0 0 1.25-1.25Z" />
+    </Icon>
+  )
+}
+
 /** 削除履歴 */
 export function TrashIcon(props: IconProps) {
   return (
@@ -88,6 +98,7 @@ export function CloseIcon(props: IconProps) {
 export const MENU_ICONS = {
   company: BuildingIcon,
   accounts: UsersIcon,
+  curriculum: BookIcon,
   deletionLogs: TrashIcon,
 } as const
 

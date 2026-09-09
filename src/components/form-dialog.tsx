@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from "react"
 import { CloseIcon, EditIcon } from "@/components/icons"
-import { buttonIcon, buttonPrimary, focusRing } from "@/components/ui"
+import { buttonIcon, buttonPrimary, buttonSecondary, focusRing } from "@/components/ui"
 
 /**
  * 新規作成のフォームを載せるモーダル。
@@ -33,10 +33,11 @@ export function FormDialog({
    */
   triggerDescription?: string
   /**
-   * primary は新規作成のボタン。icon は一覧の行に置く鉛筆だけのボタンで、
+   * primary は新規作成のボタン。secondary は同じ画面に追加の入口が複数あるとき
+   * （カリキュラムの各マスタ）に使う。icon は一覧の行に置く鉛筆だけのボタンで、
    * 名前は triggerLabel を aria-label として与える。
    */
-  triggerVariant?: "primary" | "icon"
+  triggerVariant?: "primary" | "secondary" | "icon"
   title: string
   children: React.ReactNode
 }) {
@@ -61,7 +62,11 @@ export function FormDialog({
           <EditIcon />
         </button>
       ) : (
-        <button type="button" onClick={open_} className={buttonPrimary}>
+        <button
+          type="button"
+          onClick={open_}
+          className={triggerVariant === "secondary" ? buttonSecondary : buttonPrimary}
+        >
           {triggerLabel}
           {triggerDescription ? <span className="sr-only">（{triggerDescription}）</span> : null}
         </button>

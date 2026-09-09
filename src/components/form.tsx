@@ -156,6 +156,45 @@ export function Field({
 }
 
 /**
+ * 複数行の入力欄。
+ * カリキュラムの「目的」のように、改行を含んだまま保存する項目で使う。
+ */
+export function TextAreaField({
+  label,
+  name,
+  hint,
+  defaultValue,
+  required,
+  errors,
+  rows = 6,
+}: {
+  label: string
+  name: string
+  hint?: string
+  defaultValue?: string | null
+  required?: boolean
+  errors?: string[]
+  rows?: number
+}) {
+  return (
+    <Label label={label} required={required} hint={hint} errors={errors}>
+      {({ id, describedBy, invalid }) => (
+        <textarea
+          id={id}
+          name={name}
+          rows={rows}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
+          aria-required={required || undefined}
+          defaultValue={defaultValue ?? ""}
+          className={invalid ? inputClass + " border-red-400" : inputClass}
+        />
+      )}
+    </Label>
+  )
+}
+
+/**
  * 変更できない項目。
  *
  * input に readOnly を付けると、押せば直せそうに見えるうえ、なぜ直せないのかが伝わらない。

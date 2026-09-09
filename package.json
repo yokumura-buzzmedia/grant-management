@@ -15,7 +15,8 @@
     "db:migrate": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs migrate",
     "db:studio": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs studio",
     "db:seed": "node --env-file=.env.local --import tsx ./src/db/seed.ts",
-    "setup": "npm run db:up && npm run db:migrate && npm run db:seed",
+    "db:curriculum": "node --env-file=.env.local --import tsx ./src/db/import-curriculum.ts",
+    "setup": "npm run db:up && npm run db:migrate && npm run db:seed && npm run db:curriculum",
     "db:postal": "node --env-file=.env.local --import tsx ./src/db/import-postal-codes.ts"
   },
   "dependencies": {

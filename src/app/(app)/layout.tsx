@@ -15,6 +15,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     ? ([
         { href: "/companies", label: "会社", icon: "company" },
         { href: "/accounts", label: "アカウント", icon: "accounts" },
+        // カリキュラムのマスタを触れるのは事務員とシステム管理者だけ（5.7）
+        { href: "/curriculum", label: "カリキュラム", icon: "curriculum" },
         { href: "/deletion-logs", label: "削除履歴", icon: "deletionLogs" },
       ] as const)
     : user.roles.includes("client") && user.companyId
