@@ -7,15 +7,17 @@ import { listStateQuery } from "@/lib/list-state"
 import { formatJst } from "@/lib/datetime"
 import { ROLE_LABELS } from "@/lib/roles"
 import {
+  actionCellClass,
+  actionHeadClass,
   buttonGhost,
   buttonPrimary,
   buttonSecondary,
   controlClass,
+  EditLink,
   Notice,
   PageHeader,
   Pagination,
   ResultCount,
-  rowLinkClass,
   SortLink,
   TabLinks,
   type SortState,
@@ -205,7 +207,7 @@ export default async function AccountsPage({
     <div className="flex flex-col gap-5">
       <PageHeader
         title="アカウント一覧"
-        description="利用者名を選ぶと編集・削除ができます。"
+        description="行の右端の鉛筆から、編集・有効／無効・削除ができます。"
         action={
           <Link href="/accounts/new" className={buttonPrimary}>
             アカウントを作成
@@ -338,12 +340,16 @@ export default async function AccountsPage({
                   </Th>
                 )
               })}
+              {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す */}
+              <Th className={actionHeadClass}>
+                <span className="sr-only">操作</span>
+              </Th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-12 text-center text-slate-500">
+                <td colSpan={columns.length + 1} className="px-4 py-12 text-center text-slate-500">
                   条件に一致するアカウントがありません。
                   {narrowed ? (
                     <Link href={resetHref} className={`${buttonGhost} ml-2`}>
@@ -356,16 +362,10 @@ export default async function AccountsPage({
               rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                  className="group border-b border-slate-100 last:border-0 hover:bg-slate-50"
                 >
-                  <th scope="row" className="px-4 py-2.5 text-left font-medium">
-                    {/* 検索や並び順を詳細へ渡し、戻ったときに復元できるようにする */}
-                    <Link
-                      href={`/accounts/${row.id}${listQuery ? `?${listQuery}` : ""}`}
-                      className={rowLinkClass}
-                    >
-                      {row.displayName}
-                    </Link>
+                  <th scope="row" className="px-4 py-2.5 text-left font-medium text-slate-900">
+                    {row.displayName}
                   </th>
                   <td className="px-4 py-2.5 font-mono text-slate-600">{row.loginId}</td>
                   <td className="px-4 py-2.5 text-slate-600">
@@ -388,6 +388,13 @@ export default async function AccountsPage({
                   </td>
                   <td className="px-4 py-2.5 tabular-nums text-slate-600">
                     {formatJst(row.updatedAt)}
+                  </td>
+                  <td className={actionCellClass}>
+                    {/* 検索や並び順を詳細へ渡し、戻ったときに復元できるようにする */}
+                    <EditLink
+                      href={`/accounts/${row.id}${listQuery ? `?${listQuery}` : ""}`}
+                      label={`${row.displayName} を編集`}
+                    />
                   </td>
                 </tr>
               ))

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { EditIcon } from "@/components/icons"
 
 /**
  * 画面をまたいで共有する見た目の定義。
@@ -52,12 +53,41 @@ export const buttonDanger =
 export const linkClass = "rounded-sm text-slate-600 hover:text-slate-900 hover:underline " + focusRing
 
 /**
- * 一覧の行から詳細へ入るリンク。
- * 一覧では行そのものが押せることが伝わればよく、常時下線は罫線と競合する。
+ * アイコンだけの操作。名前を持たないので、使う側が aria-label で与える。
+ * 一覧の行に置く鉛筆（FormDialog の icon トリガーと EditLink）で共有する。
  */
-export const rowLinkClass =
-  "rounded-sm font-medium text-slate-900 underline decoration-slate-300 underline-offset-4 hover:decoration-slate-900 " +
+export const buttonIcon =
+  "inline-flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 " +
   focusRing
+
+/**
+ * 一覧の右端に固定する操作列。
+ *
+ * 列が多い表は横スクロールが出るため、編集の入り口が画面の外へ隠れる。
+ * 右端に貼り付けて、どこまで横に流しても押せる位置に置く。
+ * 背景を敷かないと下を流れる列が透けるので、見出しと本体で色を分ける。
+ * 本体はホバーを行に追従させるため、tr 側に group を付けて使う。
+ */
+export const actionHeadClass =
+  "sticky right-0 w-px bg-slate-50 shadow-[inset_1px_0_0_theme(colors.slate.200)]"
+
+export const actionCellClass =
+  "sticky right-0 bg-white px-4 py-2.5 text-right shadow-[inset_1px_0_0_theme(colors.slate.200)] group-hover:bg-slate-50"
+
+/**
+ * 一覧の行から編集へ入るアイコンリンク。
+ *
+ * 受講者とクライアントアカウントは編集がモーダル（FormDialog の icon トリガー）、
+ * 会社とアカウントは別画面と、開く先は違う。行の右端の鉛筆から入るという操作を
+ * そろえたいので、見た目と位置は共通にし、リンクとボタンだけを使い分ける。
+ */
+export function EditLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href} aria-label={label} className={buttonIcon}>
+      <EditIcon />
+    </Link>
+  )
+}
 
 /**
  * 一覧や親画面へ戻る導線。見出しの上に置く。

@@ -4,7 +4,7 @@ import { AccountStatusControl } from "@/components/account-status-control"
 import { ClientAccountForm } from "@/components/client-account-form"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { FormDialog } from "@/components/form-dialog"
-import { Th } from "@/components/ui"
+import { actionCellClass, actionHeadClass, Th } from "@/components/ui"
 import { deleteAccountAction } from "@/lib/deletions/actions"
 
 export type CompanyAccount = {
@@ -70,7 +70,7 @@ export function CompanyAccounts({
                 <Th>有効／無効</Th>
                 <Th>パスワード</Th>
                 {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す */}
-                <Th className="w-px">
+                <Th className={actionHeadClass}>
                   <span className="sr-only">操作</span>
                 </Th>
               </tr>
@@ -79,7 +79,7 @@ export function CompanyAccounts({
               {accounts.map((account) => (
                 <tr
                   key={account.id}
-                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                  className="group border-b border-slate-100 last:border-0 hover:bg-slate-50"
                 >
                   <th scope="row" className="px-4 py-2.5 text-left font-medium text-slate-900">
                     {account.displayName}
@@ -102,7 +102,7 @@ export function CompanyAccounts({
                       <span className="text-slate-600">本人が設定済み</span>
                     )}
                   </td>
-                  <td className="px-4 py-2.5 text-right">
+                  <td className={actionCellClass}>
                     {/*
                       保存・有効／無効・削除は redirect するため、画面遷移でこのダイアログごと消える。
                       仮パスワードの再生成だけは状態を返すので、開いたまま結果がこの中に出る。

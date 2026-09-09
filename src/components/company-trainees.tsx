@@ -2,14 +2,14 @@ import type { EmploymentType, Gender } from "@/db/schema"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { EmploymentContract, type ContractView } from "@/components/employment-contract"
 import { FormDialog } from "@/components/form-dialog"
-import { Th } from "@/components/ui"
+import { actionCellClass, actionHeadClass, Th } from "@/components/ui"
 import { TraineeForm } from "@/components/trainee-form"
 import {
   createTraineeAction,
   deleteTraineeAction,
   updateTraineeAction,
 } from "@/lib/trainees/actions"
-import { EMPLOYMENT_TYPE_LABELS, GENDER_LABELS } from "@/lib/trainees/labels"
+import { EMPLOYMENT_TYPE_LABELS } from "@/lib/trainees/labels"
 
 export type CompanyTrainee = {
   id: number
@@ -78,7 +78,7 @@ export function CompanyTrainees({
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full min-w-[1040px] text-sm">
+          <table className="w-full min-w-[760px] text-sm">
             <caption className="sr-only">この会社の受講者の一覧。全 {trainees.length} 件。</caption>
             <thead className="border-b border-slate-200 bg-slate-50 text-left">
               <tr>
@@ -87,12 +87,11 @@ export function CompanyTrainees({
                 <Th>雇用保険被保険者番号</Th>
                 <Th>雇用形態</Th>
                 <Th>職種</Th>
-                <Th>職務内容</Th>
-                <Th>性別</Th>
+                {/* 職務内容と性別は一覧に出さない。職務内容は255文字まで入るため
+                    幅を取り、性別は一覧で見比べる場面がない。編集ダイアログで扱う */}
                 <Th>雇用契約書</Th>
-                {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す。
-                    列が多く横スクロールが出るため、右端に固定して常に押せるようにする */}
-                <Th className="sticky right-0 w-px bg-slate-50 shadow-[inset_1px_0_0_theme(colors.slate.200)]">
+                {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す */}
+                <Th className={actionHeadClass}>
                   <span className="sr-only">操作</span>
                 </Th>
               </tr>
@@ -114,14 +113,10 @@ export function CompanyTrainees({
                     {EMPLOYMENT_TYPE_LABELS[trainee.employmentType]}
                   </td>
                   <td className="px-4 py-2.5 text-slate-600">{trainee.jobType}</td>
-                  <td className="px-4 py-2.5 text-slate-600">{trainee.jobDescription}</td>
-                  <td className="px-4 py-2.5 text-slate-600">{GENDER_LABELS[trainee.gender]}</td>
                   <td className="px-4 py-2.5">
                     <ContractStatus contract={trainee.contract} />
                   </td>
-                  {/* 見出しと同じく右端に固定する。背景を敷かないと下の列が透ける。
-                      行のホバーにも追従させるため、tr 側の group を使う */}
-                  <td className="sticky right-0 bg-white px-4 py-2.5 text-right shadow-[inset_1px_0_0_theme(colors.slate.200)] group-hover:bg-slate-50">
+                  <td className={actionCellClass}>
                     <FormDialog
                       triggerVariant="icon"
                       triggerLabel={`${trainee.name} を編集`}

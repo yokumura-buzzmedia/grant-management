@@ -6,15 +6,17 @@ import { requireRoles } from "@/lib/auth/guards"
 import { formatJst } from "@/lib/datetime"
 import { listStateQuery } from "@/lib/list-state"
 import {
+  actionCellClass,
+  actionHeadClass,
   buttonGhost,
   buttonPrimary,
   buttonSecondary,
   controlClass,
+  EditLink,
   Notice,
   PageHeader,
   Pagination,
   ResultCount,
-  rowLinkClass,
   SortLink,
   type SortState,
   Th,
@@ -185,12 +187,16 @@ export default async function CompaniesPage({
                   </Th>
                 )
               })}
+              {/* 中身は鉛筆だけなので、見出しは読み上げにだけ渡す */}
+              <Th className={actionHeadClass}>
+                <span className="sr-only">操作</span>
+              </Th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-slate-500">
+                <td colSpan={6} className="px-4 py-12 text-center text-slate-500">
                   {query ? (
                     <>
                       「{query}」に一致する会社がありません。
@@ -207,16 +213,10 @@ export default async function CompaniesPage({
               rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                  className="group border-b border-slate-100 last:border-0 hover:bg-slate-50"
                 >
-                  <th scope="row" className="px-4 py-2.5 text-left font-medium">
-                    {/* 検索や並び順を詳細へ渡し、戻ったときに復元できるようにする */}
-                    <Link
-                      href={`/companies/${row.id}${listQuery ? `?${listQuery}` : ""}`}
-                      className={rowLinkClass}
-                    >
-                      {row.name}
-                    </Link>
+                  <th scope="row" className="px-4 py-2.5 text-left font-medium text-slate-900">
+                    {row.name}
                   </th>
                   <td className="px-4 py-2.5 font-mono tabular-nums text-slate-600">
                     {row.corporateNumber ?? "—"}
@@ -225,6 +225,13 @@ export default async function CompaniesPage({
                   <td className="px-4 py-2.5 tabular-nums text-slate-600">{row.phone ?? "—"}</td>
                   <td className="px-4 py-2.5 tabular-nums text-slate-600">
                     {formatJst(row.updatedAt)}
+                  </td>
+                  <td className={actionCellClass}>
+                    {/* 検索や並び順を詳細へ渡し、戻ったときに復元できるようにする */}
+                    <EditLink
+                      href={`/companies/${row.id}${listQuery ? `?${listQuery}` : ""}`}
+                      label={`${row.name} を編集`}
+                    />
                   </td>
                 </tr>
               ))

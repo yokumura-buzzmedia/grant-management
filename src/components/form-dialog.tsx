@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from "react"
 import { CloseIcon, EditIcon } from "@/components/icons"
-import { buttonPrimary, focusRing } from "@/components/ui"
+import { buttonIcon, buttonPrimary, focusRing } from "@/components/ui"
 
 /**
  * 新規作成のフォームを載せるモーダル。
@@ -56,10 +56,7 @@ export function FormDialog({
           type="button"
           aria-label={triggerLabel}
           onClick={open_}
-          className={
-            "inline-flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 " +
-            focusRing
-          }
+          className={buttonIcon}
         >
           <EditIcon />
         </button>
