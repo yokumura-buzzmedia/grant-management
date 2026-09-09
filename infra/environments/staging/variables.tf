@@ -30,11 +30,6 @@ variable "image_tag" {
   default = "latest"
 }
 
-variable "cors_allowed_origins" {
-  description = "S3 への直接 PUT を許可するオリジン。ALB の DNS 名が決まってから設定する"
-  type        = list(string)
-  default     = []
-}
 
 variable "db_instance_class" {
   description = "ステージングは最小インスタンス（03_技術選定.md 5.5）"
@@ -52,4 +47,24 @@ variable "migrate_image_tag" {
   description = "マイグレーション用イメージのタグ。アプリとは別に push する"
   type        = string
   default     = "migrate-latest"
+}
+
+variable "zone_name" {
+  description = "Route 53 の公開ホストゾーン。ドメイン登録まで空"
+  type        = string
+  default     = ""
+}
+
+variable "fqdn" {
+  description = "この環境の完全修飾ドメイン名。ドメイン登録まで空"
+  type        = string
+  default     = ""
+}
+
+# 証明書は module.dns が発行するが、compute へ渡すには先に値が要る。
+# 初回は空で apply して証明書を作り、次に ARN を入れて HTTPS を有効にする。
+variable "certificate_arn" {
+  description = "ALB の HTTPS リスナーに使う証明書。空なら HTTP のまま"
+  type        = string
+  default     = ""
 }

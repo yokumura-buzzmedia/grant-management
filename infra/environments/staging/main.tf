@@ -1,6 +1,12 @@
 locals {
   account_id     = data.aws_caller_identity.current.account_id
   uploads_bucket = "${var.name}-uploads-${local.account_id}"
+
+  # ドメインを登録するまでは空。HTTPS リスナーも Route 53 レコードも作らない。
+  dns_enabled = var.zone_name != "" && var.fqdn != ""
+
+  # 署名付きURLで直接 PUT するオリジン。HTTPS で使うため証明書が要る。
+  app_origins = local.dns_enabled ? ["https://${var.fqdn}"] : []
 }
 
 module "network" {
@@ -15,7 +21,7 @@ module "storage" {
   source = "../../modules/storage"
 
   bucket_name          = local.uploads_bucket
-  cors_allowed_origins = var.cors_allowed_origins
+  cors_allowed_origins = local.app_origins
 }
 
 # イメージは環境間で共有する。タグで本番とステージングを分ける。
@@ -51,6 +57,8 @@ module "compute" {
   migrate_image = "${module.registry.repository_url}:${var.migrate_image_tag}"
   desired_count = var.desired_count
 
+  certificate_arn = var.certificate_arn
+
   uploads_bucket_arn      = module.storage.bucket_arn
   database_url_secret_arn = module.database.database_url_secret_arn
 
@@ -77,6 +85,17 @@ module "scheduler" {
 
   db_instance_identifier = module.database.instance_identifier
   db_instance_arn        = module.database.instance_arn
+}
+
+# ドメイン登録後に有効化する。証明書の検証レコードも同じゾーンに置く。
+module "dns" {
+  source = "../../modules/dns"
+  count  = local.dns_enabled ? 1 : 0
+
+  zone_name    = var.zone_name
+  fqdn         = var.fqdn
+  alb_dns_name = module.compute.alb_dns_name
+  alb_zone_id  = module.compute.alb_zone_id
 }
 
 # 手元から RDS を見るための踏み台。SSM のポートフォワードで使う。

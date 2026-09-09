@@ -46,3 +46,13 @@ output "bastion_instance_id" {
   description = "aws ssm start-session の --target に渡す"
   value       = module.bastion.instance_id
 }
+
+output "certificate_arn" {
+  description = "ドメイン登録後の1回目の apply で発行される。terraform.tfvars に写す"
+  value       = try(module.dns[0].certificate_arn, "")
+}
+
+output "app_url" {
+  description = "利用者がアクセスする先"
+  value       = local.dns_enabled ? "https://${var.fqdn}" : "http://${module.compute.alb_dns_name}"
+}

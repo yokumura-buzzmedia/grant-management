@@ -85,15 +85,69 @@ resource "aws_lb_target_group" "this" {
   deregistration_delay = 30
 }
 
+locals {
+  https_enabled = var.certificate_arn != ""
+}
+
+# 証明書が無いうちは 80 番でそのまま転送する。
+# 証明書が入ったら HTTPS へ 301 で飛ばす。
+# セッション Cookie に Secure が付く（src/lib/auth/session.ts）ため、
+# HTTP のままでは実際にはログイン状態を保てない。
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
 
+  dynamic "default_action" {
+    for_each = local.https_enabled ? [] : [1]
+
+    content {
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.this.arn
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = local.https_enabled ? [1] : []
+
+    content {
+      type = "redirect"
+
+      redirect {
+        protocol    = "HTTPS"
+        port        = "443"
+        status_code = "HTTP_301"
+      }
+    }
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  count = local.https_enabled ? 1 : 0
+
+  load_balancer_arn = aws_lb.this.arn
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = var.certificate_arn
+
+  # TLS 1.2 以上のみ。1.0 と 1.1 は受け付けない。
+  ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
   }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alb_https" {
+  count = local.https_enabled ? 1 : 0
+
+  security_group_id = aws_security_group.alb.id
+  description       = "HTTPS"
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -286,7 +340,7 @@ resource "aws_ecs_service" "this" {
     ignore_changes = [desired_count]
   }
 
-  depends_on = [aws_lb_listener.http]
+  depends_on = [aws_lb_listener.http, aws_lb_listener.https]
 }
 
 # マイグレーションはサービスではなく単発タスクとして流す（03_技術選定.md 5.6）。

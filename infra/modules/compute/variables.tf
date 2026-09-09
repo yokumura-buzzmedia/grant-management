@@ -72,3 +72,9 @@ variable "migrate_image" {
   description = "マイグレーション用のイメージ。ECS の単発タスクで使う"
   type        = string
 }
+
+variable "certificate_arn" {
+  description = "ACM の証明書。空なら HTTPS リスナーを作らず、HTTP のまま転送する"
+  type        = string
+  default     = ""
+}
