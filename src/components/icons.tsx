@@ -59,6 +59,15 @@ export function BookIcon(props: IconProps) {
   )
 }
 
+/** 申請案件 */
+export function FolderIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M3.5 6.75A1.75 1.75 0 0 1 5.25 5h3.4a1.75 1.75 0 0 1 1.24.51l1.1 1.1a.75.75 0 0 0 .53.22h7.23a1.75 1.75 0 0 1 1.75 1.75v8.67A1.75 1.75 0 0 1 18.75 19H5.25a1.75 1.75 0 0 1-1.75-1.75Z" />
+    </Icon>
+  )
+}
+
 /** 削除履歴 */
 export function TrashIcon(props: IconProps) {
   return (
@@ -96,6 +105,7 @@ export function CloseIcon(props: IconProps) {
  * クライアントコンポーネントへ関数を渡すことになり、境界を越えられない。
  */
 export const MENU_ICONS = {
+  projects: FolderIcon,
   company: BuildingIcon,
   accounts: UsersIcon,
   curriculum: BookIcon,

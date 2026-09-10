@@ -5,7 +5,12 @@ import { companies } from "@/db/schema"
 import { AccountEditForm } from "@/components/account-edit-form"
 import { AccountPasswordReset } from "@/components/account-password-reset"
 import { AccountStatusControl } from "@/components/account-status-control"
-import { canManage, countActiveAdmins, findAccount } from "@/lib/accounts/authorize"
+import {
+  canManage,
+  countActiveAdmins,
+  countOpenProjectsAsStaff,
+  findAccount,
+} from "@/lib/accounts/authorize"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { listHref, pickListState } from "@/lib/list-state"
 import { BackLink, Notice, PageHeader } from "@/components/ui"
@@ -23,6 +28,8 @@ const ERRORS: Record<string, string> = {
   forbidden: "このアカウントを操作する権限がありません。",
   self: "自分自身のアカウントは無効にできません。",
   lastAdmin: "有効なシステム管理者が1人だけのため、無効にできません。",
+  primaryStaff:
+    "完了していない申請案件の主担当に設定されているため、無効にできません。主担当を別の事務員へ変更してから、もう一度お試しください。",
 }
 
 /** G-02 アカウントの編集（5.4）。 */
@@ -69,14 +76,19 @@ export default async function AccountPage({
   const isClient = account.roles.includes("client")
   const showRoles = !isClient || editableRoles.length > 0
 
-  // 無効にできない条件（5.4）
-  const otherActiveAdmins = await countActiveAdmins(account.id)
+  // 無効にできない条件（5.4, 5.16）。押してから断るより、先に理由を出す
+  const [otherActiveAdmins, openProjects] = await Promise.all([
+    countActiveAdmins(account.id),
+    countOpenProjectsAsStaff(account.id),
+  ])
   const disabledReason =
     account.isActive && account.id === actor.id
       ? "自分自身のアカウントは無効にできません。"
       : account.isActive && account.roles.includes("admin") && otherActiveAdmins === 0
         ? "有効なシステム管理者が1人だけのため、無効にできません。"
-        : null
+        : account.isActive && openProjects > 0
+          ? `完了していない申請案件 ${openProjects} 件の主担当のため、無効にできません。主担当を別の事務員へ変更してください。`
+          : null
 
   // 有効なシステム管理者が1人だけの場合は削除できない（5.4）
   const deleteBlockedReason =

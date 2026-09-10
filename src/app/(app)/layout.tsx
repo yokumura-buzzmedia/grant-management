@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { AnnouncementBanner } from "@/components/announcement-banner"
+import type { MenuIconName } from "@/components/icons"
 import { MainMenu } from "@/components/main-menu"
 import { NavLink } from "@/components/nav-link"
 import { requireActiveUser } from "@/lib/auth/guards"
@@ -10,18 +11,24 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const user = await requireActiveUser()
   const canManage = user.roles.includes("staff") || user.roles.includes("admin")
 
+  // 申請案件一覧は講師以外が使う。見える範囲は画面側で権限ごとに絞る（06_画面設計.md 5）
+  const projectsLink = { href: "/projects", label: "申請案件", icon: "projects" } as const
+
   // クライアントは会社一覧を使えないので、自社の会社情報へ直接入る（06_画面設計.md 5）
-  const links = canManage
-    ? ([
+  const links: readonly { href: string; label: string; icon?: MenuIconName }[] = canManage
+    ? [
+        projectsLink,
         { href: "/companies", label: "会社", icon: "company" },
         { href: "/accounts", label: "アカウント", icon: "accounts" },
         // カリキュラムのマスタを触れるのは事務員とシステム管理者だけ（5.7）
         { href: "/curriculum", label: "カリキュラム", icon: "curriculum" },
         { href: "/deletion-logs", label: "削除履歴", icon: "deletionLogs" },
-      ] as const)
+      ]
     : user.roles.includes("client") && user.companyId
-      ? ([{ href: `/companies/${user.companyId}`, label: "会社情報", icon: "company" }] as const)
-      : []
+      ? [projectsLink, { href: `/companies/${user.companyId}`, label: "会社情報", icon: "company" }]
+      : user.roles.includes("agency") || user.roles.includes("advisor")
+        ? [projectsLink]
+        : []
 
   return (
     <div className="min-h-dvh">

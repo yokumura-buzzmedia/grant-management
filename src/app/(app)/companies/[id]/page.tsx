@@ -11,9 +11,11 @@ import { DeleteDialog } from "@/components/delete-dialog"
 import { Tabs } from "@/components/tabs"
 import { listHref, pickListState } from "@/lib/list-state"
 import { CompanyAccounts } from "@/components/company-accounts"
+import { CompanyProjects } from "@/components/company-projects"
 import { CompanyTrainees } from "@/components/company-trainees"
 import { BackLink, Notice, PageHeader } from "@/components/ui"
 import { formatJst } from "@/lib/datetime"
+import { desc } from "drizzle-orm"
 import { createDownloadUrl, createPreviewUrl } from "@/lib/storage"
 
 const NOTICES: Record<string, string> = {
@@ -39,6 +41,9 @@ const ERRORS: Record<string, string> = {
   "account-forbidden": "このアカウントを操作する権限がありません。",
   "account-self": "自分自身のアカウントは無効にできません。",
   "account-lastAdmin": "有効なシステム管理者が1人だけのため、操作できません。",
+  // クライアントアカウントは主担当になれないため通常は出ないが、文言の欠落を防ぐ
+  "account-primaryStaff":
+    "完了していない申請案件の主担当に設定されているため、無効にできません。",
   "contract-forbidden": "雇用契約書を承認する権限がありません。",
   "contract-notFound": "受講者が見つかりません。",
 }
@@ -153,13 +158,25 @@ export default async function CompanyPage({
     }),
   )
 
-  // 削除で一緒に消えるものの件数（5.3）。受講者は取得済みの行から数える
-  const [projectCount] = manager
-    ? await db
-        .select({ count: sql<number>`count(*)` })
-        .from(projects)
-        .where(eq(projects.companyId, company.id))
-    : [{ count: 0 }]
+  // 案件タブと、削除で一緒に消える件数（5.3）の両方に使う。
+  // 一覧（C-01）と同じく案件番号の降順で並べる（5.14）
+  const projectRows = await db
+    .select({
+      id: projects.id,
+      projectNumber: projects.projectNumber,
+      name: projects.name,
+      status: projects.status,
+      primaryStaffName: projects.primaryStaffName,
+      updatedAt: projects.updatedAt,
+    })
+    .from(projects)
+    .where(eq(projects.companyId, company.id))
+    .orderBy(desc(projects.projectNumber))
+
+  const projectList = projectRows.map(({ updatedAt, ...project }) => ({
+    ...project,
+    updatedAtText: formatJst(updatedAt),
+  }))
 
   return (
     <div className="flex flex-col gap-6">
@@ -215,7 +232,7 @@ export default async function CompanyPage({
                         consequences={[
                           `クライアントアカウント ${clientAccounts.length} 件が削除されます。`,
                           `受講者 ${traineeList.length} 件が削除されます。`,
-                          `申請案件 ${Number(projectCount?.count ?? 0)} 件と、その案件専用データが削除されます。`,
+                          `申請案件 ${projectList.length} 件と、その案件専用データが削除されます。`,
                           "削除履歴に会社名と法人番号が残ります。",
                         ]}
                       />
@@ -233,6 +250,18 @@ export default async function CompanyPage({
               <CompanyTrainees
                 companyId={company.id}
                 trainees={traineeList}
+                canManage={manager}
+              />
+            ),
+          },
+          {
+            id: "projects",
+            label: "申請案件",
+            count: projectList.length,
+            panel: (
+              <CompanyProjects
+                companyId={company.id}
+                projects={projectList}
                 canManage={manager}
               />
             ),

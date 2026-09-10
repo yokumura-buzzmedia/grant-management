@@ -12,7 +12,7 @@ import { generateTemporaryPassword, hashPassword } from "@/lib/auth/password"
 import { validateLoginId } from "@/lib/auth/policy"
 import { now } from "@/lib/datetime"
 import { creatableRoles } from "@/lib/roles"
-import { canManage, countActiveAdmins, findAccount } from "./authorize"
+import { canManage, countActiveAdmins, countOpenProjectsAsStaff, findAccount } from "./authorize"
 import type { AccountFormState } from "./state"
 
 /** アカウントを作成できるのは事務員とシステム管理者（5.4）。 */
@@ -247,6 +247,19 @@ export async function updateAccountAction(
     fieldErrors.roles = ["有効なシステム管理者が1人だけのため、管理者権限は解除できません。"]
   }
 
+  // 完了していない申請案件の主担当からは、事務員・管理者の権限を外せない（5.16）。
+  // 主担当に指定できるのは有効な事務員かシステム管理者だけで、
+  // どちらも失うと進行中の案件が指せない担当者を持つことになる
+  const keepsStaffRole = nextRoles.includes("staff") || nextRoles.includes("admin")
+  if (!keepsStaffRole && (target.roles.includes("staff") || target.roles.includes("admin"))) {
+    const openProjects = await countOpenProjectsAsStaff(target.id)
+    if (openProjects > 0) {
+      fieldErrors.roles = [
+        `完了していない申請案件 ${openProjects} 件の主担当のため、事務員・システム管理者の権限は解除できません。先に主担当を別の事務員へ変更してください。`,
+      ]
+    }
+  }
+
   if (Object.keys(fieldErrors).length > 0) {
     return { errors: [], fieldErrors, values, attempt: (prev.attempt ?? 0) + 1 }
   }
@@ -325,6 +338,11 @@ export async function setAccountActiveAction(
     // 有効なシステム管理者が1人だけの場合は無効にできない（5.4）
     if (target.roles.includes("admin") && (await countActiveAdmins(target.id)) === 0) {
       redirect(back("error", "lastAdmin"))
+    }
+    // 完了していない申請案件の主担当は無効にできない（5.16）。
+    // 無効にすると、進行中の案件の担当者が誰もいない状態になる
+    if ((await countOpenProjectsAsStaff(target.id)) > 0) {
+      redirect(back("error", "primaryStaff"))
     }
   }
 
