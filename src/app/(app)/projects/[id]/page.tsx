@@ -38,6 +38,8 @@ const NOTICES: Record<string, string> = {
   contractSent: "契約書を送付しました。",
   contractSentAdvanced: "契約書を送付し、ステータスを「契約書送付済」へ進めました。",
   contractSynced: "freeeサインから最新の状態を取得しました。",
+  contractSyncedAdvanced:
+    "締結を確認し、ステータスを「契約締結済」へ進めました。",
 }
 
 const ERRORS: Record<string, string> = {

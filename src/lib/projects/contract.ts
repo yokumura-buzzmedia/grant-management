@@ -137,11 +137,19 @@ export async function sendContractAction(
  * 締結の検知は本来ポーリング（3.9）で行うが未実装のため、いまは事務員が
  * この操作で1件ずつ取り直す。事務員の操作に対する応答なので同期処理にする（5.22）。
  *
- * **申請案件のステータスは動かさない。** 締結を確認して「5 契約締結済」へ進めるのは
- * 事務員の判断（5.8）。却下・期限切れも記録だけ行い、前へは戻さない（3.9）。
+ * **締結を確認できたら「5 契約締結済」へ自動で進める**（5.1 の例外）。
+ * 進めるのは現在が「4 契約書送付済」のときだけで、順序は飛ばさない。
+ * 却下・有効期限切れは記録だけ行い、前へは戻さない（3.9）。
  */
 export async function syncContractAction(projectId: number): Promise<FormState> {
-  await requireRoles(EDITORS)
+  const actor = await requireRoles(EDITORS)
+
+  const [project] = await db
+    .select({ id: projects.id, status: projects.status })
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1)
+  if (!project) redirect("/projects")
 
   const [existing] = await db
     .select({
@@ -204,6 +212,19 @@ export async function syncContractAction(projectId: number): Promise<FormState> 
     })
     .where(eq(contracts.id, existing.id))
 
+  // 締結を確認できたときだけ進める。順序を飛ばさないため、現在が4のときに限る（5.1）
+  const advanced =
+    document.status === "concluded" && nextStatus(project.status) === "contract_concluded"
+  if (advanced) {
+    await db
+      .update(projects)
+      .set({ status: "contract_concluded", updatedAt: now(), updatedBy: actor.id })
+      .where(eq(projects.id, project.id))
+  }
+
   revalidatePath(`/projects/${projectId}`)
-  redirect(`/projects/${projectId}?tab=contract&notice=contractSynced`)
+  revalidatePath("/projects")
+  redirect(
+    `/projects/${projectId}?tab=contract&notice=${advanced ? "contractSyncedAdvanced" : "contractSynced"}`,
+  )
 }

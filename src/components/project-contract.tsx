@@ -206,7 +206,9 @@ export function ProjectContract({
           <ErrorList errors={syncState.errors} />
           <p className="text-xs text-slate-600">
             freeeサインに問い合わせて、この契約書の状態を取り直します。
-            締結を確認しても申請案件のステータスは変わりません。
+            <span className="font-medium">
+              「契約書送付済」の案件は、締結を確認できたら「契約締結済」へ自動で進みます。
+            </span>
           </p>
         </div>
       ) : null}
