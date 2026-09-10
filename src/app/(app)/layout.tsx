@@ -23,6 +23,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         // カリキュラムのマスタを触れるのは事務員とシステム管理者だけ（5.7）
         { href: "/curriculum", label: "カリキュラム", icon: "curriculum" },
         { href: "/deletion-logs", label: "削除履歴", icon: "deletionLogs" },
+        // 外部連携の接続はシステム管理者だけ（05_外部連携仕様.md 3.2）
+        ...(user.roles.includes("admin")
+          ? [{ href: "/settings/freee-sign", label: "freeeサイン連携" }]
+          : []),
       ]
     : user.roles.includes("client") && user.companyId
       ? [projectsLink, { href: `/companies/${user.companyId}`, label: "会社情報", icon: "company" }]

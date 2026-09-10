@@ -62,6 +62,15 @@ variable "database_url_secret_arn" {
   type = string
 }
 
+# freeeサインの client_id / client_secret を入れた Secrets Manager のシークレット。
+# 空ならタスクへ渡さない。値を入れる前に参照するとタスクが起動できないため、
+# シークレットを作って値を入れてから、この ARN を設定する（05_外部連携仕様.md 3.2）。
+variable "freee_sign_secret_arn" {
+  description = "freeeサインのクレデンシャル。JSON の client_id / client_secret を参照する"
+  type        = string
+  default     = ""
+}
+
 variable "environment" {
   description = "コンテナに渡す環境変数"
   type        = map(string)

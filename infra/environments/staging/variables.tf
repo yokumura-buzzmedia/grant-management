@@ -68,3 +68,39 @@ variable "certificate_arn" {
   type        = string
   default     = ""
 }
+
+# freeeサイン（05_外部連携仕様.md 3）。
+# **検証環境と本番環境は同じテナントを共有し、契約書の置き場をフォルダで分ける。**
+# 分離はフォルダIDだけが担保するため、本番のフォルダIDをここへ書かないこと。
+#
+# client_id / client_secret は Terraform では管理しない。
+# aws_secretsmanager_secret に手で値を入れてから、この変数を true にする。
+variable "freee_sign_enabled" {
+  description = "freeeサイン連携を有効にするか。シークレットに値を入れてから true にする"
+  type        = bool
+  default     = false
+}
+
+variable "freee_sign_base_url" {
+  description = "freeeサインAPIのベースURL"
+  type        = string
+  default     = ""
+}
+
+variable "freee_sign_template_id" {
+  description = "契約書のテンプレートID。freeeサインの画面で登録したもの"
+  type        = string
+  default     = ""
+}
+
+variable "freee_sign_sender_id" {
+  description = "送信ユーザーID。GET /v1/users で調べる"
+  type        = string
+  default     = ""
+}
+
+variable "freee_sign_folder_id" {
+  description = "この環境の契約書を入れるフォルダID。**本番と必ず分ける**"
+  type        = string
+  default     = ""
+}

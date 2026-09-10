@@ -62,12 +62,35 @@ module "compute" {
   uploads_bucket_arn      = module.storage.bucket_arn
   database_url_secret_arn = module.database.database_url_secret_arn
 
-  environment = {
-    NODE_ENV  = "production"
-    PORT      = "3000"
-    S3_REGION = var.region
-    S3_BUCKET = module.storage.bucket_name
-  }
+  freee_sign_secret_arn = var.freee_sign_enabled ? aws_secretsmanager_secret.freee_sign.arn : ""
+
+  environment = merge(
+    {
+      NODE_ENV  = "production"
+      PORT      = "3000"
+      S3_REGION = var.region
+      S3_BUCKET = module.storage.bucket_name
+    },
+    # 有効にするまでは何も渡さない。アプリ側は未設定として扱い、画面に理由を出す
+    var.freee_sign_enabled ? {
+      FREEE_SIGN_MODE     = "live"
+      FREEE_SIGN_BASE_URL = var.freee_sign_base_url
+      # freeeサイン側の登録値と完全一致していないと認可が弾かれる。
+      # 取り違えを防ぐため、この環境のFQDNから組み立てる
+      FREEE_SIGN_REDIRECT_URI = "https://${var.fqdn}/settings/freee-sign/callback"
+      FREEE_SIGN_TEMPLATE_ID  = var.freee_sign_template_id
+      FREEE_SIGN_SENDER_ID    = var.freee_sign_sender_id
+      FREEE_SIGN_FOLDER_ID    = var.freee_sign_folder_id
+    } : {}
+  )
+}
+
+# freeeサインのクレデンシャル（05_外部連携仕様.md 3.2）。
+# **値は Terraform で管理しない。** state に平文で残るため、
+# 作成後に aws secretsmanager put-secret-value で入れる。
+resource "aws_secretsmanager_secret" "freee_sign" {
+  name        = "${var.name}/freee-sign"
+  description = "freeeサインAPIの client_id / client_secret"
 }
 
 # 業務時間外は ECS のタスク数を0にし、RDS を停止する（03_技術選定.md 5.5）。

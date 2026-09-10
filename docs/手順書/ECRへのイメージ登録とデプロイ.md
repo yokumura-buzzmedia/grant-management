@@ -306,6 +306,67 @@ aws ssm describe-instance-information \
 
 ---
 
+## freeeサイン連携を有効にする（ステージング）
+
+**検証環境と本番環境は同じテナントを共有し、契約書はフォルダで分けます**
+（`05_外部連携仕様.md` 3.12）。分離を担保しているのはフォルダIDだけなので、
+**本番のフォルダIDをステージングへ設定しないでください。**
+
+freeeサインは **OAuth 2.0 クライアントしか発行できない**ため、設定を入れたあとに
+**システム管理者がブラウザで一度だけ認可**します（`05_外部連携仕様.md` 3.2）。
+
+0. freeeサインの「OAuth 2.0 API クライアント設定」で、**リダイレクトURIに次を追加**する。
+   1行1URIなので、既存の行は消さずに足す。**完全一致でないと認可が弾かれます。**
+
+```
+https://staging.grant-management.buzzmedia-app.com/settings/freee-sign/callback
+```
+
+1. Terraform でシークレットの器を作る（値は入りません）。
+
+```bash
+export AWS_PROFILE=grant
+terraform -chdir=infra/environments/staging apply
+```
+
+2. freeeサインの資格情報を入れる。**値は Terraform で管理しません**（state に平文で残るため）。
+
+```bash
+aws secretsmanager put-secret-value \
+  --secret-id grant-management-staging/freee-sign \
+  --secret-string '{"client_id":"...","client_secret":"..."}'
+```
+
+3. 残りの設定を `terraform.tfvars` に書いて apply する。
+
+```hcl
+freee_sign_enabled     = true
+freee_sign_base_url    = "https://..."   # APIのベースURL
+freee_sign_template_id = "..."           # 契約書テンプレート
+freee_sign_sender_id   = "..."           # GET /v1/users で調べる
+freee_sign_folder_id   = "..."           # GET /v1/folders で調べる。検証用フォルダ
+```
+
+タスク定義が変わるので、apply でサービスが新しいリビジョンへ切り替わります。
+
+4. **システム管理者でログインし、`/settings/freee-sign` から「freeeサインと接続する」を押す。**
+   freeeサインの認可画面で許可すると戻ってきて、「接続済み」になります。
+   以後はリフレッシュトークンで自動更新されるので、この操作は通常1回だけです。
+
+5. 反映されたか確認する。案件詳細の契約書タブで、モードの帯も
+   「設定されていません」も出なければ有効です。
+
+```bash
+aws ecs describe-task-definition \
+  --task-definition grant-management-staging \
+  --query 'taskDefinition.containerDefinitions[0].{env:environment,secrets:secrets[].name}'
+```
+
+`FREEE_SIGN_MODE` が `live`、`secrets` に `FREEE_SIGN_CLIENT_ID` と
+`FREEE_SIGN_CLIENT_SECRET` が並んでいれば通っています。
+
+---
+
 ## つまずきやすい点
 
 | 症状 | 原因 |
@@ -319,6 +380,10 @@ aws ssm describe-instance-information \
 | `CannotPullContainerError` | ECR にそのタグが無い。`describe-images` で確認する |
 | `image Manifest does not contain descriptor matching platform 'linux/amd64'` | サービスが古いタスク定義（X86_64）を参照している。`describe-services` でリビジョンを確認する |
 | `grant-managementatest does not exist` | zsh の `:l` モディファイア。`${REPO}:latest` と書く |
+| タスクが `ResourceInitializationError` で起動しない | `freee_sign_enabled = true` にしたが、シークレットに値を入れていない |
+| 契約書の送付が403 | `FREEE_SIGN_FOLDER_ID` が誤り。`GET /v1/folders` で確認する |
+| 認可の戻りで `exchangeFailed` | リダイレクトURIが freeeサインの登録値と一致していない |
+| 契約書タブで「接続が切れています」 | リフレッシュトークンが無効。設定画面から接続し直す |
 
 ログイン画面までは DB を使うため、RDS が停止しているとヘルスチェックが通りません。
 確認は RDS を起こしてから行ってください。

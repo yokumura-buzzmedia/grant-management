@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm"
 import {
   type AnyMySqlColumn,
   check,
@@ -6,12 +7,13 @@ import {
   index,
   json,
   mysqlTable,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/mysql-core"
-import { fk, pk, users } from "./core"
+import { fk, pk, timestamps, users } from "./core"
 import { DELETION_TARGET_TYPES, type DeletionTargetType, inList } from "./enums"
 
-/** 削除履歴と郵便番号。 */
+/** 削除履歴と郵便番号、外部連携のトークン。 */
 
 // ---------------------------------------------------------------------------
 // 削除履歴（01_要件定義.md 5.3、5.4、5.15）
@@ -69,4 +71,42 @@ export const postalCodes = mysqlTable(
     updatedAt: datetime("updated_at").notNull(),
   },
   (t) => [index("idx_postal_codes_postal_code").on(t.postalCode)],
+)
+
+// ---------------------------------------------------------------------------
+// freeeサインのトークン（05_外部連携仕様.md 3.2）
+// ---------------------------------------------------------------------------
+
+/**
+ * freeeサインは OAuth 2.0 の認可コードフローしか提供していない。
+ * サーバー間だけで完結する付与方式（client_credentials）が無いため、
+ * 管理者が一度ブラウザで認可し、得たトークンをここに保管して以後は自動で更新する。
+ *
+ * **リフレッシュトークンは更新のたびに新しくなる。** 前のものは使えなくなるので、
+ * 保管場所は1か所でなければならない。プロセス内に持つとタスクを増やした瞬間に壊れる。
+ *
+ * 行は常に1つ。`singleton` の一意制約で、2つ目が入らないようにする。
+ */
+export const freeeSignTokens = mysqlTable(
+  "freee_sign_tokens",
+  {
+    id: pk(),
+    /** 常に "x"。1行しか作らせないための列 */
+    singleton: char("singleton", { length: 1 }).notNull().default("x"),
+    accessToken: varchar("access_token", { length: 2048 }).notNull(),
+    /** 期限切れの手前で更新する。UTC */
+    accessTokenExpiresAt: datetime("access_token_expires_at").notNull(),
+    refreshToken: varchar("refresh_token", { length: 2048 }).notNull(),
+    /** 認可した利用者。削除されても誰が繋いだかを残す（04_DB論理設計.md 2.4） */
+    authorizedBy: fk("authorized_by").references((): AnyMySqlColumn => users.id, {
+      onDelete: "set null",
+    }),
+    authorizedByName: varchar("authorized_by_name", { length: 100 }).notNull(),
+    authorizedAt: datetime("authorized_at").notNull(),
+    ...timestamps(),
+  },
+  (t) => [
+    uniqueIndex("uq_freee_sign_tokens_singleton").on(t.singleton),
+    check("chk_freee_sign_tokens_singleton", sql.raw("`singleton` = 'x'")),
+  ],
 )

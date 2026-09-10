@@ -186,9 +186,12 @@ resource "aws_iam_role_policy" "execution_secrets" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect   = "Allow"
-      Action   = ["secretsmanager:GetSecretValue"]
-      Resource = [var.database_url_secret_arn]
+      Effect = "Allow"
+      Action = ["secretsmanager:GetSecretValue"]
+      Resource = compact([
+        var.database_url_secret_arn,
+        var.freee_sign_secret_arn,
+      ])
     }]
   })
 }
@@ -288,10 +291,24 @@ resource "aws_ecs_task_definition" "this" {
       for k, v in var.environment : { name = k, value = v }
     ]
 
-    secrets = [{
-      name      = "DATABASE_URL"
-      valueFrom = var.database_url_secret_arn
-    }]
+    # クレデンシャルは環境変数に直接置かず、Secrets Manager から解決させる。
+    # freeeサインは ARN が空なら渡さない（未設定として画面に出る）
+    secrets = concat(
+      [{
+        name      = "DATABASE_URL"
+        valueFrom = var.database_url_secret_arn
+      }],
+      var.freee_sign_secret_arn == "" ? [] : [
+        {
+          name      = "FREEE_SIGN_CLIENT_ID"
+          valueFrom = "${var.freee_sign_secret_arn}:client_id::"
+        },
+        {
+          name      = "FREEE_SIGN_CLIENT_SECRET"
+          valueFrom = "${var.freee_sign_secret_arn}:client_secret::"
+        },
+      ]
+    )
 
     logConfiguration = {
       logDriver = "awslogs"

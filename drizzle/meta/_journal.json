@@ -36,6 +36,13 @@
       "when": 1788939613763,
       "tag": "0004_dazzling_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1789015245335,
+      "tag": "0005_natural_chimera",
+      "breakpoints": true
     }
   ]
 }

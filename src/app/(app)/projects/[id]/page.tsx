@@ -2,13 +2,16 @@ import { notFound } from "next/navigation"
 import { alias } from "drizzle-orm/mysql-core"
 import { and, asc, eq, inArray, sql } from "drizzle-orm"
 import { db } from "@/db/client"
-import { companies, projects, userRoles, users } from "@/db/schema"
+import { companies, contracts, projects, userRoles, users } from "@/db/schema"
 import { DeleteDialog } from "@/components/delete-dialog"
+import { ProjectContract } from "@/components/project-contract"
 import { ProjectEditForm } from "@/components/project-edit-form"
 import { ProjectStatusControl } from "@/components/project-status-control"
+import { Tabs } from "@/components/tabs"
 import { BackLink, linkClass, Notice, PageHeader } from "@/components/ui"
 import { requireRoles } from "@/lib/auth/guards"
 import { formatJst } from "@/lib/datetime"
+import { freeeSignMode, missingSettings } from "@/lib/freee-sign"
 import { deleteProjectAction } from "@/lib/projects/actions"
 import { nextStatus, PROJECT_STATUS_LABELS, statusNumber } from "@/lib/projects/status"
 import { findTransitionBlockers } from "@/lib/projects/transition"
@@ -23,13 +26,14 @@ import Link from "next/link"
  * 各段階へ進む条件は要件定義の第6章で未確定だが、要件が確定している前提条件は
  * transition.ts で検査し、満たさない理由をここに出す。
  *
- * 必要書類・契約書・見積・予約・出欠・掲示板のタブ（C-03〜C-08）は未実装のため、
- * タブそのものを出していない。
+ * 契約書（C-04）はタブとして持つ。いまあるのは送付だけで、再送・取消・締結の検知は未実装。
+ * 必要書類・見積・予約・出欠・掲示板（C-03、C-05〜C-08）はタブそのものを出していない。
  */
 
 const NOTICES: Record<string, string> = {
   saved: "保存しました。",
   statusChanged: "ステータスを変更しました。",
+  contractSent: "契約書を送付しました。",
 }
 
 const ERRORS: Record<string, string> = {
@@ -108,6 +112,25 @@ export default async function ProjectPage({
         .orderBy(asc(users.displayName))
     : []
 
+  // 契約書は1案件につき1件（uq_contracts_project_id）。無ければ未送付
+  const [contract] = await db
+    .select({
+      sentAt: contracts.sentAt,
+      canceledAt: contracts.canceledAt,
+      concludedAt: contracts.concludedAt,
+      freeeSignDocumentId: contracts.freeeSignDocumentId,
+    })
+    .from(contracts)
+    .where(eq(contracts.projectId, project.id))
+    .limit(1)
+
+  // 送付先は会社情報の担当者メールアドレス（05_外部連携仕様.md 3.6）
+  const [company] = await db
+    .select({ contactEmail: companies.contactEmail })
+    .from(companies)
+    .where(eq(companies.id, project.companyId))
+    .limit(1)
+
   // 進められない理由は開いた時点で出す（06_画面設計.md C-02）。
   // 進める権限が無い利用者には理由を出しても意味がないので引かない
   const target = canManage ? nextStatus(project.status) : null
@@ -151,73 +174,111 @@ export default async function ProjectPage({
         blockers={blockers}
       />
 
-      <section className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="text-base font-bold text-slate-900">基本情報</h2>
-        {canManage ? (
-          <ProjectEditForm
-            projectId={project.id}
-            projectNumber={project.projectNumber}
-            companyName={project.companyName}
-            name={project.name}
-            primaryStaffId={project.primaryStaffId}
-            staff={staffRows.map((row) => ({ value: String(row.id), label: row.displayName }))}
-          />
-        ) : (
-          <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-[10rem_1fr]">
-            <dt className="text-sm font-medium text-slate-500">案件番号</dt>
-            <dd className="font-mono text-sm text-slate-900">{project.projectNumber}</dd>
-            <dt className="text-sm font-medium text-slate-500">会社</dt>
-            <dd className="text-sm text-slate-900">{project.companyName}</dd>
-            <dt className="text-sm font-medium text-slate-500">案件名</dt>
-            <dd className="text-sm text-slate-900">{project.name}</dd>
-            <dt className="text-sm font-medium text-slate-500">主担当の事務員</dt>
-            <dd className="text-sm text-slate-900">{project.primaryStaffName}</dd>
-          </dl>
-        )}
-      </section>
+      {/* C-02 基本情報 と C-04 契約書。ほかのタブ（C-03、C-05〜C-08）は未実装 */}
+      <Tabs
+        label="申請案件"
+        defaultTabId={raw("tab")}
+        tabs={[
+          {
+            id: "basic",
+            label: "基本情報",
+            panel: (
+              <div className="flex flex-col gap-6">
+                <section className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6">
+                  {canManage ? (
+                    <ProjectEditForm
+                      projectId={project.id}
+                      projectNumber={project.projectNumber}
+                      companyName={project.companyName}
+                      name={project.name}
+                      primaryStaffId={project.primaryStaffId}
+                      staff={staffRows.map((row) => ({
+                        value: String(row.id),
+                        label: row.displayName,
+                      }))}
+                    />
+                  ) : (
+                    <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-[10rem_1fr]">
+                      <dt className="text-sm font-medium text-slate-500">案件番号</dt>
+                      <dd className="font-mono text-sm text-slate-900">{project.projectNumber}</dd>
+                      <dt className="text-sm font-medium text-slate-500">会社</dt>
+                      <dd className="text-sm text-slate-900">{project.companyName}</dd>
+                      <dt className="text-sm font-medium text-slate-500">案件名</dt>
+                      <dd className="text-sm text-slate-900">{project.name}</dd>
+                      <dt className="text-sm font-medium text-slate-500">主担当の事務員</dt>
+                      <dd className="text-sm text-slate-900">{project.primaryStaffName}</dd>
+                    </dl>
+                  )}
+                </section>
 
-      <section className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="text-base font-bold text-slate-900">更新情報</h2>
-        {/* 変更前後の内容は保存しない。最新の作成・更新だけを出す（5.17） */}
-        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-[10rem_1fr]">
-          <dt className="text-sm font-medium text-slate-500">作成</dt>
-          <dd className="text-sm text-slate-900">
-            {formatJst(project.createdAt)} ／ {project.createdByName ?? "—"}
-          </dd>
-          <dt className="text-sm font-medium text-slate-500">最終更新</dt>
-          <dd className="text-sm text-slate-900">
-            {formatJst(project.updatedAt)} ／ {project.updatedByName ?? "—"}
-          </dd>
-        </dl>
-        {canManage ? (
-          <p className="text-xs text-slate-600">
-            会社情報は
-            <Link href={`/companies/${project.companyId}`} className={linkClass}>
-              会社詳細
-            </Link>
-            から変更します。
-          </p>
-        ) : null}
-      </section>
+                <section className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6">
+                  <h3 className="text-base font-bold text-slate-900">更新情報</h3>
+                  {/* 変更前後の内容は保存しない。最新の作成・更新だけを出す（5.17） */}
+                  <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-[10rem_1fr]">
+                    <dt className="text-sm font-medium text-slate-500">作成</dt>
+                    <dd className="text-sm text-slate-900">
+                      {formatJst(project.createdAt)} ／ {project.createdByName ?? "—"}
+                    </dd>
+                    <dt className="text-sm font-medium text-slate-500">最終更新</dt>
+                    <dd className="text-sm text-slate-900">
+                      {formatJst(project.updatedAt)} ／ {project.updatedByName ?? "—"}
+                    </dd>
+                  </dl>
+                  {canManage ? (
+                    <p className="text-xs text-slate-600">
+                      会社情報は
+                      <Link href={`/companies/${project.companyId}`} className={linkClass}>
+                        会社詳細
+                      </Link>
+                      から変更します。
+                    </p>
+                  ) : null}
+                </section>
 
-      {canManage ? (
-        <section className="flex flex-col gap-3 rounded-lg border border-red-200 bg-white p-6">
-          <h2 className="text-base font-bold text-red-700">申請案件の削除</h2>
-          {/* 影響の内訳は確認ダイアログが持つ。ここで先に並べると二重になる */}
-          <div>
-            <DeleteDialog
-              action={deleteProjectAction.bind(null, project.id)}
-              title="申請案件を完全に削除しますか"
-              targetName={`${project.projectNumber}　${project.name}`}
-              consequences={[
-                "この案件の書類・予約・チーム・掲示板投稿もすべて削除されます。",
-                "会社情報・クライアントアカウント・受講者は残ります。",
-                "削除履歴に「案件番号」「会社名」「削除した利用者」「削除日時」が残ります。",
-              ]}
-            />
-          </div>
-        </section>
-      ) : null}
+                {canManage ? (
+                  <section className="flex flex-col gap-3 rounded-lg border border-red-200 bg-white p-6">
+                    <h3 className="text-base font-bold text-red-700">申請案件の削除</h3>
+                    {/* 影響の内訳は確認ダイアログが持つ。ここで先に並べると二重になる */}
+                    <div>
+                      <DeleteDialog
+                        action={deleteProjectAction.bind(null, project.id)}
+                        title="申請案件を完全に削除しますか"
+                        targetName={`${project.projectNumber}　${project.name}`}
+                        consequences={[
+                          "この案件の書類・予約・チーム・掲示板投稿もすべて削除されます。",
+                          "会社情報・クライアントアカウント・受講者は残ります。",
+                          "削除履歴に「案件番号」「会社名」「削除した利用者」「削除日時」が残ります。",
+                        ]}
+                      />
+                    </div>
+                  </section>
+                ) : null}
+              </div>
+            ),
+          },
+          {
+            id: "contract",
+            label: "契約書",
+            panel: (
+              <section className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6">
+                <ProjectContract
+                  projectId={project.id}
+                  companyId={project.companyId}
+                  contactEmail={company?.contactEmail ?? null}
+                  sentAtLabel={contract?.sentAt ? formatJst(contract.sentAt) : null}
+                  documentId={contract?.freeeSignDocumentId ?? null}
+                  concluded={Boolean(contract?.concludedAt)}
+                  canceled={Boolean(contract?.canceledAt)}
+                  mode={freeeSignMode()}
+                  missingSettings={missingSettings()}
+                  canSend={canManage}
+                />
+              </section>
+            ),
+          },
+        ]}
+      />
+
     </div>
   )
 }

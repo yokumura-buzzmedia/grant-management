@@ -13,8 +13,9 @@ import { companies, employmentContracts, trainees, type ProjectStatus } from "@/
  *
  * - 22 必要書類収集完了 … 支給申請用の書類がすべて承認済みであること（5.2）。
  *   書類の種類と名称が未確定（要件6章1）で、C-03 も未実装
- * - 5 契約締結済 / 9 日程調整済 / 10 カリキュラム選定済 / 12 見積もり兼発注書受領済 …
- *   freeeサイン連携・予約・チームの実装後に、それぞれの完了を条件へ足す
+ * - 5 契約締結済 … freeeサインで締結を検知してから進める（3.9・ポーリング未実装）
+ * - 9 日程調整済 / 10 カリキュラム選定済 / 12 見積もり兼発注書受領済 …
+ *   予約・チーム・見積の実装後に、それぞれの完了を条件へ足す
  *
  * 残りの遷移は条件が未確定（要件6章3）なので、事務員の判断だけで進む。
  */
@@ -39,7 +40,15 @@ const REQUIRED_COMPANY_FIELDS = [
  * 会社情報が揃っているか（5.3 / 06_画面設計.md D-02）。
  *
  * 会社情報は一時保存できるため、未入力のままでも申請案件を作れる。
- * 契約書を送る時点で全項目と受講者1人以上を求める。
+ * 「6 必要事項記入中」を抜けるときに、全項目と受講者1人以上を求める。
+ *
+ * 契約書の送付時点ではない。05_外部連携仕様.md 3.5 が
+ * 「契約書を送付する時点では会社情報がまだ入力されていません」と書いており、
+ * だからこそ会社名を署名者側の入力項目に置いている。送付時点で求めると、
+ * 契約書を送ったのにステータスを進められない状態になる。
+ *
+ * ただし 6→7 の遷移条件そのものは未確定（11_ステータスの遷移.drawio）。
+ * 「会社情報の必須項目の入力完了と対応する可能性」とあるものを採っている。
  */
 const checkCompanyReady = async (companyId: number) => {
   const [company] = await db
@@ -114,7 +123,7 @@ export const findTransitionBlockers = async (
   target: ProjectStatus,
   companyId: number,
 ): Promise<string[]> => {
-  if (target === "contract_sent") return checkCompanyReady(companyId)
+  if (target === "employment_contract_pending") return checkCompanyReady(companyId)
   if (target === "employment_contract_completed") return checkEmploymentContracts(companyId)
   return []
 }
