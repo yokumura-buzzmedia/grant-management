@@ -77,6 +77,8 @@ npm run db:studio    # Drizzle Studio
 `docs/手順書/` は運用手順です。`ECRへのイメージ登録とデプロイ.md` に、
 手元でイメージをビルドして ECR へ push し、ステージングへ反映するまでを書いています。
 CI/CD は未整備で、当面は手動です。
+実行手順は `.claude/skills/deploy-staging/` にスキルとして置いています。
+手順書は背景と踏み台経由の操作、スキルは実行の流れ、と役割を分けています。
 
 `docs/data/` はカリキュラムマスタの初期データ（UTF-8 BOM付き CSV 6ファイル）です。
 `courses.csv` の「目的」列に改行を含むため、行分割ではなく必ず CSV パーサで読みます

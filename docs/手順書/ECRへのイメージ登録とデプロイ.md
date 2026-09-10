@@ -11,7 +11,7 @@ GitHub Actions による自動化（`03_技術選定.md` 5.6）は未整備で�
 | リージョン | ap-northeast-1 |
 | ECR | `024430211741.dkr.ecr.ap-northeast-1.amazonaws.com/grant-management` |
 | ECSクラスタ / サービス | `grant-management-staging` |
-| アクセス先 | http://grant-management-staging-2044214452.ap-northeast-1.elb.amazonaws.com |
+| アクセス先 | https://staging.grant-management.buzzmedia-app.com |
 
 ---
 
@@ -168,7 +168,7 @@ aws logs tail /ecs/grant-management-staging --follow
 ALB 越しに応答するか確認します。
 
 ```bash
-curl -I http://grant-management-staging-2044214452.ap-northeast-1.elb.amazonaws.com/login
+curl -I https://staging.grant-management.buzzmedia-app.com/login
 ```
 
 ## 6. 切り戻し
