@@ -7,3 +7,6 @@ node_modules/
 next-env.d.ts
 *.tsbuildinfo
 .next-build/
+
+# Claude Code の端末ごとの設定（スキルは .claude/skills/ を共有する）
+.claude/settings.local.json

@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm"
 import { db } from "@/db/client"
 import { freeeSignTokens } from "@/db/schema"
 import { now, secondsFromNow } from "@/lib/datetime"
+import { type FreeeSignDocumentStatus, isDocumentStatus } from "./document-status"
 
 /**
  * freeeサイン（電子契約）との連携（05_外部連携仕様.md 3）。
@@ -260,6 +261,20 @@ const call = async (path: string, body: unknown): Promise<unknown> => {
   return response.json()
 }
 
+/** 状態の取得だけは GET。本文が無いので分けている */
+const get = async (path: string): Promise<unknown> => {
+  const response = await fetch(`${setting("FREEE_SIGN_BASE_URL")}${path}`, {
+    headers: {
+      accept: "application/json",
+      authorization: `Bearer ${await accessToken()}`,
+    },
+    // 外部の最新状態を見に行くので、フレームワークのキャッシュに乗せない
+    cache: "no-store",
+  })
+  if (!response.ok) throw new FreeeSignError(errorMessage(response.status), response.status)
+  return response.json()
+}
+
 /** 3.6 のエラー表。原因が事務員の手元にあるものと、設定側にあるものを言い分ける */
 const errorMessage = (status: number) => {
   if (status === 400) return "freeeサインにテンプレートが見つかりません。設定を確認してください。"
@@ -321,4 +336,71 @@ export const sendContract = async ({ title, email }: { title: string; email: str
   })
 
   return { documentId, mocked: false as const }
+}
+
+// ---------------------------------------------------------------------------
+// 文書の状態
+// ---------------------------------------------------------------------------
+
+/**
+ * 文書の状態を取り直す（3.11 手動同期）。
+ *
+ * 締結は本来ポーリング（3.9）で拾うが、それは未実装。いまは事務員の操作で
+ * 1件ずつ取り直す。事務員が freeeサインの画面で締結を確認した直後に
+ * 本システムを開いた場合の遅延も、これで埋まる。
+ *
+ * `timestamped` は締結済みPDFを取得できる状態かを表す（3.10）。
+ * PDFの取得はまだ実装していないが、判断材料として一緒に返す。
+ */
+export const fetchDocument = async (documentId: number) => {
+  const mode = freeeSignMode()
+  if (mode === "unconfigured") {
+    throw new FreeeSignError("freeeサイン連携が設定されていません。")
+  }
+  // モックは本物を呼ばない。締結しない状態を返し続ける
+  if (mode === "mock") {
+    return { status: "in_progress" as FreeeSignDocumentStatus, timestamped: false }
+  }
+
+  const body = (await get(`/v1/documents/${documentId}`)) as {
+    status?: string
+    timestamped?: boolean
+  }
+  if (!isDocumentStatus(body.status)) {
+    throw new FreeeSignError("freeeサインが想定しない状態を返しました。")
+  }
+  return { status: body.status, timestamped: body.timestamped === true }
+}
+
+/**
+ * 文書のPDFを取得する（3.10）。
+ *
+ * 締結済みかどうかに関わらず取得できる。**未署名でも中身は見られる**ため、
+ * 送付直後の確認にも使う。ただし freeeサイン側でPDFを生成している最中はエラーになる。
+ * 独自の再試行は持たない。呼び出し側が「まだ取れない」として扱い、次の機会に任せる。
+ */
+export const fetchDocumentPdf = async (documentId: number): Promise<Uint8Array> => {
+  const mode = freeeSignMode()
+  if (mode === "unconfigured") {
+    throw new FreeeSignError("freeeサイン連携が設定されていません。")
+  }
+  if (mode === "mock") {
+    throw new FreeeSignError("この環境（mock）では契約書のPDFを取得できません。")
+  }
+
+  const response = await fetch(`${setting("FREEE_SIGN_BASE_URL")}/v1/documents/${documentId}`, {
+    headers: {
+      accept: "application/pdf",
+      authorization: `Bearer ${await accessToken()}`,
+    },
+    cache: "no-store",
+  })
+  if (!response.ok) {
+    // 生成中は 4xx/5xx が返る。理由を伝えて、あとで取り直せるようにする
+    throw new FreeeSignError(
+      "freeeサインから契約書のPDFを取得できませんでした。生成中の可能性があります。時間をおいて、もう一度お試しください。",
+      response.status,
+    )
+  }
+  return new Uint8Array(await response.arrayBuffer())
 }

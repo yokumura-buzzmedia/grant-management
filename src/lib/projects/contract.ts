@@ -1,5 +1,6 @@
 "use server"
 
+import { randomUUID } from "node:crypto"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { eq } from "drizzle-orm"
@@ -8,7 +9,10 @@ import { companies, contracts, projects } from "@/db/schema"
 import type { FormState } from "@/lib/auth/form-state"
 import { requireRoles } from "@/lib/auth/guards"
 import { now } from "@/lib/datetime"
-import { FreeeSignError, sendContract } from "@/lib/freee-sign"
+import { fetchDocument, fetchDocumentPdf, FreeeSignError, sendContract } from "@/lib/freee-sign"
+import { isDocumentStatus } from "@/lib/freee-sign/document-status"
+import { putObject } from "@/lib/storage"
+import { nextStatus } from "./status"
 
 /** 契約書を送れるのは事務員とシステム管理者だけ（06_画面設計.md 権限マトリクス C-04）。 */
 const EDITORS = ["staff", "admin"] as const
@@ -19,9 +23,10 @@ const EDITORS = ["staff", "admin"] as const
  * 送付先は会社情報の担当者メールアドレス。ログインアカウントのメールアドレスではない。
  * 署名依頼メールは freeeサインから送られるため、本システムからは何も送らない。
  *
- * **申請案件のステータスは自動で進めない。** 送付後に事務員が手動で「4 契約書送付済」
- * へ進める（5.1）。送付と記録を分けるのは要件どおりで、送っただけで進むと
- * 送付の失敗に気づけない。
+ * **送付に成功したら「4 契約書送付済」へ自動で進める。**
+ * 要件5.1 の「ステータスの自動変更は行わない」に対する例外で、運用の判断による。
+ * 進めるのは現在が「3 助成金説明済」のときだけ。順序どおりにしか進まない決まりは
+ * 変えないので、それ以外のステータスからは送付だけ行い、ステータスは動かさない。
  */
 export async function sendContractAction(
   projectId: number,
@@ -35,6 +40,7 @@ export async function sendContractAction(
       id: projects.id,
       projectNumber: projects.projectNumber,
       name: projects.name,
+      status: projects.status,
       companyName: companies.name,
       contactEmail: companies.contactEmail,
     })
@@ -83,6 +89,15 @@ export async function sendContractAction(
   }
 
   const at = now()
+  // 送付できたときだけ進める。順序を飛ばさないため、現在が3のときに限る（5.1）
+  const advanced = nextStatus(row.status) === "contract_sent"
+  if (advanced) {
+    await db
+      .update(projects)
+      .set({ status: "contract_sent", updatedAt: at, updatedBy: actor.id })
+      .where(eq(projects.id, row.id))
+  }
+
   if (existing) {
     await db
       .update(contracts)
@@ -109,5 +124,86 @@ export async function sendContractAction(
   }
 
   revalidatePath(`/projects/${row.id}`)
-  redirect(`/projects/${row.id}?notice=contractSent`)
+  revalidatePath("/projects")
+  // 操作した契約書タブへ戻す。既定のタブへ落ちると結果が見えない
+  redirect(
+    `/projects/${row.id}?tab=contract&notice=${advanced ? "contractSentAdvanced" : "contractSent"}`,
+  )
+}
+
+/**
+ * 送付した契約書の状態を取り直す（05_外部連携仕様.md 3.11）。
+ *
+ * 締結の検知は本来ポーリング（3.9）で行うが未実装のため、いまは事務員が
+ * この操作で1件ずつ取り直す。事務員の操作に対する応答なので同期処理にする（5.22）。
+ *
+ * **申請案件のステータスは動かさない。** 締結を確認して「5 契約締結済」へ進めるのは
+ * 事務員の判断（5.8）。却下・期限切れも記録だけ行い、前へは戻さない（3.9）。
+ */
+export async function syncContractAction(projectId: number): Promise<FormState> {
+  await requireRoles(EDITORS)
+
+  const [existing] = await db
+    .select({
+      id: contracts.id,
+      freeeSignDocumentId: contracts.freeeSignDocumentId,
+      concludedAt: contracts.concludedAt,
+      pdfFileKey: contracts.pdfFileKey,
+    })
+    .from(contracts)
+    .where(eq(contracts.projectId, projectId))
+    .limit(1)
+  if (!existing?.freeeSignDocumentId) {
+    return { errors: ["まだ契約書を送付していません。"] }
+  }
+
+  let document: Awaited<ReturnType<typeof fetchDocument>>
+  try {
+    document = await fetchDocument(existing.freeeSignDocumentId)
+  } catch (error) {
+    if (error instanceof FreeeSignError) return { errors: [error.message] }
+    throw error
+  }
+  if (!isDocumentStatus(document.status)) {
+    return { errors: ["freeeサインが想定しない状態を返しました。"] }
+  }
+
+  /*
+   * 締結済みPDFだけを手元に残す（3.10）。未署名は都度取りに行くので保存しない。
+   * 保存するのは `timestamped` が true のものだけ。false の間は PDF が未完成で、
+   * 取りに行ってもエラーになる。pdf_file_key が NULL のままなら次の取得でやり直せる。
+   *
+   * 取得に失敗しても状態の記録は残したいので、ここでは例外を外へ出さない。
+   */
+  let pdfFileKey = existing.pdfFileKey
+  if (!pdfFileKey && document.status === "concluded" && document.timestamped) {
+    try {
+      const pdf = await fetchDocumentPdf(existing.freeeSignDocumentId)
+      const key = `contracts/${projectId}/${randomUUID()}.pdf`
+      await putObject(key, pdf, "application/pdf")
+      pdfFileKey = key
+    } catch (error) {
+      if (!(error instanceof FreeeSignError)) throw error
+    }
+  }
+
+  await db
+    .update(contracts)
+    .set({
+      freeeSignStatus: document.status,
+      pdfFileKey,
+      pdfFetchedAt: pdfFileKey && !existing.pdfFileKey ? now() : undefined,
+      /*
+       * 締結時刻は freeeサインが返さないので、締結を最初に確認できた時点を残す。
+       * 一度入ったら上書きしない。取り直すたびに現在時刻を入れると、
+       * いつ締結したのかが分からなくなる。
+       */
+      concludedAt:
+        existing.concludedAt ?? (document.status === "concluded" ? now() : null),
+      updatedAt: now(),
+    })
+    .where(eq(contracts.id, existing.id))
+
+  revalidatePath(`/projects/${projectId}`)
+  redirect(`/projects/${projectId}?tab=contract&notice=contractSynced`)
 }

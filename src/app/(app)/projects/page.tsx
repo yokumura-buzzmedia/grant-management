@@ -3,6 +3,7 @@ import { and, asc, desc, eq, like, or, sql } from "drizzle-orm"
 import { db } from "@/db/client"
 import { companies, projects, type ProjectStatus } from "@/db/schema"
 import { requireRoles } from "@/lib/auth/guards"
+import { projectScope } from "@/lib/projects/authorize"
 import { formatJst } from "@/lib/datetime"
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_OPTIONS, statusNumber } from "@/lib/projects/status"
 import {
@@ -110,15 +111,7 @@ export default async function ProjectsPage({
    */
   const canManage = user.roles.includes("staff") || user.roles.includes("admin")
   const canSeeAll = canManage || user.roles.includes("advisor")
-  const scope = canSeeAll
-    ? undefined
-    : user.roles.includes("client")
-      ? user.companyId
-        ? eq(projects.companyId, user.companyId)
-        : sql`1 = 0`
-      : user.agencyId
-        ? eq(companies.referralAgencyId, user.agencyId)
-        : sql`1 = 0`
+  const scope = projectScope(user)
 
   const filter = and(
     scope,

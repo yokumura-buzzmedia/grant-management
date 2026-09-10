@@ -22,8 +22,7 @@ freee_sign_folder_id = "642129"
 # 送信ユーザー。APIクライアントから送る場合は必須（3.6）。
 freee_sign_sender_id = "1713140"
 
-# 有効化は client_id / client_secret が通ってから。
-# いまは POST /v1/token が 401 のため有効化できない。
-# 手順は docs/手順書/ECRへのイメージ登録とデプロイ.md の
-# 「freeeサイン連携を有効にする」を参照。
-freee_sign_enabled = false
+# client_id / client_secret は Secrets Manager（grant-management-staging/freee-sign）に
+# 手で入れてある。Terraform では値を管理しない。
+# 有効化後、管理者が /settings/freee-sign で一度だけ認可する（OAuth 2.0 認可コードフロー）。
+freee_sign_enabled = true

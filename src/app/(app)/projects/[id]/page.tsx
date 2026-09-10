@@ -10,8 +10,10 @@ import { ProjectStatusControl } from "@/components/project-status-control"
 import { Tabs } from "@/components/tabs"
 import { BackLink, linkClass, Notice, PageHeader } from "@/components/ui"
 import { requireRoles } from "@/lib/auth/guards"
+import { projectScope } from "@/lib/projects/authorize"
 import { formatJst } from "@/lib/datetime"
 import { freeeSignMode, missingSettings } from "@/lib/freee-sign"
+import { isDocumentStatus } from "@/lib/freee-sign/document-status"
 import { deleteProjectAction } from "@/lib/projects/actions"
 import { nextStatus, PROJECT_STATUS_LABELS, statusNumber } from "@/lib/projects/status"
 import { findTransitionBlockers } from "@/lib/projects/transition"
@@ -34,6 +36,8 @@ const NOTICES: Record<string, string> = {
   saved: "保存しました。",
   statusChanged: "ステータスを変更しました。",
   contractSent: "契約書を送付しました。",
+  contractSentAdvanced: "契約書を送付し、ステータスを「契約書送付済」へ進めました。",
+  contractSynced: "freeeサインから最新の状態を取得しました。",
 }
 
 const ERRORS: Record<string, string> = {
@@ -64,17 +68,8 @@ export default async function ProjectPage({
   const error = raw("error")
 
   const canManage = user.roles.includes("staff") || user.roles.includes("admin")
-  const canSeeAll = canManage || user.roles.includes("advisor")
   // 一覧と同じ絞り込み。会社や代理店が紐づいていないときは見せない
-  const scope = canSeeAll
-    ? undefined
-    : user.roles.includes("client")
-      ? user.companyId
-        ? eq(projects.companyId, user.companyId)
-        : sql`1 = 0`
-      : user.agencyId
-        ? eq(companies.referralAgencyId, user.agencyId)
-        : sql`1 = 0`
+  const scope = projectScope(user)
 
   const createdBy = alias(users, "created_by_user")
   const updatedBy = alias(users, "updated_by_user")
@@ -118,6 +113,7 @@ export default async function ProjectPage({
       sentAt: contracts.sentAt,
       canceledAt: contracts.canceledAt,
       concludedAt: contracts.concludedAt,
+      freeeSignStatus: contracts.freeeSignStatus,
       freeeSignDocumentId: contracts.freeeSignDocumentId,
     })
     .from(contracts)
@@ -267,6 +263,12 @@ export default async function ProjectPage({
                   contactEmail={company?.contactEmail ?? null}
                   sentAtLabel={contract?.sentAt ? formatJst(contract.sentAt) : null}
                   documentId={contract?.freeeSignDocumentId ?? null}
+                  documentStatus={
+                    isDocumentStatus(contract?.freeeSignStatus) ? contract.freeeSignStatus : null
+                  }
+                  concludedAtLabel={
+                    contract?.concludedAt ? formatJst(contract.concludedAt) : null
+                  }
                   concluded={Boolean(contract?.concludedAt)}
                   canceled={Boolean(contract?.canceledAt)}
                   mode={freeeSignMode()}

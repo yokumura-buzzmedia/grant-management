@@ -107,6 +107,24 @@ export const createDownloadUrl = (key: string, filename: string, contentType: st
 export const createPreviewUrl = (key: string, filename: string, contentType: string) =>
   createReadUrl(key, filename, contentType, "inline")
 
+/**
+ * サーバーが取得したバイト列をそのまま置く。
+ *
+ * 利用者のアップロードは署名付きURLでブラウザから直接送らせるが（4.6）、
+ * 外部サービスから取ってきたファイルは手元にあるので、ここから置く。
+ * 締結済みの契約書PDFがこれにあたる（05_外部連携仕様.md 3.10）。
+ */
+export const putObject = async (key: string, body: Uint8Array, contentType: string) => {
+  await client().send(
+    new PutObjectCommand({
+      Bucket: required("S3_BUCKET"),
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    }),
+  )
+}
+
 /** 差し替え・削除時に実体を消す（履歴を保持しない方針・5.2） */
 export const deleteObject = async (key: string) => {
   await client().send(new DeleteObjectCommand({ Bucket: required("S3_BUCKET"), Key: key }))
