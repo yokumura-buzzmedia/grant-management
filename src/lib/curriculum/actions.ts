@@ -76,77 +76,6 @@ const chunk = <T,>(rows: T[]) => {
   return chunks
 }
 
-/**
- * コースの全コマを、全開催パターンの初日に割り当てる。
- * 割当はコースごとに持つため、コースを作ったらパターンの数だけ必要になる。
- */
-const assignToAllPatterns = async (courseId: number, at: Date) => {
-  const [sessions, patterns] = await Promise.all([
-    db
-      .select({ id: courseSessions.id, displayOrder: courseSessions.displayOrder })
-      .from(courseSessions)
-      .where(eq(courseSessions.courseId, courseId)),
-    db.select({ code: sessionPatterns.code }).from(sessionPatterns),
-  ])
-  if (sessions.length === 0 || patterns.length === 0) return
-
-  const rows = patterns.flatMap((pattern) =>
-    sessions.map((session) => ({
-      patternCode: pattern.code,
-      courseSessionId: session.id,
-      dayNumber: 1,
-      displayOrder: session.displayOrder,
-      createdAt: at,
-      updatedAt: at,
-    })),
-  )
-  for (const part of chunk(rows)) await db.insert(patternDaySessions).values(part)
-}
-
-/**
- * コース追加フォームの講義コマを読む。
- * 行数は可変で、session0Title … と続くところまでを1コースぶんとする。
- */
-const readSessionRows = (values: Record<string, string>) => {
-  const rows: {
-    sessionSymbol: string
-    displayOrder: number
-    durationHours: number
-    title: string
-    description: string | null
-  }[] = []
-  const errors: Record<string, string[]> = {}
-
-  for (let index = 0; values[`session${index}Title`] !== undefined; index += 1) {
-    const row = sessionSchema.safeParse({
-      sessionSymbol: values[`session${index}Symbol`] ?? "",
-      displayOrder: index + 1,
-      durationHours: values[`session${index}Hours`] ?? "",
-      title: values[`session${index}Title`] ?? "",
-      description: values[`session${index}Description`] ?? "",
-    })
-    if (row.success) {
-      rows.push(row.data)
-      continue
-    }
-    // 行ごとの入力欄に返せるよう、項目名に行番号を付け直す
-    for (const [key, messages] of Object.entries(row.error.flatten().fieldErrors)) {
-      const suffix = SESSION_FIELDS[key]
-      if (suffix && messages) errors[`session${index}${suffix}`] = messages
-    }
-  }
-
-  return { rows, errors }
-}
-
-/** 講義コマの項目名と、コース追加フォームでの入力欄名の対応。 */
-const SESSION_FIELDS: Record<string, string> = {
-  sessionSymbol: "Symbol",
-  durationHours: "Hours",
-  title: "Title",
-  description: "Description",
-}
-
 /** count(*) の1行を数値で取り出す。 */
 const countOf = (rows: { count: number }[]) => Number(rows[0]?.count ?? 0)
 
@@ -372,11 +301,12 @@ export async function deleteCategoryAction(code: string, view: CurriculumView) {
 /**
  * コースを追加する。
  *
- * 講義コマの数は可変（5.7）。あとから足していく作りにすると、途中はずっと
- * 所要時間の合計が10時間から外れるため、コマ一式をコースと同時に受け取る。
+ * 講義コマは登録しない。コマ数は可変で（5.7）、内容も1コマずつ決めるため、
+ * コースを作ってから「講義コマを追加」で足していく。
+ * 日別コマ割当もコマを足したときに作られる。
  *
- * 日別コマ割当はコースごとに持つので、ここで全開催パターン分を作る。
- * 初日にまとめて置き、日程は追加後に調整してもらう。
+ * 作った直後は所要時間の合計が0時間で、5.7の「合計10時間」を満たさない。
+ * ここでは止めず、外れているコースを画面で示す。
  */
 export async function createCourseAction(
   view: CurriculumView,
@@ -386,28 +316,8 @@ export async function createCourseAction(
   await requireRoles(EDITORS)
   const values = rawValues(formData)
   const parsed = courseSchema.safeParse(values)
-  const fieldErrors: Record<string, string[]> = parsed.success
-    ? {}
-    : (parsed.error.flatten().fieldErrors as Record<string, string[]>)
-
-  const { rows, errors } = readSessionRows(values)
-  Object.assign(fieldErrors, errors)
-  if (Object.keys(fieldErrors).length > 0) return invalid(prev, values, fieldErrors)
-  if (!parsed.success) return invalid(prev, values, fieldErrors)
-  if (rows.length === 0) return failed(prev, values, "講義コマを1つ以上入力してください。")
-
-  const symbols = rows.map((row) => row.sessionSymbol)
-  if (new Set(symbols).size !== symbols.length) {
-    return failed(prev, values, "コマ記号が重複しています。コマごとに別の記号を付けてください。")
-  }
-
-  const total = rows.reduce((sum, row) => sum + row.durationHours, 0)
-  if (total !== COURSE_TOTAL_HOURS) {
-    return failed(
-      prev,
-      values,
-      `所要時間の合計が ${total} 時間です。${COURSE_TOTAL_HOURS} 時間になるよう調整してください。`,
-    )
+  if (!parsed.success) {
+    return invalid(prev, values, parsed.error.flatten().fieldErrors as Record<string, string[]>)
   }
 
   const [duplicate] = await db
@@ -426,24 +336,8 @@ export async function createCourseAction(
 
   const at = now()
   const [result] = await db.insert(courses).values({ ...parsed.data, createdAt: at, updatedAt: at })
-  const courseId = Number(result.insertId)
 
-  await db.insert(courseSessions).values(
-    rows.map((row) => ({
-      courseId,
-      sessionSymbol: row.sessionSymbol,
-      displayOrder: row.displayOrder,
-      // decimal(3,1) に合わせる。0.5時間単位なので桁は落ちない
-      durationHours: row.durationHours.toFixed(1),
-      title: row.title,
-      description: row.description,
-      createdAt: at,
-      updatedAt: at,
-    })),
-  )
-
-  await assignToAllPatterns(courseId, at)
-  back({ ...view, course: String(courseId) }, { notice: "courseCreated" })
+  back({ ...view, course: String(Number(result.insertId)) }, { notice: "courseCreated" })
 }
 
 export async function updateCourseAction(
@@ -492,6 +386,8 @@ export async function deleteCourseAction(courseId: number, view: CurriculumView)
  * 講義コマを編集する。
  *
  * コマ記号は開催パターンの日別割当と対応するため変えられない。
+ * 表示順もここでは触らない。日の中の並びは開催パターンごとに持ち、
+ * 日程のカードをドラッグして決める。
  * 所要時間の合計が10時間から外れても保存は通す。コマ数が可変になった以上、
  * 1コマずつ直す途中は必ず合計がずれるため、ここで止めると編集できなくなる。
  * 外れているコースは一覧の側で示す。
@@ -512,7 +408,6 @@ export async function updateSessionAction(
   await db
     .update(courseSessions)
     .set({
-      displayOrder: parsed.data.displayOrder,
       durationHours: parsed.data.durationHours.toFixed(1),
       title: parsed.data.title,
       description: parsed.data.description,
@@ -525,7 +420,10 @@ export async function updateSessionAction(
 
 /**
  * 講義コマを追加する。
- * 日別コマ割当は全開催パターンとも初日に置く。何日目かは割当の編集で決める。
+ *
+ * 表示順は入力させず、末尾に付ける。日の中の並びは開催パターンごとに持ち、
+ * 追加したあとに日程のカードをドラッグして決める。
+ * 日別コマ割当は全開催パターンとも初日の末尾に置く。
  */
 export async function createSessionAction(
   courseId: number,
@@ -535,7 +433,16 @@ export async function createSessionAction(
 ): Promise<FormState> {
   await requireRoles(EDITORS)
   const values = rawValues(formData)
-  const parsed = sessionSchema.safeParse(values)
+
+  const [last] = await db
+    .select({ max: sql<number>`coalesce(max(${courseSessions.displayOrder}), 0)` })
+    .from(courseSessions)
+    .where(eq(courseSessions.courseId, courseId))
+
+  const parsed = sessionSchema.safeParse({
+    ...values,
+    displayOrder: Number(last?.max ?? 0) + 1,
+  })
   if (!parsed.success) {
     return invalid(prev, values, parsed.error.flatten().fieldErrors as Record<string, string[]>)
   }
@@ -567,13 +474,27 @@ export async function createSessionAction(
   })
 
   const patterns = await db.select({ code: sessionPatterns.code }).from(sessionPatterns)
+  // 初日の末尾に置く。開催パターンごとに並びが違うので、日の中の最大値から採る
+  const tails = new Map(
+    (
+      await db
+        .select({
+          patternCode: patternDaySessions.patternCode,
+          max: sql<number>`coalesce(max(${patternDaySessions.displayOrder}), 0)`,
+        })
+        .from(patternDaySessions)
+        .innerJoin(courseSessions, eq(courseSessions.id, patternDaySessions.courseSessionId))
+        .where(and(eq(courseSessions.courseId, courseId), eq(patternDaySessions.dayNumber, 1)))
+        .groupBy(patternDaySessions.patternCode)
+    ).map((row) => [row.patternCode, Number(row.max)]),
+  )
   if (patterns.length > 0) {
     await db.insert(patternDaySessions).values(
       patterns.map((pattern) => ({
         patternCode: pattern.code,
         courseSessionId: Number(result.insertId),
         dayNumber: 1,
-        displayOrder: parsed.data.displayOrder,
+        displayOrder: (tails.get(pattern.code) ?? 0) + 1,
         createdAt: at,
         updatedAt: at,
       })),
@@ -714,6 +635,9 @@ export async function deletePatternAction(code: string, view: CurriculumView) {
  *
  * いま開いているコースの分だけを受け取る。割当はコースごとに持つので、
  * 別のコースの日程は変わらない。コマの増減はここではできない。
+ *
+ * 割当の無いコマは作る。コマを追加した直後や、取り込みの取りこぼしで
+ * どの日にも入っていないコマができたとき、画面から戻せるようにしておく。
  */
 export async function updatePatternDaysAction(
   code: string,
@@ -731,44 +655,154 @@ export async function updatePatternDaysAction(
     .limit(1)
   if (!pattern) return failed(prev, values, "開催パターンが見つかりません。")
 
-  const ids = Object.keys(values)
-    .filter((key) => key.startsWith("day_"))
-    .map((key) => Number(key.slice(4)))
-    .filter((id) => Number.isInteger(id))
-  if (ids.length === 0) return failed(prev, values, "割り当てる講義コマがありません。")
+  const requested = new Map<number, number>()
+  for (const [key, value] of Object.entries(values)) {
+    if (!key.startsWith("day_")) continue
+    const sessionId = Number(key.slice(4))
+    if (Number.isInteger(sessionId)) requested.set(sessionId, Number(value))
+  }
+  if (requested.size === 0) return failed(prev, values, "割り当てる講義コマがありません。")
 
-  const rows = await db
-    .select({
-      id: patternDaySessions.id,
-      courseSessionId: patternDaySessions.courseSessionId,
-      dayNumber: patternDaySessions.dayNumber,
-      sessionSymbol: courseSessions.sessionSymbol,
-    })
-    .from(patternDaySessions)
-    .innerJoin(courseSessions, eq(courseSessions.id, patternDaySessions.courseSessionId))
-    .where(
-      and(
-        eq(patternDaySessions.patternCode, code),
-        inArray(patternDaySessions.courseSessionId, ids),
-      ),
-    )
+  const sessions = await db
+    .select({ id: courseSessions.id, sessionSymbol: courseSessions.sessionSymbol })
+    .from(courseSessions)
+    .where(inArray(courseSessions.id, [...requested.keys()]))
 
-  const at = now()
-  const updates: { id: number; dayNumber: number }[] = []
-  for (const row of rows) {
-    const day = Number(values[`day_${row.courseSessionId}`])
-    if (!Number.isInteger(day) || day < 1 || day > pattern.days) {
-      return failed(prev, values, `「${row.sessionSymbol}」の日が 1〜${pattern.days} の外です。`)
+  for (const session of sessions) {
+    const day = requested.get(session.id)
+    if (day === undefined || !Number.isInteger(day) || day < 1 || day > pattern.days) {
+      return failed(prev, values, `「${session.sessionSymbol}」の日が 1〜${pattern.days} の外です。`)
     }
-    if (day !== row.dayNumber) updates.push({ id: row.id, dayNumber: day })
   }
 
-  for (const update of updates) {
-    await db
-      .update(patternDaySessions)
-      .set({ dayNumber: update.dayNumber, updatedAt: at })
-      .where(eq(patternDaySessions.id, update.id))
+  const existing = new Map(
+    (
+      await db
+        .select({
+          id: patternDaySessions.id,
+          courseSessionId: patternDaySessions.courseSessionId,
+          dayNumber: patternDaySessions.dayNumber,
+        })
+        .from(patternDaySessions)
+        .where(
+          and(
+            eq(patternDaySessions.patternCode, code),
+            inArray(patternDaySessions.courseSessionId, [...requested.keys()]),
+          ),
+        )
+    ).map((row) => [row.courseSessionId, row]),
+  )
+
+  const at = now()
+  for (const session of sessions) {
+    const day = requested.get(session.id) ?? 1
+    const current = existing.get(session.id)
+    if (!current) {
+      await db.insert(patternDaySessions).values({
+        patternCode: code,
+        courseSessionId: session.id,
+        dayNumber: day,
+        displayOrder: 1,
+        createdAt: at,
+        updatedAt: at,
+      })
+      continue
+    }
+    if (current.dayNumber !== day) {
+      await db
+        .update(patternDaySessions)
+        .set({ dayNumber: day, updatedAt: at })
+        .where(eq(patternDaySessions.id, current.id))
+    }
   }
 
   back(view, { notice: "saved" })
+}
+
+/**
+ * 1日ぶんの割当を並べ替える（5.7）。
+ *
+ * 画面のドラッグから呼ぶ。他のアクションと違って redirect しない。
+ * 動かすたびに画面遷移して通知帯が出ると、続けて並べ替えられない。
+ *
+ * その日のコマを並び順どおりに丸ごと受け取り、表示順を振り直す。
+ * 動いたものだけを送る形にすると、途中で失敗したときに順序が壊れる。
+ * 割当が無ければ作る。未割当のコマを日へ入れるのも同じ操作になる。
+ *
+ * 書き込むのは pattern_day_sessions の表示順で、コース側のコマ順は動かさない。
+ * 割当はパターンとコースの組ごとなので、ここでの並べ替えは他のパターンに及ばない。
+ */
+export async function arrangeDayAction(
+  patternCode: string,
+  dayNumber: number,
+  sessionIds: number[],
+) {
+  await requireRoles(EDITORS)
+
+  const [pattern] = await db
+    .select({ days: sessionPatterns.days })
+    .from(sessionPatterns)
+    .where(eq(sessionPatterns.code, patternCode))
+    .limit(1)
+  if (!pattern) throw new Error("開催パターンが見つかりません。")
+  if (!Number.isInteger(dayNumber) || dayNumber < 1 || dayNumber > pattern.days) {
+    throw new Error(`日が 1〜${pattern.days} の外です。`)
+  }
+
+  const ids = sessionIds.filter((id) => Number.isInteger(id))
+  if (ids.length === 0) return
+  if (new Set(ids).size !== ids.length) throw new Error("同じ講義コマが重複しています。")
+
+  const rows = await db
+    .select({ id: courseSessions.id, courseId: courseSessions.courseId })
+    .from(courseSessions)
+    .where(inArray(courseSessions.id, ids))
+  if (rows.length !== ids.length) throw new Error("講義コマが見つかりません。")
+  // 1日に並ぶのは1コースぶん。別のコースのコマが混ざる並びは受け取らない
+  if (new Set(rows.map((row) => row.courseId)).size !== 1) {
+    throw new Error("別のコースの講義コマが混ざっています。")
+  }
+
+  const existing = new Map(
+    (
+      await db
+        .select({
+          id: patternDaySessions.id,
+          courseSessionId: patternDaySessions.courseSessionId,
+          dayNumber: patternDaySessions.dayNumber,
+          displayOrder: patternDaySessions.displayOrder,
+        })
+        .from(patternDaySessions)
+        .where(
+          and(
+            eq(patternDaySessions.patternCode, patternCode),
+            inArray(patternDaySessions.courseSessionId, ids),
+          ),
+        )
+    ).map((row) => [row.courseSessionId, row]),
+  )
+
+  const at = now()
+  for (const [index, sessionId] of ids.entries()) {
+    const displayOrder = index + 1
+    const current = existing.get(sessionId)
+    if (!current) {
+      await db.insert(patternDaySessions).values({
+        patternCode,
+        courseSessionId: sessionId,
+        dayNumber,
+        displayOrder,
+        createdAt: at,
+        updatedAt: at,
+      })
+      continue
+    }
+    if (current.dayNumber === dayNumber && current.displayOrder === displayOrder) continue
+    await db
+      .update(patternDaySessions)
+      .set({ dayNumber, displayOrder, updatedAt: at })
+      .where(eq(patternDaySessions.id, current.id))
+  }
+
+  revalidatePath("/curriculum")
 }

@@ -17,8 +17,10 @@ import {
   ProgramForm,
   SessionForm,
 } from "@/components/curriculum-forms"
+import { CurriculumDayBoard, type BoardItem } from "@/components/curriculum-day-board"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { FormDialog } from "@/components/form-dialog"
+import { SubmitButton } from "@/components/form"
 import { buttonSecondary, focusRing, Notice, PageHeader } from "@/components/ui"
 import { requireRoles } from "@/lib/auth/guards"
 import {
@@ -32,6 +34,7 @@ import {
   deletePatternAction,
   deleteProgramAction,
   deleteSessionAction,
+  arrangeDayAction,
   toggleCourseActiveAction,
   toggleMasterActiveAction,
   updateCategoryAction,
@@ -63,11 +66,11 @@ const NOTICES: Record<string, string> = {
   deactivated:
     "無効にしました。新規のチームでは選べません。既存のチームの内容は変わりません。",
   courseCreated:
-    "コースを追加しました。講義コマも一緒に登録し、日別コマ割当は全パターンとも初日に置いています。開催パターンの「日別コマ割当」で日程を決めてください。",
+    "コースを追加しました。講義コマはまだありません。「講義コマを追加」から登録してください。",
   sessionCreated:
-    "講義コマを追加しました。日別コマ割当は全パターンとも初日に置いています。開催パターンの「日別コマ割当」で日程を決めてください。",
+    "講義コマを追加しました。どの開催パターンでも初日に置いています。下の「日程を変更」から、開催パターンごとに日を決めてください。",
   patternCreated:
-    "開催パターンを追加しました。全コースの講義コマを初日に置いてあります。コースごとに日別コマ割当を決めてください。",
+    "開催パターンを追加しました。全コースの講義コマを初日に置いてあります。下の「日程を変更」から、コースごとに日を決めてください。",
 }
 
 const ERRORS: Record<string, string> = {
@@ -105,12 +108,15 @@ type PillItem = {
  * 選んでいるものは aria-current で伝える。色だけでは選択が分からない。
  */
 function PillRow({
+  id,
   label,
   items,
   emptyText,
   edit,
   add,
 }: {
+  /** ラベルとリストを結ぶ。段は見出しではなく選択肢の並びなので、h2 にはしない */
+  id: string
   label: string
   items: PillItem[]
   emptyText: string
@@ -118,13 +124,22 @@ function PillRow({
   edit?: React.ReactNode
   add: React.ReactNode
 }) {
+  // ピルは折り返さない語のかたまりで、幅が足りなくても縮まない。
+  // 1行に並べると狭い画面で操作ボタンと重なるため、格子で置き場所を決める。
+  // 狭いとき: 1行目にラベルと操作、2行目にピル。広いとき: 3列で1行
+  const cell = "col-span-2 row-start-2 sm:col-span-1 sm:col-start-2 sm:row-start-1"
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-slate-100 px-5 py-3 last:border-0">
-      <h2 className="w-32 shrink-0 text-sm font-medium text-slate-500">{label}</h2>
+    <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 border-b border-slate-100 px-5 py-3 last:border-0 sm:grid-cols-[8rem_minmax(0,1fr)_auto] sm:items-start">
+      <span
+        id={id}
+        className="col-start-1 row-start-1 self-center text-sm font-medium text-slate-500 sm:self-start sm:pt-2"
+      >
+        {label}
+      </span>
       {items.length === 0 ? (
-        <p className="min-w-0 flex-1 text-sm text-slate-500">{emptyText}</p>
+        <p className={cell + " text-sm text-slate-500 sm:pt-2"}>{emptyText}</p>
       ) : (
-        <ul className="flex min-w-0 flex-1 flex-wrap gap-2">
+        <ul aria-labelledby={id} className={cell + " flex flex-wrap gap-2"}>
           {items.map((item) => (
             <li key={item.key}>
               <Link
@@ -148,7 +163,7 @@ function PillRow({
           ))}
         </ul>
       )}
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="col-start-2 row-start-1 flex items-center justify-end gap-1 sm:col-start-3">
         {edit}
         {add}
       </div>
@@ -176,9 +191,10 @@ function ActiveToggle({
           ? `この${kind}は有効です。新規のチームで選べます。`
           : `この${kind}は無効です。新規のチームでは選べません。`}
       </p>
-      <button type="submit" className={buttonSecondary + " whitespace-nowrap"}>
+      {/* 押したあと再描画までの間、押せたことが分からないと二度押しされる */}
+      <SubmitButton variant="secondary" fullWidth={false}>
         {isActive ? "無効にする" : "有効に戻す"}
-      </button>
+      </SubmitButton>
     </form>
   )
 }
@@ -275,28 +291,14 @@ export default async function CurriculumPage({
   // コマ数が可変になったぶん、合計が10時間から外れたまま気づかない状態を作りたくない（5.7）
   const hoursMatched = totalHours === COURSE_TOTAL_HOURS
 
-  const dayOf = new Map(dayRows.map((row) => [row.courseSessionId, row.dayNumber]))
-  const days = pattern
-    ? Array.from({ length: pattern.days }, (_, index) => index + 1).map((day) => {
-        const entries = sessions.filter((session) => dayOf.get(session.id) === day)
-        return {
-          day,
-          entries,
-          hours: entries.reduce((sum, session) => sum + Number(session.durationHours), 0),
-        }
-      })
-    : []
-  // どの日にも入っていないコマ。追加した直後や、割当を作り損ねたときに出る
-  const unassigned = pattern ? sessions.filter((session) => !dayOf.has(session.id)) : []
+  // 日の中の並びは開催パターン側の表示順で決まる。コース側のコマ順とは別に持つ
+  const dayOf = new Map(dayRows.map((row) => [row.courseSessionId, row]))
 
   const categoryOptions = categories.map((row) => ({ value: row.code, label: row.name }))
 
-  // コース追加の入力の手掛かり。いま開いているコースの記号を初期値にする
-  const symbols = sessions.map((row) => row.sessionSymbol)
-
-  /** 講義コマ1件のカード。日ごとの並びと「未割当」で同じものを使う */
+  /** 講義コマ1件のカードの中身。外枠と並べ替えは日程の板が持つ */
   const sessionCard = (session: (typeof sessions)[number]) => (
-    <li key={session.id} className="flex flex-col gap-2 rounded-md border border-slate-200 p-4">
+    <>
       <div className="flex items-start justify-between gap-2">
         <span className="inline-flex items-center gap-2">
           <span className="rounded bg-slate-900 px-2 py-0.5 text-xs font-medium text-white">
@@ -307,14 +309,20 @@ export default async function CurriculumPage({
         <FormDialog
           triggerVariant="icon"
           triggerLabel={`${session.title} を編集`}
-          title={`${session.title} の編集`}
+          title={`${session.title}の編集`}
         >
           <div className="flex flex-col gap-6">
             <SessionForm
               action={updateSessionAction.bind(null, session.id, view)}
               values={{
                 sessionSymbol: session.sessionSymbol,
-                displayOrder: session.displayOrder,
+                // ドラッグで動くのは開催パターン側の表示順。コース側の値は出さない
+                orderText: (() => {
+                  const assigned = dayOf.get(session.id)
+                  return assigned
+                    ? `${pattern?.name ?? ""}　${assigned.dayNumber} 日目の ${assigned.displayOrder} 番目`
+                    : "未割当"
+                })(),
                 durationHours: session.durationHours,
                 title: session.title,
                 description: session.description,
@@ -336,12 +344,24 @@ export default async function CurriculumPage({
         </FormDialog>
       </div>
 
-      <h3 className="text-sm font-bold text-slate-900">{session.title}</h3>
+      <h4 className="text-sm font-bold text-slate-900">{session.title}</h4>
       {session.description ? (
         <p className="text-sm leading-relaxed text-slate-600">{session.description}</p>
       ) : null}
-    </li>
+    </>
   )
+
+  const boardItems: BoardItem[] = sessions
+    .map((session) => ({
+      id: session.id,
+      day: dayOf.get(session.id)?.dayNumber ?? null,
+      // 割当が無いコマはコース側の順で並べる
+      order: dayOf.get(session.id)?.displayOrder ?? session.displayOrder,
+      sessionSymbol: session.sessionSymbol,
+      durationHours: Number(session.durationHours),
+      card: sessionCard(session),
+    }))
+    .sort((a, b) => a.order - b.order)
 
   return (
     <div className="flex flex-col gap-5">
@@ -360,9 +380,13 @@ export default async function CurriculumPage({
         </p>
       ) : null}
 
-      <div className="rounded-lg border border-slate-200 bg-white">
+      <section
+        aria-label="表示するカリキュラムの選択"
+        className="rounded-lg border border-slate-200 bg-white"
+      >
         {/* 研修プログラム */}
         <PillRow
+          id="pick-program"
           label="研修プログラム"
           emptyText="研修プログラムがありません。右の「追加」から登録してください。"
           items={programs.map((row) => ({
@@ -379,7 +403,7 @@ export default async function CurriculumPage({
               <FormDialog
                 triggerVariant="icon"
                 triggerLabel={`${program.name} を編集`}
-                title={`${program.name} の編集`}
+                title={`${program.name}の編集`}
               >
                 <div className="flex flex-col gap-6">
                   <ProgramForm
@@ -429,6 +453,7 @@ export default async function CurriculumPage({
 
         {/* 職種カテゴリ */}
         <PillRow
+          id="pick-category"
           label="職種カテゴリ"
           emptyText="職種カテゴリがありません。右の「追加」から登録してください。"
           items={categories.map((row) => ({
@@ -443,7 +468,7 @@ export default async function CurriculumPage({
               <FormDialog
                 triggerVariant="icon"
                 triggerLabel={`${category.name} を編集`}
-                title={`${category.name} の編集`}
+                title={`${category.name}の編集`}
               >
                 <div className="flex flex-col gap-6">
                   <CategoryForm
@@ -497,6 +522,7 @@ export default async function CurriculumPage({
 
         {/* コース */}
         <PillRow
+          id="pick-course"
           label="コース"
           emptyText="この組み合わせのコースはありません。"
           items={courseRows.map((row) => ({
@@ -512,7 +538,7 @@ export default async function CurriculumPage({
               <FormDialog
                 triggerVariant="icon"
                 triggerLabel={`${course.jobName} を編集`}
-                title={`${course.jobName} の編集`}
+                title={`${course.jobName}の編集`}
               >
                 <div className="flex flex-col gap-6">
                   <CourseForm
@@ -563,7 +589,6 @@ export default async function CurriculumPage({
                   action={createCourseAction.bind(null, view)}
                   categories={categoryOptions}
                   program={{ code: program.code, name: program.name }}
-                  symbols={symbols}
                   submitLabel="追加する"
                 />
               </FormDialog>
@@ -573,6 +598,7 @@ export default async function CurriculumPage({
 
         {/* 開催パターン */}
         <PillRow
+          id="pick-pattern"
           label="開催パターン"
           emptyText="開催パターンがありません。右の「追加」から登録してください。"
           items={patterns.map((row) => ({
@@ -588,7 +614,7 @@ export default async function CurriculumPage({
               <FormDialog
                 triggerVariant="icon"
                 triggerLabel={`${pattern.name} を編集`}
-                title={`${pattern.name} の編集`}
+                title={`${pattern.name}の編集`}
               >
                 <div className="flex flex-col gap-6">
                   <PatternForm
@@ -602,29 +628,6 @@ export default async function CurriculumPage({
                     }}
                     submitLabel="保存する"
                   />
-                  <Divider>
-                    <div className="flex flex-col gap-3">
-                      <h3 className="text-sm font-bold text-slate-900">日別コマ割当</h3>
-                      <p className="text-sm text-slate-600">
-                        いま開いているコース「{course?.jobName ?? "—"}」の日程です。
-                        コースごとに決めるので、他のコースの日程は変わりません。
-                      </p>
-                      <PatternDaysForm
-                        action={updatePatternDaysAction.bind(null, pattern.code, view)}
-                        days={pattern.days}
-                        rows={dayRows.map((row) => {
-                          const session = sessions.find((item) => item.id === row.courseSessionId)
-                          return {
-                            id: row.courseSessionId,
-                            sessionSymbol: session?.sessionSymbol ?? "—",
-                            dayNumber: row.dayNumber,
-                            title: session?.title ?? "",
-                          }
-                        })}
-                        submitLabel="割当を保存する"
-                      />
-                    </div>
-                  </Divider>
                   <Divider>
                     <ActiveToggle
                       kind="開催パターン"
@@ -659,7 +662,7 @@ export default async function CurriculumPage({
             </FormDialog>
           }
         />
-      </div>
+      </section>
 
       {course && program && category ? (
         <section className="rounded-lg border border-slate-200 bg-white p-6">
@@ -670,10 +673,7 @@ export default async function CurriculumPage({
           </p>
           {hoursMatched ? null : (
             // 1コマずつの編集では合計が外れたまま保存できる。気づける場所をここに置く
-            <p
-              role="alert"
-              className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
-            >
+            <p className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               所要時間の合計が {hours(totalHours)} です。1コースの合計は{" "}
               {COURSE_TOTAL_HOURS} 時間にそろえてください。
             </p>
@@ -688,7 +688,7 @@ export default async function CurriculumPage({
             <FormDialog
               triggerVariant="secondary"
               triggerLabel="講義コマを追加"
-              title={`${course.jobName} への講義コマの追加`}
+              title={`${course.jobName}への講義コマの追加`}
             >
               <SessionForm
                 action={createSessionAction.bind(null, course.id, view)}
@@ -703,46 +703,55 @@ export default async function CurriculumPage({
         </p>
       )}
 
-      {course && pattern
-        ? days.map(({ day, entries, hours: dayHours }) => (
-            <section
-              key={day}
-              className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-6"
+      {course && pattern ? (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* 補足は見出しの外に出す。中に入れると読み上げの見出し名が
+                「2日間コースの日程受講日数 2 日 ／ …」と1つの長い名前になる */}
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h2 className="text-base font-bold text-slate-900">{pattern.name}の日程</h2>
+              <p className="text-sm text-slate-500">
+                受講日数 {pattern.days} 日 ／ 時間内訳 {pattern.timeBreakdown}
+              </p>
+              {/* ドラッグはマウスだけの手段。同じことができる導線が隣にあることを伝える */}
+              <p className="basis-full text-sm text-slate-500">
+                カードをドラッグすると、別の日へ移したり日の中の順を入れ替えたりできます。
+                「日程を変更」からは一覧で日を決められます。
+              </p>
+            </div>
+            {/* 開催パターンの編集ではなく日程の側に置く。
+                「このコースをどう割り振るか」は、マスタの項目を直す操作とは別のこと */}
+            <FormDialog
+              triggerVariant="secondary"
+              triggerLabel="日程を変更"
+              triggerDescription={`${course.jobName}／${pattern.name}`}
+              title={`${course.jobName}：${pattern.name}の日程`}
             >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-base font-bold text-slate-900">{day} 日目</h2>
-                <p className="text-sm text-slate-500">
-                  {entries.length} コマ ／ {hours(dayHours)}
+              <div className="flex flex-col gap-3">
+                <p className="text-sm text-slate-600">
+                  このコースの日程です。コースごとに決めるので、他のコースの日程は変わりません。
                 </p>
+                <PatternDaysForm
+                  action={updatePatternDaysAction.bind(null, pattern.code, view)}
+                  days={pattern.days}
+                  rows={sessions.map((session) => ({
+                    id: session.id,
+                    sessionSymbol: session.sessionSymbol,
+                    dayNumber: dayOf.get(session.id)?.dayNumber ?? 1,
+                    title: session.title,
+                  }))}
+                  submitLabel="日程を保存する"
+                />
               </div>
-
-              {entries.length === 0 ? (
-                <p className="text-sm text-slate-500">
-                  この日に割り当てられた講義コマがありません。
-                </p>
-              ) : (
-                <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {entries.map(sessionCard)}
-                </ul>
-              )}
-            </section>
-          ))
-        : null}
-
-      {unassigned.length > 0 ? (
-        <section className="flex flex-col gap-3 rounded-lg border border-amber-300 bg-white p-6">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-base font-bold text-amber-900">未割当</h2>
-            <p className="text-sm text-amber-900">{unassigned.length} コマ</p>
+            </FormDialog>
           </div>
-          <p className="text-sm text-slate-600">
-            この開催パターンで、どの日にも入っていない講義コマです。開催パターンの
-            「日別コマ割当」から日を決めてください。
-          </p>
-          <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {unassigned.map(sessionCard)}
-          </ul>
-        </section>
+
+          <CurriculumDayBoard
+            dayCount={pattern.days}
+            items={boardItems}
+            onArrange={arrangeDayAction.bind(null, pattern.code)}
+          />
+        </>
       ) : null}
     </div>
   )

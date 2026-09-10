@@ -91,8 +91,11 @@ export const sessionSchema = z.object({
   description: optionalText("説明", 1000),
 })
 
-/** コマ記号は開催パターンの日別割当と対応する。登録後は変更しない */
-export const sessionEditSchema = sessionSchema.omit({ sessionSymbol: true })
+/**
+ * コマ記号は開催パターンの日別割当と対応する。登録後は変更しない。
+ * 表示順は日程のカードをドラッグして決めるので、フォームからは受け取らない。
+ */
+export const sessionEditSchema = sessionSchema.omit({ sessionSymbol: true, displayOrder: true })
 
 export const patternSchema = z.object({
   code: code("開催パターンコード"),
