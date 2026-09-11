@@ -55,6 +55,7 @@ module "compute" {
 
   image         = "${data.aws_ecr_repository.app.repository_url}:${var.image_tag}"
   migrate_image = "${data.aws_ecr_repository.app.repository_url}:${var.migrate_image_tag}"
+  jobs_image    = "${data.aws_ecr_repository.app.repository_url}:${var.jobs_image_tag}"
   desired_count = var.desired_count
 
   certificate_arn = var.certificate_arn
@@ -108,6 +109,17 @@ module "scheduler" {
 
   db_instance_identifier = module.database.instance_identifier
   db_instance_arn        = module.database.instance_arn
+
+  # 契約書の締結を検知するポーリング（05_外部連携仕様.md 3.9）。
+  # freeeサイン連携を有効にするまでスケジュールを作らない。
+  poll_contracts_enabled  = var.freee_sign_enabled
+  poll_contracts_task_arn = module.compute.poll_contracts_task_arn
+  private_subnet_ids      = module.network.private_subnet_ids
+  security_group_ids      = [module.compute.service_security_group_id]
+  task_role_arns = [
+    module.compute.execution_role_arn,
+    module.compute.task_role_arn,
+  ]
 }
 
 # ドメイン登録後に有効化する。証明書の検証レコードも同じゾーンに置く。

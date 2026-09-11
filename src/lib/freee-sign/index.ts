@@ -342,6 +342,30 @@ export const sendContract = async ({ title, email }: { title: string; email: str
 // 文書の状態
 // ---------------------------------------------------------------------------
 
+/** 本システムが使う文書の状態。freeeサインの応答から必要な分だけ取り出す */
+export type DocumentState = {
+  status: FreeeSignDocumentStatus
+  /** 締結済みPDFを取得できる状態か（3.10） */
+  timestamped: boolean
+  /** freeeサインが持つ締結日時。未締結なら null */
+  concludedAt: Date | null
+}
+
+const toDocumentState = (body: unknown): DocumentState | null => {
+  if (typeof body !== "object" || body === null) return null
+  const raw = body as { status?: unknown; timestamped?: unknown; concluded_at?: unknown }
+  if (!isDocumentStatus(raw.status)) return null
+
+  // 日時は文字列で返る。壊れていたら締結日時なしとして扱い、状態の記録は続ける
+  const concludedAt =
+    typeof raw.concluded_at === "string" ? new Date(raw.concluded_at) : null
+  return {
+    status: raw.status,
+    timestamped: raw.timestamped === true,
+    concludedAt: concludedAt && !Number.isNaN(concludedAt.getTime()) ? concludedAt : null,
+  }
+}
+
 /**
  * 文書の状態を取り直す（3.11 手動同期）。
  *
@@ -352,24 +376,59 @@ export const sendContract = async ({ title, email }: { title: string; email: str
  * `timestamped` は締結済みPDFを取得できる状態かを表す（3.10）。
  * PDFの取得はまだ実装していないが、判断材料として一緒に返す。
  */
-export const fetchDocument = async (documentId: number) => {
+export const fetchDocument = async (documentId: number): Promise<DocumentState> => {
   const mode = freeeSignMode()
   if (mode === "unconfigured") {
     throw new FreeeSignError("freeeサイン連携が設定されていません。")
   }
   // モックは本物を呼ばない。締結しない状態を返し続ける
   if (mode === "mock") {
-    return { status: "in_progress" as FreeeSignDocumentStatus, timestamped: false }
+    return { status: "in_progress", timestamped: false, concludedAt: null }
   }
 
-  const body = (await get(`/v1/documents/${documentId}`)) as {
-    status?: string
-    timestamped?: boolean
+  const state = toDocumentState(await get(`/v1/documents/${documentId}`))
+  if (!state) throw new FreeeSignError("freeeサインが想定しない状態を返しました。")
+  return state
+}
+
+/** 1リクエストで問い合わせる上限（3.9）。超える分は分割する */
+const DOCUMENTS_PER_REQUEST = 100
+
+/**
+ * 複数の文書の状態をまとめて取得する（3.9）。
+ *
+ * ポーリングは未締結の契約書をまとめて聞く。1件ずつ問い合わせると
+ * 件数ぶんの往復が生じ、レート制限にも近づく。
+ * **応答はラップされていない配列**で、返らなかったIDは結果に含まれない
+ * （freeeサイン側で削除された文書など）。
+ */
+export const fetchDocuments = async (documentIds: number[]) => {
+  const result = new Map<number, DocumentState>()
+  const mode = freeeSignMode()
+  if (mode === "unconfigured") {
+    throw new FreeeSignError("freeeサイン連携が設定されていません。")
   }
-  if (!isDocumentStatus(body.status)) {
-    throw new FreeeSignError("freeeサインが想定しない状態を返しました。")
+  if (mode === "mock") {
+    for (const id of documentIds) {
+      result.set(id, { status: "in_progress", timestamped: false, concludedAt: null })
+    }
+    return result
   }
-  return { status: body.status, timestamped: body.timestamped === true }
+
+  for (let from = 0; from < documentIds.length; from += DOCUMENTS_PER_REQUEST) {
+    const chunk = documentIds.slice(from, from + DOCUMENTS_PER_REQUEST)
+    const query = new URLSearchParams()
+    for (const id of chunk) query.append("ids[]", String(id))
+    query.set("per_page", String(DOCUMENTS_PER_REQUEST))
+
+    const body = await get(`/v1/documents?${query}`)
+    for (const item of Array.isArray(body) ? body : []) {
+      const state = toDocumentState(item)
+      const id = (item as { id?: unknown }).id
+      if (state && typeof id === "number") result.set(id, state)
+    }
+  }
+  return result
 }
 
 /**
@@ -404,3 +463,4 @@ export const fetchDocumentPdf = async (documentId: number): Promise<Uint8Array> 
   }
   return new Uint8Array(await response.arrayBuffer())
 }
+

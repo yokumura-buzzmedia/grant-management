@@ -87,10 +87,21 @@ docker push "${REPO}:migrate-${TAG}"
 docker push "${REPO}:migrate-latest"
 ```
 
+**`src/` を変えたときは定期ジョブのイメージも push する。**
+契約書の締結ポーリング（`src/jobs/poll-contracts.ts`）がこのイメージを使い、
+アプリと同じコードを `tsx` で実行する。押し忘れるとジョブだけ古いまま動き続ける。
+
+```bash
+docker build --platform linux/arm64 --target jobs -t "${REPO}:jobs-${TAG}" .
+docker tag "${REPO}:jobs-${TAG}" "${REPO}:jobs-latest"
+docker push "${REPO}:jobs-${TAG}"
+docker push "${REPO}:jobs-latest"
+```
+
 - **`--platform linux/arm64` を省かない。** タスクは Graviton。省くと `exec format error`
 - **`${REPO}:latest` と波かっこで囲む。** zsh は `$REPO:l` を小文字化のモディファイアとして
   解釈し、`grant-managementatest` へ push しようとして失敗する
-- **タスク定義は `latest` / `migrate-latest` を見る。** コミットのタグだけ push しても反映されない。
+- **タスク定義は `latest` / `migrate-latest` / `jobs-latest` を見る。** コミットのタグだけ push しても反映されない。
   ハッシュ付きのタグは切り戻し用に一緒に push する
 
 ### 3. マイグレーションを先に適用する
@@ -164,6 +175,28 @@ curl -s -o /dev/null -w "%{http_code}\n" https://staging.grant-management.buzzme
 ポートフォワードしたうえで `DATABASE_URL` を明示する。
 
 これらは勝手に流さない。**必要そうなら、状況を伝えて指示を仰ぐ。**
+
+## 定期ジョブ
+
+契約書の締結を10分間隔で検知する（`05_外部連携仕様.md` 3.9）。
+EventBridge Scheduler が ECS の単発タスクを起動する。
+**業務時間内（平日9〜19時台）だけ回る。** 時間外は RDS が停止しているため。
+
+スケジュールは `freee_sign_enabled = true` のときだけ作られる。
+
+```bash
+aws scheduler get-schedule --name grant-management-staging-poll-contracts \
+  --query '{state:State,cron:ScheduleExpression}'
+aws logs tail /ecs/grant-management-staging --log-stream-name-prefix poll --since 30m
+```
+
+手で1回流すこともできる。
+
+```bash
+aws ecs run-task --cluster grant-management-staging \
+  --task-definition grant-management-staging-poll-contracts --launch-type FARGATE \
+  --network-configuration 'awsvpcConfiguration={subnets=[subnet-0ae8b567cc98d4567,subnet-01bc49fb7015ea514],securityGroups=[sg-04a267cde159da5ef],assignPublicIp=DISABLED}'
+```
 
 ## 切り戻し
 

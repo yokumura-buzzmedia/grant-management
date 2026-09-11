@@ -1,6 +1,5 @@
 "use server"
 
-import { randomUUID } from "node:crypto"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { eq } from "drizzle-orm"
@@ -9,9 +8,8 @@ import { companies, contracts, projects } from "@/db/schema"
 import type { FormState } from "@/lib/auth/form-state"
 import { requireRoles } from "@/lib/auth/guards"
 import { now } from "@/lib/datetime"
-import { fetchDocument, fetchDocumentPdf, FreeeSignError, sendContract } from "@/lib/freee-sign"
-import { isDocumentStatus } from "@/lib/freee-sign/document-status"
-import { putObject } from "@/lib/storage"
+import { fetchDocument, FreeeSignError, sendContract } from "@/lib/freee-sign"
+import { applyDocumentState } from "./contract-sync"
 import { nextStatus } from "./status"
 
 /** 契約書を送れるのは事務員とシステム管理者だけ（06_画面設計.md 権限マトリクス C-04）。 */
@@ -144,87 +142,40 @@ export async function sendContractAction(
 export async function syncContractAction(projectId: number): Promise<FormState> {
   const actor = await requireRoles(EDITORS)
 
-  const [project] = await db
-    .select({ id: projects.id, status: projects.status })
-    .from(projects)
-    .where(eq(projects.id, projectId))
-    .limit(1)
-  if (!project) redirect("/projects")
-
-  const [existing] = await db
+  const [target] = await db
     .select({
-      id: contracts.id,
+      contractId: contracts.id,
+      projectId: projects.id,
+      projectStatus: projects.status,
       freeeSignDocumentId: contracts.freeeSignDocumentId,
       concludedAt: contracts.concludedAt,
       pdfFileKey: contracts.pdfFileKey,
     })
     .from(contracts)
+    .innerJoin(projects, eq(projects.id, contracts.projectId))
     .where(eq(contracts.projectId, projectId))
     .limit(1)
-  if (!existing?.freeeSignDocumentId) {
+  if (!target?.freeeSignDocumentId) {
     return { errors: ["まだ契約書を送付していません。"] }
   }
 
   let document: Awaited<ReturnType<typeof fetchDocument>>
   try {
-    document = await fetchDocument(existing.freeeSignDocumentId)
+    document = await fetchDocument(target.freeeSignDocumentId)
   } catch (error) {
     if (error instanceof FreeeSignError) return { errors: [error.message] }
     throw error
   }
-  if (!isDocumentStatus(document.status)) {
-    return { errors: ["freeeサインが想定しない状態を返しました。"] }
-  }
 
-  /*
-   * 締結済みPDFだけを手元に残す（3.10）。未署名は都度取りに行くので保存しない。
-   * 保存するのは `timestamped` が true のものだけ。false の間は PDF が未完成で、
-   * 取りに行ってもエラーになる。pdf_file_key が NULL のままなら次の取得でやり直せる。
-   *
-   * 取得に失敗しても状態の記録は残したいので、ここでは例外を外へ出さない。
-   */
-  let pdfFileKey = existing.pdfFileKey
-  if (!pdfFileKey && document.status === "concluded" && document.timestamped) {
-    try {
-      const pdf = await fetchDocumentPdf(existing.freeeSignDocumentId)
-      const key = `contracts/${projectId}/${randomUUID()}.pdf`
-      await putObject(key, pdf, "application/pdf")
-      pdfFileKey = key
-    } catch (error) {
-      if (!(error instanceof FreeeSignError)) throw error
-    }
-  }
-
-  await db
-    .update(contracts)
-    .set({
-      freeeSignStatus: document.status,
-      pdfFileKey,
-      pdfFetchedAt: pdfFileKey && !existing.pdfFileKey ? now() : undefined,
-      /*
-       * 締結時刻は freeeサインが返さないので、締結を最初に確認できた時点を残す。
-       * 一度入ったら上書きしない。取り直すたびに現在時刻を入れると、
-       * いつ締結したのかが分からなくなる。
-       */
-      concludedAt:
-        existing.concludedAt ?? (document.status === "concluded" ? now() : null),
-      updatedAt: now(),
-    })
-    .where(eq(contracts.id, existing.id))
-
-  // 締結を確認できたときだけ進める。順序を飛ばさないため、現在が4のときに限る（5.1）
-  const advanced =
-    document.status === "concluded" && nextStatus(project.status) === "contract_concluded"
-  if (advanced) {
-    await db
-      .update(projects)
-      .set({ status: "contract_concluded", updatedAt: now(), updatedBy: actor.id })
-      .where(eq(projects.id, project.id))
-  }
+  const outcome = await applyDocumentState(
+    { ...target, freeeSignDocumentId: target.freeeSignDocumentId },
+    document,
+    actor.id,
+  )
 
   revalidatePath(`/projects/${projectId}`)
   revalidatePath("/projects")
   redirect(
-    `/projects/${projectId}?tab=contract&notice=${advanced ? "contractSyncedAdvanced" : "contractSynced"}`,
+    `/projects/${projectId}?tab=contract&notice=${outcome.advanced ? "contractSyncedAdvanced" : "contractSynced"}`,
   )
 }

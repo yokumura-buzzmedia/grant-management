@@ -33,3 +33,15 @@ output "service_arn" {
 output "migrate_task_family" {
   value = aws_ecs_task_definition.migrate.family
 }
+
+output "poll_contracts_task_arn" {
+  value = aws_ecs_task_definition.poll_contracts.arn
+}
+
+output "poll_contracts_task_family" {
+  value = aws_ecs_task_definition.poll_contracts.family
+}
+
+output "execution_role_arn" {
+  value = aws_iam_role.execution.arn
+}

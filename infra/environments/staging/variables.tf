@@ -49,6 +49,12 @@ variable "migrate_image_tag" {
   default     = "migrate-latest"
 }
 
+variable "jobs_image_tag" {
+  description = "定期ジョブ用イメージのタグ。アプリとは別に push する"
+  type        = string
+  default     = "jobs-latest"
+}
+
 variable "zone_id" {
   description = "shared スタックが作る委譲済みホストゾーン。作成まで空"
   type        = string

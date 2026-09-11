@@ -33,6 +33,17 @@ COPY drizzle ./drizzle
 COPY scripts/migrate.mjs ./scripts/migrate.mjs
 CMD ["node", "scripts/migrate.mjs"]
 
+# 定期ジョブ用。EventBridge Scheduler から ECS の単発タスクとして実行する
+# （05_外部連携仕様.md 3.9）。アプリの実装をそのまま使うため、standalone ではなく
+# src をそのまま持ち込み、tsx で走らせる。ロジックを写すとバッチと画面で挙動が割れる。
+FROM node:22-slim AS jobs
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json tsconfig.json ./
+COPY src ./src
+CMD ["node", "--import", "tsx", "src/jobs/poll-contracts.ts"]
+
 FROM node:22-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production

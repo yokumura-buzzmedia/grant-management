@@ -77,6 +77,11 @@ variable "environment" {
   default     = {}
 }
 
+variable "jobs_image" {
+  description = "定期ジョブ用のイメージ。アプリとは別に push する"
+  type        = string
+}
+
 variable "migrate_image" {
   description = "マイグレーション用のイメージ。ECS の単発タスクで使う"
   type        = string

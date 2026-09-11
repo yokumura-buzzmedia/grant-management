@@ -219,7 +219,8 @@ export default async function ProjectPage({
                     </dd>
                     <dt className="text-sm font-medium text-slate-500">最終更新</dt>
                     <dd className="text-sm text-slate-900">
-                      {formatJst(project.updatedAt)} ／ {project.updatedByName ?? "—"}
+                      {/* 自動処理が更新した行は利用者が紐づかない。「システム」と出す（5.17） */}
+            {formatJst(project.updatedAt)} ／ {project.updatedByName ?? "システム"}
                     </dd>
                   </dl>
                   {canManage ? (
